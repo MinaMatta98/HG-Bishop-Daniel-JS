@@ -1,0 +1,133 @@
+body.scrollflip-relative [tr-scrollflip-sticky=true] {
+	position: relative;
+}
+
+.disabled {
+	pointer-events: none;
+	cursor: not-allowed;
+	text-decoration: none;
+}
+
+.morphed {
+	filter: invert(41%) sepia(97%) saturate(1483%) hue-rotate(184deg) brightness(100%) contrast(101%);
+}
+
+textarea,
+input[type="text"],
+input[type="submit"],
+input[type="password"],
+[type="email"] {
+	-webkit-appearance: none;
+}
+
+.w-webflow-badge {
+	display: none !important;
+
+
+}
+
+/* 'star-rating-brix' component */
+.starRate {
+	position: relative;
+	margin: 20px;
+	overflow: hidden;
+	zoom: 1;
+}
+
+.starRate ul {
+	width: 160px;
+	margin: 0;
+	padding: 0;
+}
+
+.starRate li {
+	display: inline;
+	list-style: none;
+}
+
+.starRate a,
+.starRate b {
+	background: url('https://assets-global.website-files.com/60ecc32f6b6419582ccbdd96/60f0893021a8c36841e9df16_star.svg') left top repeat-x;
+}
+
+.starRate a {
+	float: righminas-exceptional-site-d5390et;
+	margin: 0 80px 0 -144px;
+	width: 80px;
+	height: 34px;
+	background-position: left 16px;
+	color: #000;
+	text-decoration: none;
+}
+
+.starRate a:hover {
+	background-position: left -32px;
+}
+
+.starRate b {
+	position: absolute;
+	z-index: -1;
+	width: 80px;
+	height: 34px;
+	background-position: left -34px;
+}
+
+.starRate div b {
+	left: 0px;
+	bottom: 0px;
+	background-position: left top;
+}
+
+.starRate a span {
+	position: absolute;
+	left: -300px;
+}
+
+.starRate a:hover span {
+	left: 90px;
+	width: 100%;
+}
+
+.rating-brix {
+	overflow: hidden;
+	display: flex;
+	flex-direction: row-reverse;
+}
+
+.rating-input-brix {
+	float: right;
+	width: 42px;
+	height: 40px;
+	padding: 0;
+	margin-left: -32px;
+	opacity: 0;
+}
+
+.rating-star-brix {
+	position: relative;
+	float: right;
+	display: block;
+	width: 42px;
+	height: 40px;
+	background: url('https://assets-global.website-files.com/60ecc32f6b6419582ccbdd96/60f0893021a8c36841e9df16_star.svg') 0 -40px;
+}
+
+.rating-brix:hover .rating-star-brix:hover,
+.rating-brix:hover .rating-star-brix:hover~.rating-star-brix,
+.rating-input-brix:checked~.rating-star-brix {
+	background-position: 0 0;
+}
+
+.rating-star-brix,
+.rating-brix:hover .rating-star-brix {
+	position: relative;
+	float: right;
+	display: block;
+	width: 42px;
+	height: 40px;
+	background: url('https://assets-global.website-files.com/60ecc32f6b6419582ccbdd96/60f0893021a8c36841e9df16_star.svg') 0 -40px;
+}
+
+.sticky-image-container {
+	top: calc(50% - 20vh);
+}
