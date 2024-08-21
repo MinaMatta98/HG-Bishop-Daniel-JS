@@ -57,6 +57,7 @@ class HomePageReferences {
   public static scheduleWrapper: string = '.schedule-wrapper';
   // public static slideContainer: string = '.slide-container';
   public static slideBlockClass: string = '.slide-block';
+  public static globeContainerClass: string = '.globe-container';
 }
 
 class MinistryPageReferences {
