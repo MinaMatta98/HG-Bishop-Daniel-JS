@@ -19,7 +19,6 @@ export const barbaInit = () => {
             startTime = new Date().getTime();
             await Utils.InitPage(startTime);
             Animations.initGlobe();
-            Animations.initScrollSection();
           }
           Utils.manualLoadRedirector(isFirstLoad);
           Utils.initStats();
