@@ -64,6 +64,7 @@ export const barbaInit = () => {
           if (!isFirstLoad) await Utils.swiperHandler(startTime);
 
           $(() => {
+            Animations.gsapGlobeContainerExpand();
             Animations.logoAnimation();
             Animations.initNavLinks();
             Animations.animateScrollButton();
