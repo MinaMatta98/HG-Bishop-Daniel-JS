@@ -95,44 +95,44 @@ export class Animations {
       removeClass: false,
     };
 
-    const newsTransition: LogoTransition = {
-      scrollSection: sections.newsSection,
-      targetContainer: containers.newslogoContainer,
-      removeClass: false,
-    };
-
-    const sermonsTransition: LogoTransition = {
-      scrollSection: sections.sermonsSection,
-      targetContainer: containers.sermonslogoContainer,
-      removeClass: false,
-    };
-
-    const feedbackTransition: LogoTransition = {
-      scrollSection: sections.feedbackSection,
-      targetContainer: containers.feedbacklogoContainer,
-      removeClass: false,
-    };
-
-    const churchesTransition: LogoTransition = {
-      scrollSection: sections.churchesSection,
-      targetContainer: containers.churcheslogoContainer,
-      removeClass: false,
-    };
-
-    const timelineTransition: LogoTransition = {
-      scrollSection: sections.timelineSection,
-      targetContainer: containers.timelinelogoContainer,
-      removeClass: false,
-    };
+    //const newsTransition: LogoTransition = {
+    //  scrollSection: sections.newsSection,
+    //  targetContainer: containers.newslogoContainer,
+    //  removeClass: false,
+    //};
+    //
+    //const sermonsTransition: LogoTransition = {
+    //  scrollSection: sections.sermonsSection,
+    //  targetContainer: containers.sermonslogoContainer,
+    //  removeClass: false,
+    //};
+    //
+    //const feedbackTransition: LogoTransition = {
+    //  scrollSection: sections.feedbackSection,
+    //  targetContainer: containers.feedbacklogoContainer,
+    //  removeClass: false,
+    //};
+    //
+    //const churchesTransition: LogoTransition = {
+    //  scrollSection: sections.churchesSection,
+    //  targetContainer: containers.churcheslogoContainer,
+    //  removeClass: false,
+    //};
+    //
+    //const timelineTransition: LogoTransition = {
+    //  scrollSection: sections.timelineSection,
+    //  targetContainer: containers.timelinelogoContainer,
+    //  removeClass: false,
+    //};
 
     [
       videoTransition,
       bioTransition,
-      newsTransition,
-      sermonsTransition,
-      feedbackTransition,
-      churchesTransition,
-      timelineTransition,
+      //newsTransition,
+      //sermonsTransition,
+      //feedbackTransition,
+      //churchesTransition,
+      //timelineTransition,
     ].forEach(({ scrollSection, targetContainer, removeClass }) => {
       ScrollTrigger.create({
         trigger: scrollSection,
