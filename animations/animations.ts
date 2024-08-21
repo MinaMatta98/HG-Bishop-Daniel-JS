@@ -230,7 +230,7 @@ export class Animations {
     if (!inView) this.displayShow(References.transitionClasses.transitionClass, false);
   };
 
-  public static pageLoaderHide = async (): Promise<void> => {
+  public static VideoAnimation = async (): Promise<void> => {
     gsap.set(References.logoClasses.topLogoClass, { translateY: '-15em' });
     gsap.set(References.logoClasses.centerLogoClass, { opacity: 0, translateY: 150 });
     gsap.set(References.homePageClasses.heroHeadingClass, { opacity: 0, translateY: 150 });
