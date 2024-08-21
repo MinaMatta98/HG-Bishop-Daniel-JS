@@ -65,12 +65,12 @@ export class Animations {
 
     const containers = {
       logoContainer: $('.logo-embed'),
-      newslogoContainer: $('.news-logo-embed'),
-      sermonslogoContainer: $('.sermons-logo-embed'),
-      feedbacklogoContainer: $('.feedback-logo-embed'),
+      //newslogoContainer: $('.news-logo-embed'),
+      //sermonslogoContainer: $('.sermons-logo-embed'),
+      //feedbacklogoContainer: $('.feedback-logo-embed'),
       logoVideoContainer: $('.logo'),
-      churcheslogoContainer: $('.churches-logo-embed'),
-      timelinelogoContainer: $('.timeline-logo-embed'),
+      //churcheslogoContainer: $('.churches-logo-embed'),
+      //timelinelogoContainer: $('.timeline-logo-embed'),
     };
 
     const moveLogo = (removeClass: boolean, targetContainer: JQuery<HTMLElement>) => {
