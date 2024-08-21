@@ -43,6 +43,19 @@ export const barbaInit = () => {
           isFirstLoad = false;
         },
       },
+      {
+        sync: true,
+        name: 'specific',
+        from: { namespace: ['bio'] },
+        to: { namespace: 'home' },
+        async afterEnter(data) {
+          Animations.footerAnimateWhite();
+          await Animations.underlineNav(data.next.namespace, true);
+        },
+        async leave(data) {
+          Animations.underlineNav(data.current.namespace, false);
+        },
+      },
     ],
     views: [
       {
