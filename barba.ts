@@ -80,6 +80,9 @@ export const barbaInit = () => {
         async afterEnter() {
           Animations.animateBioLogo();
           Animations.cursorWhite();
+          Animations.animateBioHeading();
+          Animations.animateBioTimeline();
+          Animations.footerAnimateBlue();
         },
       },
       {
