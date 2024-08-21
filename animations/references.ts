@@ -71,8 +71,17 @@ class NavBarReferences {
   public static scrollButton: string = '.outer-parent';
 }
 
+class FooterReferences {
+	public static footerSectionClass: string = '.footer-section';
+	public static footerCtaClass: string = '.footer-cta';
+	public static footerBottomClass: string = '.footer-bottom';
+	public static footerSocialClass: string = '.social-media-grid-top';
+}
+
 export class References {
   public static navBarClasses = NavBarReferences;
+  public static footerClasses = FooterReferences;
+  public static bioClasses = BioReferences;
   public static cursorClasses = CursorReferences;
   public static swiperClasses = SwiperReferences;
   public static logoClasses = LogoReferences;
