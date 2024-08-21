@@ -247,8 +247,43 @@ export class Animations {
   };
 
   public static gsapSliderInit = () => {
-    this.carousel.initCarousel();
-    this.carousel.initializeWrappers();
-    this.carousel.initializeButtons();
+    this._carousel.initCarousel();
+    this._carousel.initializeWrappers();
+    this._carousel.initializeButtons();
+  };
+
+  public static gsapGlobeContainerExpand = () => {
+    const container = $(References.homePageClasses.globeContainerClass);
+
+    gsap.from(container, {
+      scrollTrigger: {
+        trigger: container,
+        start: 'top 70%',
+        end: 'top top',
+        scrub: 1,
+      },
+      maxWidth: 1640,
+      borderRadius: '3rem',
+    });
+  };
+
+  public static animateBioHeading = () => {
+    this._bioAnimator.animateHeading();
+  };
+
+  public static animateBioTimeline = () => {
+    this._bioAnimator.animateTimeline();
+  };
+
+  public static footerAnimateBlue = () => {
+    this._footerAnimator.animateFooterBlue();
+  };
+
+  public static footerAnimateWhite = () => {
+    this._footerAnimator.animateFooterWhite();
+  };
+
+  public static animateBioLogo = () => {
+    this._bioAnimator.animateBioLogo();
   };
 }
