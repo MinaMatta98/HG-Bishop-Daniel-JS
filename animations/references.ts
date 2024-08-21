@@ -32,6 +32,11 @@ class TransitionReferences {
   public static pageLoadClass: string = '.pageload';
 }
 
+class BioReferences {
+	public static headingClass: string = '.bio-heading';
+	public static timelineClass: string = '.timeline_item';
+}
+
 class HomePageReferences {
   public static videoID: string = '#b965e91e-9ebd-466c-d50e-3a2d768d8b8c-video';
   public static heroHeadingClass: string = '.hero-heading';
