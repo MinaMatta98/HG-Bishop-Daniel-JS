@@ -2,8 +2,10 @@ import type { ISchemaPage } from '@barba/core/dist/core/src/src/defs';
 import { Flip, gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
 
+import { BioAnimations } from './bio-animations';
 import { CarouselAnimations } from './carousel';
 import { CursorAnimations } from './cursor-animations';
+import { FooterAnimations } from './FooterAnimations';
 import { GlobeAnimation } from './globe';
 import { NavBarAnimations } from './navbar-animations';
 import { References } from './references';
@@ -18,7 +20,10 @@ interface LogoTransition {
 export class Animations {
   private static _cursorAnimator = CursorAnimations;
   private static _navBarAnimator: NavBarAnimations = new NavBarAnimations();
-  private static carousel = new CarouselAnimations();
+  private static _carousel = new CarouselAnimations();
+  private static _scrollAnimator = ScrollSection;
+  private static _bioAnimator = BioAnimations;
+  private static _footerAnimator = FooterAnimations;
 
   public static initGlobe = () => {
     const globe = new GlobeAnimation();
@@ -27,7 +32,7 @@ export class Animations {
   };
 
   public static initScrollSection = () => {
-    ScrollSection.initAnimation();
+    this._scrollAnimator.initAnimation();
   };
 
   public static cursorWhite = (): void => {
