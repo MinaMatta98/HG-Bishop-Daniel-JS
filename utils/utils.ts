@@ -78,7 +78,6 @@ export class Utils {
         Animations.displayShow('.cursor', true, 'flex');
         this.scrollFlipInit();
         Animations.initNavLinks();
-        Animations.animateScrollButton();
         await Animations.initHomePage(initTime, isFirstLoad);
         Animations.animateToc();
       }
