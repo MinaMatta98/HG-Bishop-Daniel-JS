@@ -48,6 +48,7 @@ class TransitionReferences {
 class BioReferences {
   public static headingClass: string = '.bio-heading';
   public static timelineClass: string = '.timeline_item';
+  public static bioHeroClass: string = '.timeline-hero-section';
 }
 
 class HomePageReferences {
@@ -71,6 +72,7 @@ class HomePageReferences {
   // public static slideContainer: string = '.slide-container';
   public static slideBlockClass: string = '.slide-block';
   public static globeContainerClass: string = '.globe-container';
+  public static stickyImageContainerClass: string = '.sticky-image-container';
 }
 
 class MinistryPageReferences {
