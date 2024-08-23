@@ -5,6 +5,19 @@ class SwiperReferences {
   public static swiperPrevElClass = '.arrow.is-left';
 }
 
+class TocReferences {
+  public static tocSectionHolderClass: string = 'section-holder';
+  public static individualSectionWrapper: string = 'toc-section-wrapper';
+  public static activeClass: string = 'current';
+  public static sectionDescriptorAttribute: string = 'data-section-descriptor';
+  public static tocSectionIconClass: string = 'current-section-icon';
+  public static tocSectionTextClass: string = 'toc-section-text';
+  public static tocSectionHeadingClass: string = 'toc-section-heading';
+  public static tocContainer: string = '.sections-toc';
+  public static tocToggleButton: string = '.toc-button';
+  public static tocButtonSvg: string = '.code-embed-7';
+}
+
 class CursorReferences {
   public static _pins: string[] = ['.cursor-pin-1', '.cursor-pin-1.pin-2', '.cursor-pin-1.pin-3'];
   public static _whitePinBg: string[] = ['white', 'rgba(255,255,255,0.6)', 'rgba(255,255,255,0.4)'];
@@ -33,8 +46,8 @@ class TransitionReferences {
 }
 
 class BioReferences {
-	public static headingClass: string = '.bio-heading';
-	public static timelineClass: string = '.timeline_item';
+  public static headingClass: string = '.bio-heading';
+  public static timelineClass: string = '.timeline_item';
 }
 
 class HomePageReferences {
@@ -72,14 +85,15 @@ class NavBarReferences {
 }
 
 class FooterReferences {
-	public static footerSectionClass: string = '.footer-section';
-	public static footerCtaClass: string = '.footer-cta';
-	public static footerBottomClass: string = '.footer-bottom';
-	public static footerSocialClass: string = '.social-media-grid-top';
+  public static footerSectionClass: string = '.footer-section';
+  public static footerCtaClass: string = '.footer-cta';
+  public static footerBottomClass: string = '.footer-bottom';
+  public static footerSocialClass: string = '.social-media-grid-top';
 }
 
 export class References {
   public static navBarClasses = NavBarReferences;
+  public static tocClasses = TocReferences;
   public static footerClasses = FooterReferences;
   public static bioClasses = BioReferences;
   public static cursorClasses = CursorReferences;
