@@ -15,10 +15,8 @@ export const barbaInit = () => {
         name: 'default',
         async once(data) {
           if (data.next.namespace === 'home') {
-            Animations.displayShow(References.transitionClasses.pageLoadClass, true, 'flex');
             startTime = new Date().getTime();
-            await Utils.InitPage(startTime);
-            Animations.initGlobe();
+            await Utils.InitWebsite(startTime, isFirstLoad);
           }
           Utils.manualLoadRedirector(isFirstLoad);
           Utils.initStats();
@@ -30,7 +28,7 @@ export const barbaInit = () => {
           Animations.underlineNav(data.current.namespace, false);
         },
         async enter(_data) {
-          Animations.animateToc();
+          await Animations.animateToc();
           Utils.linkHandler();
         },
         async after(data) {
@@ -49,6 +47,7 @@ export const barbaInit = () => {
         from: { namespace: ['bio'] },
         to: { namespace: 'home' },
         async after(data) {
+          await Animations.animateToc();
           Animations.footerAnimateWhite();
           await Animations.underlineNav(data.next.namespace, true);
         },
@@ -61,14 +60,8 @@ export const barbaInit = () => {
       {
         namespace: 'home',
         async afterEnter() {
-          if (!isFirstLoad) {
-            await Utils.swiperHandler(startTime);
-            Animations.initGlobe();
-          }
-
           $(() => {
-            Animations.gsapGlobeContainerExpand();
-            Animations.logoAnimation();
+            Animations.initHomePage(startTime, isFirstLoad);
             Animations.initNavLinks();
             Animations.animateScrollButton();
           });
