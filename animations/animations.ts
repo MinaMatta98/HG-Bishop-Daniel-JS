@@ -106,16 +106,8 @@ export class Animations {
     if (!inView) this.displayShow(References.transitionClasses.transitionClass, false);
   };
 
-  public static animateBioHeading = () => {
-    this._bioAnimator.animateHeading();
-  };
-
-  public static animateBioTimeline = () => {
-    this._bioAnimator.animateTimeline();
-  };
-
-  public static animateBioLogo = () => {
-    this._bioAnimator.animateBioLogo();
+  public static animateBio = async () => {
+    await this._bioAnimator.animateBio();
   };
 
   public static footerAnimateBlue = () => {
@@ -126,7 +118,7 @@ export class Animations {
     this._footerAnimator.animateFooterWhite();
   };
 
-  public static animateToc =async  () => {
-    await this._tocAnimator.tocAnimation();
+  public static animateToc = async () => {
+    this._tocAnimator.tocAnimation();
   };
 }
