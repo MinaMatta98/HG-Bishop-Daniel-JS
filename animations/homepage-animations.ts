@@ -12,6 +12,7 @@ import { Utils } from '$utils/utils';
 
 import { Animations } from './animations';
 import { GlobeAnimation } from './globe';
+import { NavBarAnimations } from './navbar-animations';
 
 /**
  * @module Keep Private. This is simply a definition of the
@@ -224,6 +225,7 @@ export class HomePageAnimations {
     this.swiperAnimation();
     this.initGlobe();
     this.animateScheduleCursor();
+    this._navBarAnimator.scrollButtonInit($(References.homePageClasses.openingHeroClass));
     await this.hidePageLoader(initTime);
     this.VideoAnimation();
   };
