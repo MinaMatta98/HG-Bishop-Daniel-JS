@@ -202,6 +202,16 @@ export class HomePageAnimations {
     this.gsapGlobeContainerExpand();
   };
 
+  private static animateScheduleCursor = () => {
+    $(References.homePageClasses.stickyImageContainerClass).on('mouseenter', () =>
+      Animations.cursorWhite()
+    );
+
+    $(References.homePageClasses.stickyImageContainerClass).on('mouseleave', () =>
+      Animations.cursorWhite()
+    );
+  };
+
   public static disposeGlobe = () => {
     this._globeAnimation.dispose();
   };
@@ -213,6 +223,7 @@ export class HomePageAnimations {
     this.logoAnimation();
     this.swiperAnimation();
     this.initGlobe();
+    this.animateScheduleCursor();
     await this.hidePageLoader(initTime);
     this.VideoAnimation();
   };
