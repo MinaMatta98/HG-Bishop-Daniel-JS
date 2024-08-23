@@ -76,9 +76,9 @@ export const barbaInit = () => {
           Animations.cursorBlue();
         },
         async afterEnter() {
-          Animations.cursorWhite();
 	  Animations.animateBio();
-          Animations.footerAnimateBlue();
+	  Animations.cursorWhite();
+	  Animations.footerAnimateBlue();
         },
       },
       {
