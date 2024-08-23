@@ -102,6 +102,7 @@ class LogoAnimations {
 
 export class HomePageAnimations {
   private static _globeAnimation = new GlobeAnimation();
+  private static _navBarAnimator: NavBarAnimations = new NavBarAnimations();
 
   private static logoAnimation = () => {
     LogoAnimations.logoAnimation();
