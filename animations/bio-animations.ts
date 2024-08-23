@@ -25,7 +25,7 @@ export class BioAnimations {
     });
   };
 
-  public static animateHeading = (): void => {
+  private static animateHeading = (): void => {
     let splitHeading: SplitType;
 
     $(() => this.splitText(splitHeading));
@@ -36,7 +36,7 @@ export class BioAnimations {
     });
   };
 
-  public static animateTimeline = async (): Promise<void> => {
+  private static animateTimeline = async (): Promise<void> => {
     $(async () => {
       await new Promise((resolve) => {
         setTimeout(resolve, 1000);
@@ -57,8 +57,14 @@ export class BioAnimations {
     });
   };
 
-  public static animateBioLogo = (): void => {
+  private static animateBioLogo = (): void => {
     gsap.set(References.logoClasses.topLogoClass, { translateY: '-15em' });
     gsap.to(References.logoClasses.topLogoClass, { translateY: '0', duration: 3 });
+  };
+
+  public static animateBio = async () => {
+    this.animateBioLogo();
+    this.animateHeading();
+    await this.animateTimeline();
   };
 }
