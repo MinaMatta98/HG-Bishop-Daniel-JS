@@ -20,35 +20,46 @@ export class GlobeAnimation {
   private prevCoords = { lat: 0, lng: 0 };
   private _GLOBE: GlobeInstance;
   private _size: { innerHeight: number; innerWidth: number };
+  private _timeout: number;
   /**
    *
    */
   constructor() {
     $(() => {
       this._canvas = $(References.homePageClasses.globeDiv);
-      this._GLOBE = Globe()
-        .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-        .globeMaterial(
-          new MeshPhysicalMaterial({
-            color: 0xebeef5,
-            reflectivity: 1,
-            roughness: 0,
-            iridescence: 2,
-            clearcoat: 0.1,
-            emissive: 0xebeef5,
-            emissiveIntensity: 0.5,
-          })
-        )
-        .width(this._canvas.width() * this._RATIO)
-        .height(this._canvas.height() * this._RATIO)
-        .backgroundColor('#ffffff00')
-        .pointsMerge(true);
+      this._GLOBE = this.initGlobe();
       this._size = {
         innerHeight: this._canvas.width(),
         innerWidth: this._canvas.height(),
       };
     });
   }
+
+  private initGlobe = (): GlobeInstance => {
+    return Globe()
+      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+      .globeMaterial(
+        new MeshPhysicalMaterial({
+          color: 0xebeef5,
+          reflectivity: 1,
+          roughness: 0,
+          iridescence: 2,
+          clearcoat: 0.1,
+          emissive: 0xebeef5,
+          emissiveIntensity: 0.5,
+        })
+      )
+      .width(this._canvas.width() * this._RATIO)
+      .height(this._canvas.height() * this._RATIO)
+      .backgroundColor('#ffffff00')
+      .pointsMerge(true);
+  };
+
+  public dispose = () => {
+    this._GLOBE._destructor();
+    this._GLOBE = null;
+    if (this._timeout) clearTimeout(this._timeout);
+  };
 
   private emitArc = ({
     lat: endLat,
@@ -179,7 +190,6 @@ export class GlobeAnimation {
           .polygonAltitude((d) => (d === hoverD ? 0.12 : 0.01))
           .polygonCapColor((d) => (d === hoverD ? '#206ff0' : '#206ff030'));
 
-        console.log(hoverD);
         hoverD ? CursorAnimations.cursorWhite() : CursorAnimations.cursorBlue();
       })
       .polygonsTransitionDuration(300);
@@ -187,7 +197,7 @@ export class GlobeAnimation {
   };
 
   private polygonHeightSetter = () => {
-    setTimeout(() => {
+    this._timeout = setTimeout(() => {
       this._GLOBE.polygonAltitude((poly) =>
         poly !== this._currentPolygon ? Math.random() * 0.05 : 0.12
       );
@@ -255,7 +265,16 @@ export class GlobeAnimation {
      * Ensure that the DOM has loaded with JQuery ready
      */
     $(async () => {
-      // const ThreeGlobe = new GlobeAnimation();
+      // Check to see if dispose has been called
+
+      if (this._GLOBE === null) {
+        this._canvas = $(References.homePageClasses.globeDiv);
+        this._size = {
+          innerHeight: this._canvas.width(),
+          innerWidth: this._canvas.height(),
+        };
+        this._GLOBE = this.initGlobe();
+      }
 
       this.addArcsData();
       this.addAtmosphere();
@@ -266,11 +285,8 @@ export class GlobeAnimation {
 
       const c = this._GLOBE(this._canvas[0]);
       this.initControls();
-      // $(c).on('mouseenter', () => CursorAnimations.cursorBlue());
-      // $(c).on('mouseover', () => CursorAnimations.cursorBlue());
 
       $(window).on('resize', () => {
-        console.log('resize event');
         this._size.innerWidth = this._canvas.width();
         this._size.innerHeight = this._canvas.height();
         const renderer = c.renderer();
