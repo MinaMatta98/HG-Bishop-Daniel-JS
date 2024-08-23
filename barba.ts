@@ -71,7 +71,6 @@ export const barbaInit = () => {
             Animations.logoAnimation();
             Animations.initNavLinks();
             Animations.animateScrollButton();
-            Animations.initGlobe();
           });
         },
         beforeLeave() {
