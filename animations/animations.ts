@@ -71,10 +71,6 @@ export class Animations {
     this._navBarAnimator.enableNavLinks();
   };
 
-  public static animateScrollButton = (): void => {
-    this._navBarAnimator.scrollButtonInit();
-  };
-
   public static displayShow(
     identifier: gsap.TweenTarget,
     view: true,
