@@ -59,10 +59,6 @@ export class Animations {
     });
   };
 
-  public static showVideo = (): void => {
-    gsap.to(References.homePageClasses.videoID, { marginLeft: 'auto', duration: 1 });
-  };
-
   public static initNavLinks = (): void => {
     this._navBarAnimator.initNavLinks();
   };
