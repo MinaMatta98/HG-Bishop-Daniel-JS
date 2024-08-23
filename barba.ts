@@ -61,7 +61,10 @@ export const barbaInit = () => {
       {
         namespace: 'home',
         async afterEnter() {
-          if (!isFirstLoad) await Utils.swiperHandler(startTime);
+          if (!isFirstLoad) {
+            await Utils.swiperHandler(startTime);
+            Animations.initGlobe();
+          }
 
           $(() => {
             Animations.gsapGlobeContainerExpand();
@@ -70,6 +73,9 @@ export const barbaInit = () => {
             Animations.animateScrollButton();
             Animations.initGlobe();
           });
+        },
+        beforeLeave() {
+          Animations.disposeGlobe();
         },
       },
       {
