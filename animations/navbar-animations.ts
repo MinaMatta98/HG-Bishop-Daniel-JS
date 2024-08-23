@@ -1,5 +1,5 @@
 import type { ISchemaPage } from '@barba/core/dist/core/src/src/defs';
-import { gsap, ScrollTrigger } from 'gsap/all';
+import { gsap } from 'gsap/all';
 import $ from 'jquery';
 
 import { References } from './references';
@@ -7,6 +7,9 @@ import { References } from './references';
 export class NavBarAnimations {
   private _links: JQuery<HTMLElement>;
   private _disabledClass: string;
+  // This is needed to maintain the gsap Animation state
+  // for the scroll button.
+  protected static currentTL: GSAPTween;
 
   constructor() {
     $(() => (this._links = $(References.navBarClasses.navLinksClass)));
@@ -45,22 +48,21 @@ export class NavBarAnimations {
     });
   };
 
-  scrollButtonInit = () => {
+  scrollButtonInit = (topContainer: JQuery<HTMLElement>) => {
+    if (NavBarAnimations.currentTL) NavBarAnimations.currentTL.kill();
+
     const scrollButton = $(References.navBarClasses.scrollButton);
-    const openingHero = $(References.homePageClasses.openingHeroClass);
     gsap.set(scrollButton, { opacity: 0 });
 
     scrollButton.on('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-    ScrollTrigger.create({
-      trigger: openingHero,
-      start: 'bottom 50%',
-      onEnter() {
-        gsap.to(scrollButton, { opacity: 1, duration: 1 });
+    NavBarAnimations.currentTL = gsap.to(scrollButton, {
+      scrollTrigger: {
+        trigger: topContainer,
+        start: 'bottom 50%',
+        scrub: 1,
       },
-      onLeaveBack() {
-        gsap.to(scrollButton, { opacity: 0, duration: 1 });
-      },
+      opacity: 1,
     });
   };
 }
