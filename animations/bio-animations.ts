@@ -1,9 +1,13 @@
 import gsap from 'gsap/all';
+import $ from 'jquery';
 import SplitType from 'split-type';
 
+import { NavBarAnimations } from './navbar-animations';
 import { References } from './references';
 
 export class BioAnimations {
+  private static _navBarAnimator = new NavBarAnimations();
+
   private static splitText = (text: SplitType) => {
     const bioHeading: JQuery<HTMLElement> = $(References.bioClasses.headingClass);
     text = new SplitType(bioHeading, { types: ['words', 'lines'] });
@@ -65,6 +69,7 @@ export class BioAnimations {
   public static animateBio = async () => {
     this.animateBioLogo();
     this.animateHeading();
+    this._navBarAnimator.scrollButtonInit($(References.bioClasses.bioHeroClass));
     await this.animateTimeline();
   };
 }
