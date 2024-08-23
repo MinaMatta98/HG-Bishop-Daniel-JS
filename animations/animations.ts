@@ -74,22 +74,6 @@ export class Animations {
     });
   };
 
-  public static cardStackingAnimation = () => {
-    const cardSection = $('.div-block-34');
-    const cardSectionHeading = $('.div-block-35');
-
-    ScrollTrigger.create({
-      trigger: cardSection,
-      start: 'bottom bottom',
-      onEnter() {
-        gsap.to(cardSectionHeading, { duration: 0.5, opacity: '0' });
-      },
-      onLeaveBack() {
-        gsap.to(cardSectionHeading, { duration: 0.5, opacity: '1' });
-      },
-    });
-  };
-
   public static showVideo = (): void => {
     gsap.to(References.homePageClasses.videoID, { marginLeft: 'auto', duration: 1 });
   };
