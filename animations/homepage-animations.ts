@@ -208,7 +208,7 @@ export class HomePageAnimations {
     );
 
     $(References.homePageClasses.stickyImageContainerClass).on('mouseleave', () =>
-      Animations.cursorWhite()
+      Animations.cursorBlue()
     );
   };
 
