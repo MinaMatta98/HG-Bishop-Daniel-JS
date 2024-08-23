@@ -30,6 +30,7 @@ export const barbaInit = () => {
           Animations.underlineNav(data.current.namespace, false);
         },
         async enter(_data) {
+          Animations.animateToc();
           Utils.linkHandler();
         },
         async after(data) {
