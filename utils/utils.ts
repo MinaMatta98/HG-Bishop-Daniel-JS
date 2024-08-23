@@ -132,6 +132,7 @@ export class Utils {
         Animations.initScrollSection();
         Animations.gsapGlobeContainerExpand();
         await this.swiperAnimation(initTime);
+        Animations.animateToc();
       }
     };
   };
