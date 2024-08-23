@@ -26,9 +26,12 @@ export class Animations {
   private static _footerAnimator = FooterAnimations;
 
   public static initGlobe = () => {
-    const globe = new GlobeAnimation();
-    globe.init();
-    globe.animateGlobeBlock();
+    this._globeAnimation.init();
+    this._globeAnimation.animateGlobeBlock();
+  };
+
+  public static disposeGlobe = () => {
+    this._globeAnimation.dispose();
   };
 
   public static initScrollSection = () => {
