@@ -1,4 +1,5 @@
 import { gsap } from 'gsap/all';
+
 import $ from 'jquery';
 
 import { References } from './references';
@@ -30,7 +31,7 @@ export class TOCAnimations {
 
   private initToggleButton = () => {
     // set the initial height of the sidebar to 0
-    this._tocButton.hideSidebar();
+    this._tocButton._toggled ? this._tocButton.hideSidebarAsync() : this._tocButton.hideSidebar();
   };
 
   /** This results in the children being cleared */
@@ -166,7 +167,7 @@ class TOCButton {
 
   private _sectionHolderRef: JQuery<HTMLElement>;
 
-  private _toggled: boolean;
+  public _toggled: boolean;
 
   constructor(sectionToc: JQuery<HTMLElement>, sectionHolder: JQuery<HTMLElement>) {
     this._tocButton = $(References.tocClasses.tocToggleButton);
@@ -193,6 +194,16 @@ class TOCButton {
     gsap.set(this._tocButton, { backgroundColor: 'rgba(0, 0, 0, 0.57)' });
     gsap.set(this._tocSvg, { rotation: 180 });
     gsap.set(this._sectionHolderRef, { height: 0 });
+  };
+
+  public hideSidebarAsync = () => {
+    const tl = gsap.timeline();
+    gsap.to(this._sectionTocRef, { height: 0, padding: 0 });
+    gsap.to(this._tocButton, { backgroundColor: 'rgba(0, 0, 0, 0.57)' });
+    gsap.to(this._tocSvg, { rotation: 180 });
+    tl.set(this._sectionHolderRef, { overflow: 'hidden' });
+    tl.to(this._sectionHolderRef, { height: 0 });
+    tl.set(this._sectionHolderRef, { display: 'none' });
   };
 
   private toggleSidebar = () => {
