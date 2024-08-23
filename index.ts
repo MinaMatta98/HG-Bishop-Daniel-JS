@@ -2,10 +2,6 @@ import $ from 'jquery';
 
 import { barbaInit } from './barba';
 
-for (let index = 0; index < 10; index++) {
-  console.log(index);
-}
-
 const containerSelector = '.main-wrapper';
 
 export const DOMAIN = 'https://hg-bishop-daniels-website.webflow.io/';
