@@ -63,7 +63,6 @@ export const barbaInit = () => {
           $(() => {
             Animations.initHomePage(startTime, isFirstLoad);
             Animations.initNavLinks();
-            Animations.animateScrollButton();
           });
         },
         beforeLeave() {
