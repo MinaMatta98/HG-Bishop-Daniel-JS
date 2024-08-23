@@ -5,7 +5,7 @@ import $ from 'jquery';
 import { BioAnimations } from './bio-animations';
 import { CarouselAnimations } from './carousel';
 import { CursorAnimations } from './cursor-animations';
-import { FooterAnimations } from './FooterAnimations';
+import { FooterAnimations } from './footerAnimations';
 import { GlobeAnimation } from './globe';
 import { NavBarAnimations } from './navbar-animations';
 import { References } from './references';
