@@ -48,7 +48,7 @@ export const barbaInit = () => {
         name: 'specific',
         from: { namespace: ['bio'] },
         to: { namespace: 'home' },
-        async afterEnter(data) {
+        async after(data) {
           Animations.footerAnimateWhite();
           await Animations.underlineNav(data.next.namespace, true);
         },
