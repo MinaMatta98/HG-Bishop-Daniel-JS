@@ -1,16 +1,9 @@
-// import Swiper styles
-import 'swiper/css';
-import 'swiper/css/effect-cards';
-import 'src/animations.css';
-
 import type { ITransitionData } from '@barba/core/dist/core/src/src/defs';
 import { restartWebflow } from '@finsweet/ts-utils';
 import { Flip, gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
 import { DOMAIN } from 'src';
 import { Animations } from 'src/animations/animations';
-import { References } from 'src/animations/references';
-import Swiper from 'swiper';
 
 import { Stats } from './sentry';
 
@@ -75,63 +68,18 @@ export class Utils {
     }
   };
 
-  private static sleep = async (ms: number): Promise<void> => {
+  public static sleep = async (ms: number): Promise<void> => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
 
-  private static swiperAnimation = async (initTime: number): Promise<void> => {
-    const currentTime = new Date().getTime();
-
-    await (currentTime - initTime < 2000
-      ? this.sleep(2000 - (currentTime - initTime))
-      : Promise.resolve());
-
-    await gsap.to(References.transitionClasses.pageLoadClass, {
-      display: 'none',
-      delay: currentTime - initTime < 2000 ? 2 - (currentTime - initTime) / 1000 : 0,
-    });
-
-    //Animations.displayShow(References.transitionClasses.pageLoadClass, false);
-
-    Animations.VideoAnimation();
-
-    const photoSwiper = new Swiper(References.swiperClasses.swiperPhotoClass, {
-      effect: 'cards',
-      grabCursor: true,
-      loop: true,
-      keyboard: true,
-      navigation: {
-        nextEl: References.swiperClasses.swiperNextElClass,
-        prevEl: References.swiperClasses.swiperPrevElClass,
-      },
-    });
-
-    const contentSwiper = new Swiper(References.swiperClasses.swiperContentClass, {
-      speed: 0,
-      loop: true,
-      followFinger: true,
-      effect: 'fade',
-      fadeEffect: {
-        crossFade: true,
-      },
-    });
-
-    photoSwiper.controller.control = contentSwiper;
-    contentSwiper.controller.control = photoSwiper;
-  };
-
-  public static InitPage = async (initTime: number): Promise<void> => {
+  public static InitWebsite = async (initTime: number, isFirstLoad: boolean): Promise<void> => {
     document.onreadystatechange = async () => {
       if (document.readyState === 'complete') {
         Animations.displayShow('.cursor', true, 'flex');
         this.scrollFlipInit();
-        Animations.gsapSliderInit();
-        Animations.logoAnimation();
         Animations.initNavLinks();
         Animations.animateScrollButton();
-        Animations.initScrollSection();
-        Animations.gsapGlobeContainerExpand();
-        await this.swiperAnimation(initTime);
+        await Animations.initHomePage(initTime, isFirstLoad);
         Animations.animateToc();
       }
     };
@@ -140,10 +88,6 @@ export class Utils {
   private static scrollFlipInit = () => {
     gsap.registerPlugin(ScrollTrigger, Flip);
     ScrollTrigger.normalizeScroll(true);
-  };
-
-  public static swiperHandler = async (initTime: number): Promise<void> => {
-    await this.swiperAnimation(initTime);
   };
 
   public static scriptReloader = async (data: ITransitionData): Promise<void> => {
