@@ -282,8 +282,10 @@ export class HomePageAnimations {
     this.swiperAnimation();
     this.initGlobe();
     this.animateScheduleCursor();
-    this._navBarAnimator.scrollButtonInit($(References.homePageClasses.openingHeroClass));
+    this._navBarAnimator.animateScrollButton($(References.homePageClasses.openingHeroClass));
+    this._scheduleAnimator.animateScheduleSection();
     await this.hidePageLoader(initTime);
+    this.swiperAnimation();
     this.VideoAnimation();
   };
 }
