@@ -105,7 +105,7 @@ export class Animations {
     }
 
     for (const div of References.transitionClasses.transitionDivs) {
-      loadTl.to(div, { marginTop: inView ? '0vh' : '100vh', duration: 0.25 });
+      await loadTl.to(div, { marginTop: inView ? '0vh' : '100vh', duration: 0.25 });
     }
 
     if (!inView) this.displayShow(References.transitionClasses.transitionClass, false);
