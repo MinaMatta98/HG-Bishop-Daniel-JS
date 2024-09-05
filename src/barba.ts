@@ -29,7 +29,6 @@ export const barbaInit = () => {
         },
         async enter(_data) {
           await Animations.animateToc();
-	  Animations.showProgress();
           Utils.linkHandler();
         },
         async after(data) {
@@ -37,6 +36,7 @@ export const barbaInit = () => {
             ? (data.next.container.style.display = 'block')
             : (data.next.container.style.display = 'flex');
           Animations.enableNavLinks();
+          Animations.showProgress();
           await Animations.handleTransitionAnimation(false);
           await Animations.underlineNav(data.next.namespace, true);
           Animations.cursorHover();
@@ -51,6 +51,7 @@ export const barbaInit = () => {
         async after(data) {
           await Animations.animateToc();
           Animations.footerAnimateWhite();
+          Animations.showProgress();
           await Animations.underlineNav(data.next.namespace, true);
         },
         async leave(data) {
