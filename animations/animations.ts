@@ -12,7 +12,7 @@ import { TOCAnimations } from './toc';
 
 export class Animations {
   private static _cursorAnimator = CursorAnimations;
-  private static _navBarAnimator: NavBarAnimations = new NavBarAnimations();
+  private static _navBarAnimator = new NavBarAnimations();
   private static _bioAnimator = BioAnimations;
   private static _footerAnimator = FooterAnimations;
   private static _tocAnimator = new TOCAnimations();
