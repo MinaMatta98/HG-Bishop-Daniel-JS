@@ -5,14 +5,103 @@ import '../animations.css';
 
 import { Flip, gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
-import { Animations } from './animations';
-import { References } from './references';
 import Swiper from 'swiper/bundle';
 
 import { Utils } from '../utils/utils';
-
+import { Animations } from './animations';
 import { GlobeAnimation } from './globe';
 import { NavBarAnimations } from './navbar-animations';
+import { References } from './references';
+
+class NewsAnimations {
+  private _articles: JQuery<HTMLElement>;
+
+  private _headers: JQuery<HTMLElement>;
+
+  private _articleCount: number;
+
+  private _stickyLinks: JQuery<HTMLElement>;
+
+  private _buttons: JQuery<HTMLElement>;
+
+  private _agendaItems: JQuery<HTMLElement>;
+
+  // Select all elements with the class 'big-article'
+
+  constructor() {
+    $(() => {
+      this._articles = $('.news-colleciton-item');
+      this._articleCount = this._articles.length;
+      this._headers = $('.special');
+      this._stickyLinks = $('.sticky-top');
+      this._buttons = $('.news-btn');
+      this._agendaItems = $('.agenda-item > div');
+    });
+  }
+
+  private scrollToSection = (element: HTMLElement) => {
+    const offset = element.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: offset, behavior: 'smooth' });
+  };
+
+  animateNewsSection = () => {
+    $(() => {
+      // Iterate over each article
+      this._articles.each((index, article) => {
+        // Calculate the font size based on the formula 2rem + 5rem * (index + 1)
+        const topPosition = 7 + 6 * (index + 1) + 'rem';
+
+        const bottomPosition = (this._articleCount - 1 - index) * 6 + 8 + 'rem';
+
+        // Apply the calculated font size to each article
+        article.style.top = topPosition;
+        article.style.marginBottom = bottomPosition;
+      });
+
+      // Iterate over each article
+      this._headers.each((index, header) => {
+        // Apply the calculated font size to each article
+        header.innerText = '0' + (index + 1);
+      });
+
+      this._stickyLinks.each((index, link) => {
+        $(link).on('click', () => {
+          this.scrollToSection(this._articles[index]);
+        });
+      });
+
+      this._buttons.each((_, button) => {
+        console.log('button clicked');
+        const { _agendaItems } = this;
+
+        $(button).on('click', function () {
+          const targetSlug = $(this).attr('target-slug');
+
+          // Hide all direct children of agenda-item
+          _agendaItems.each((_, el) => {
+            $(el).css('display', 'none');
+          });
+
+          // Show the div with the id that matches the target-slug
+          const targetElement = $('#' + targetSlug);
+
+          if (targetElement) {
+            targetElement.css('display', 'block');
+
+            targetElement[0].scrollIntoView({ behavior: 'smooth' });
+
+            // Simulate a click on the target element
+            setTimeout(() => {
+              //targetElement.click();
+            }, 500);
+            // Adding a slight delay to
+            // ensure the element is visible and scrolled into view
+          }
+        });
+      });
+    });
+  };
+}
 
 class scheduleAnimations {
   private _sideBlocks: JQuery<HTMLElement>;
@@ -151,6 +240,7 @@ export class HomePageAnimations {
   private static _globeAnimation = new GlobeAnimation();
   private static _navBarAnimator: NavBarAnimations = new NavBarAnimations();
   private static _scheduleAnimator = new scheduleAnimations();
+  private static _newsAnimator = new NewsAnimations();
   private static _globeTL: GSAPTween;
 
   private static logoAnimation = () => {
@@ -189,27 +279,27 @@ export class HomePageAnimations {
   };
 
   private static swiperAnimation = (): void => {
-      const photoSwiper = new Swiper(References.swiperClasses.swiperPhotoClass, {
-        effect: 'cards',
-        grabCursor: true,
-        loop: true,
-        keyboard: true,
-        navigation: {
-          nextEl: References.swiperClasses.swiperNextElClass,
-          prevEl: References.swiperClasses.swiperPrevElClass,
-        },
-      });
-      const contentSwiper = new Swiper(References.swiperClasses.swiperContentClass, {
-        speed: 0,
-        loop: true,
-        followFinger: true,
-        effect: 'fade',
-        fadeEffect: {
-          crossFade: true,
-        },
-      });
-      photoSwiper.controller.control = contentSwiper;
-      contentSwiper.controller.control = photoSwiper;
+    const photoSwiper = new Swiper(References.swiperClasses.swiperPhotoClass, {
+      effect: 'cards',
+      grabCursor: true,
+      loop: true,
+      keyboard: true,
+      navigation: {
+        nextEl: References.swiperClasses.swiperNextElClass,
+        prevEl: References.swiperClasses.swiperPrevElClass,
+      },
+    });
+    const contentSwiper = new Swiper(References.swiperClasses.swiperContentClass, {
+      speed: 0,
+      loop: true,
+      followFinger: true,
+      effect: 'fade',
+      fadeEffect: {
+        crossFade: true,
+      },
+    });
+    photoSwiper.controller.control = contentSwiper;
+    contentSwiper.controller.control = photoSwiper;
   };
 
   private static initScheduleAnimation = () => {
@@ -283,6 +373,7 @@ export class HomePageAnimations {
     this.animateScheduleCursor();
     this._navBarAnimator.animateScrollButton($(References.homePageClasses.openingHeroClass));
     this._scheduleAnimator.animateScheduleSection();
+    this._newsAnimator.animateNewsSection();
     await this.hidePageLoader(initTime);
     this.swiperAnimation();
     this.VideoAnimation();
