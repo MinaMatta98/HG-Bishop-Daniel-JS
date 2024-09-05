@@ -141,30 +141,28 @@ export class HomePageAnimations {
     }
   };
 
-  private static swiperAnimation = async (): Promise<void> => {
-    const photoSwiper = new Swiper(References.swiperClasses.swiperPhotoClass, {
-      effect: 'cards',
-      grabCursor: true,
-      loop: true,
-      keyboard: true,
-      navigation: {
-        nextEl: References.swiperClasses.swiperNextElClass,
-        prevEl: References.swiperClasses.swiperPrevElClass,
-      },
-    });
-
-    const contentSwiper = new Swiper(References.swiperClasses.swiperContentClass, {
-      speed: 0,
-      loop: true,
-      followFinger: true,
-      effect: 'fade',
-      fadeEffect: {
-        crossFade: true,
-      },
-    });
-
-    photoSwiper.controller.control = contentSwiper;
-    contentSwiper.controller.control = photoSwiper;
+  private static swiperAnimation = (): void => {
+      const photoSwiper = new Swiper(References.swiperClasses.swiperPhotoClass, {
+        effect: 'cards',
+        grabCursor: true,
+        loop: true,
+        keyboard: true,
+        navigation: {
+          nextEl: References.swiperClasses.swiperNextElClass,
+          prevEl: References.swiperClasses.swiperPrevElClass,
+        },
+      });
+      const contentSwiper = new Swiper(References.swiperClasses.swiperContentClass, {
+        speed: 0,
+        loop: true,
+        followFinger: true,
+        effect: 'fade',
+        fadeEffect: {
+          crossFade: true,
+        },
+      });
+      photoSwiper.controller.control = contentSwiper;
+      contentSwiper.controller.control = photoSwiper;
   };
 
   private static initScheduleAnimation = () => {
