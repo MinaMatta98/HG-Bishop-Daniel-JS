@@ -14,6 +14,53 @@ import { Utils } from '../utils/utils';
 import { GlobeAnimation } from './globe';
 import { NavBarAnimations } from './navbar-animations';
 
+class scheduleAnimations {
+  private _sideBlocks: JQuery<HTMLElement>;
+  private _stickyImageContainer: JQuery<HTMLElement>;
+
+  constructor() {}
+
+  init() {
+    this._sideBlocks = $(References.homePageClasses.slideBlockClass);
+    this._stickyImageContainer = $(References.homePageClasses.stickyImageContainerClass);
+  }
+
+  public animateScheduleSection = () => {
+    $(() => {
+      this.init();
+      const { _sideBlocks, _stickyImageContainer } = this;
+      const children = _stickyImageContainer.children();
+
+      _sideBlocks.each((index, block) => {
+        gsap.from(children[index], {
+          scrollTrigger: {
+            trigger: block,
+            start: 'top 50%',
+            end: 'bottom 50%',
+            scrub: true,
+            onEnter: () => {
+              gsap.set(children[index], { display: 'block' });
+              gsap.from(children[index], { opacity: 0, duration: 1, translateY: 10 });
+              const neighbours = children.slice(0, index).extend(children.slice(index + 1));
+              gsap.set(neighbours, { display: 'none' });
+            },
+            onLeave: () => {
+              gsap.set(children[index], { display: 'none' });
+            },
+            onEnterBack: () => {
+              gsap.set(children[index], { display: 'block' });
+              gsap.from(children[index], { opacity: 0, duration: 1, translateY: 10 });
+              const neighbours = children.slice(0, index).extend(children.slice(index + 1));
+              gsap.set(neighbours, { display: 'none' });
+            },
+          },
+          marginBottom: '20em',
+        });
+      });
+    });
+  };
+}
+
 /**
  * @module Keep Private. This is simply a definition of the
  * LogoAnimations class to ensure strong typing.
