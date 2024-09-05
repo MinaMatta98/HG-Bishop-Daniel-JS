@@ -48,7 +48,7 @@ export class NavBarAnimations {
     });
   };
 
-  scrollButtonInit = (topContainer: JQuery<HTMLElement>) => {
+animateScrollButton = (topContainer: JQuery<HTMLElement>) => {
     if (NavBarAnimations.currentTL) NavBarAnimations.currentTL.kill();
 
     const scrollButton = $(References.navBarClasses.scrollButton);
