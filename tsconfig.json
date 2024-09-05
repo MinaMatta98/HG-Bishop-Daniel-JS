@@ -1,0 +1,42 @@
+{
+	"extends": "@finsweet/tsconfig",
+	"compilerOptions": {
+		"target": "esnext",
+		"useDefineForClassFields": true,
+		"module": "esnext",
+		"rootDir": ".",
+		"baseUrl": ".",
+		"paths": {
+			"$utils/*": [
+				"src/utils/*"
+			]
+		},
+		"lib": [
+			"ES2020",
+			"DOM",
+			"DOM.Iterable"
+		],
+		//"types": [
+		//	"@finsweet/ts-utils", "node"
+		//],
+		"skipLibCheck": false,
+		"checkJs": true,
+		"allowJs": true,
+		"moduleResolution": "bundler",
+		/* Bundler mode */
+		//"allowImportingTsExtensions": true,
+		"isolatedModules": true,
+		"esModuleInterop": true,
+		"moduleDetection": "force",
+		"sourceMap": true,
+		"noEmit": false,
+		/* Linting */
+		"strict": false,
+		"noUnusedLocals": false,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": false,
+		"noImplicitAny": false
+	},
+  	"include": ["src/**/*"],
+    	"types": ["@finsweet/ts-utils"]
+}

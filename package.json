@@ -1,0 +1,78 @@
+{
+  "name": "@finsweet/developer-starter",
+  "version": "0.0.0",
+  "description": "Developer starter template for Finsweet projects.",
+  "homepage": "https://github.com/finsweet/developer-starter#readme",
+  "license": "ISC",
+  "keywords": [],
+  "author": {
+    "name": "Finsweet",
+    "url": "https://finsweet.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/finsweet/developer-starter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/finsweet/developer-starter/issues"
+  },
+  "main": "src/index.ts",
+  "module": "src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development node --inspect ./bin/build.js",
+    "build": "cross-env NODE_ENV=production node ./bin/build.js",
+    "lint": "eslint --ignore-path .gitignore ./src && prettier --check ./src",
+    "lint:fix": "eslint --ignore-path .gitignore ./src --fix",
+    "check": "tsc --noEmit",
+    "format": "prettier --write ./src",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "release": "changeset publish",
+    "update": "pnpm update -i -L -r"
+  },
+  "devDependencies": {
+    "@barba/core": "^2.10.0",
+    "@changesets/changelog-git": "^0.2.0",
+    "@changesets/cli": "^2.27.7",
+    "@finsweet/eslint-config": "^2.0.7",
+    "@finsweet/tsconfig": "^1.3.4",
+    "@playwright/test": "^1.45.3",
+    "@types/jquery": "^3.5.30",
+    "@types/three": "^0.167.2",
+    "@typescript-eslint/eslint-plugin": "^7.17.0",
+    "@typescript-eslint/parser": "^7.17.0",
+    "cross-env": "^7.0.3",
+    "css-loader": "^7.1.2",
+    "esbuild": "^0.20.2",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "globe.gl": "^2.32.5",
+    "jquery": "^3.7.1",
+    "prettier": "^3.3.3",
+    "style-loader": "^4.0.0",
+    "three": "^0.167.1",
+    "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4",
+    "webpack": "^5.94.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4",
+    "webpack-merge": "^6.0.1"
+  },
+  "dependencies": {
+    "@finsweet/ts-utils": "^0.40.0",
+    "@sentry/browser": "^8.24.0",
+    "gsap": "^3.12.5",
+    "split-type": "^0.3.4",
+    "swiper": "^11.1.11"
+  },
+  "engines": {
+    "pnpm": ">=9"
+  }
+}
