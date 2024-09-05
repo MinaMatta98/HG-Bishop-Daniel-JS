@@ -24,6 +24,7 @@ export class Animations {
 
   public static showProgress = () => {
     this.displayShow(References.ancillaryClasses.progressBar, true, 'block');
+    this.setOpaque(References.ancillaryClasses.progressBar);
   };
 
   public static initHomePage = async (initTime: number, isFirstLoad: boolean) => {
