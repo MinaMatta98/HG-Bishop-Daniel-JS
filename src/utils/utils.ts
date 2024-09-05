@@ -76,6 +76,7 @@ export class Utils {
     document.onreadystatechange = async () => {
       if (document.readyState === 'complete') {
         Animations.displayShow('.cursor', true, 'flex');
+        Animations.showProgress();
         this.scrollFlipInit();
         Animations.initNavLinks();
         await Animations.initHomePage(initTime, isFirstLoad);

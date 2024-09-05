@@ -22,6 +22,10 @@ export class Animations {
     this._homePageAnimator.disposeGlobe();
   };
 
+  public static showProgress = () => {
+    this.displayShow(References.ancillaryClasses.progressBar, true, 'block');
+  };
+
   public static initHomePage = async (initTime: number, isFirstLoad: boolean) => {
     await this._homePageAnimator.animateHomePage(initTime, isFirstLoad);
   };
