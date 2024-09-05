@@ -19,7 +19,7 @@ export const barbaInit = () => {
             await Utils.InitWebsite(startTime, isFirstLoad);
           }
           Utils.manualLoadRedirector(isFirstLoad);
-          Utils.initStats();
+          //Utils.initStats();
         },
         async leave(data) {
           data.next.container.style.display = 'none';
@@ -61,8 +61,8 @@ export const barbaInit = () => {
       {
         namespace: 'home',
         async afterEnter() {
-          $(() => {
-            Animations.initHomePage(startTime, isFirstLoad);
+          $(async () => {
+            await Animations.initHomePage(startTime, isFirstLoad);
             Animations.initNavLinks();
           });
         },
