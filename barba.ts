@@ -38,6 +38,7 @@ export const barbaInit = () => {
           Animations.enableNavLinks();
           await Animations.handleTransitionAnimation(false);
           await Animations.underlineNav(data.next.namespace, true);
+          Animations.cursorHover();
           isFirstLoad = false;
         },
       },
@@ -75,9 +76,9 @@ export const barbaInit = () => {
           Animations.cursorBlue();
         },
         async afterEnter() {
-	  Animations.animateBio();
-	  Animations.cursorWhite();
-	  Animations.footerAnimateBlue();
+          Animations.animateBio();
+          Animations.cursorWhite();
+          Animations.footerAnimateBlue();
         },
       },
       {

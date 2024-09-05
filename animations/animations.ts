@@ -34,6 +34,10 @@ export class Animations {
     this._cursorAnimator.cursorBlue();
   };
 
+  public static cursorHover = (): void => {
+    this._cursorAnimator.cursorHover();
+  };
+
   public static underlineNav = async (
     identifier: ISchemaPage['namespace'],
     underline: boolean
