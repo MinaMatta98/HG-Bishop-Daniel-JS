@@ -103,6 +103,8 @@ class LogoAnimations {
 export class HomePageAnimations {
   private static _globeAnimation = new GlobeAnimation();
   private static _navBarAnimator: NavBarAnimations = new NavBarAnimations();
+  private static _scheduleAnimator = new scheduleAnimations();
+  private static _globeTL: GSAPTween;
 
   private static logoAnimation = () => {
     LogoAnimations.logoAnimation();
@@ -186,7 +188,12 @@ export class HomePageAnimations {
   private static gsapGlobeContainerExpand = () => {
     const container = $(References.homePageClasses.globeContainerClass);
 
-    gsap.from(container, {
+    if (this._globeTL) {
+      this._globeTL.kill();
+      gsap.set(container, { maxWidth: '100vw', borderRadius: '0' });
+    }
+
+    this._globeTL = gsap.from(container, {
       scrollTrigger: {
         trigger: container,
         start: 'top 70%',
@@ -202,6 +209,10 @@ export class HomePageAnimations {
     this._globeAnimation.init();
     this._globeAnimation.animateGlobeBlock();
     this.gsapGlobeContainerExpand();
+    window.addEventListener('resize', () => {
+      this._globeAnimation.animateGlobeBlock();
+      this.gsapGlobeContainerExpand();
+    });
   };
 
   private static animateScheduleCursor = () => {
