@@ -2,9 +2,9 @@ import type { ITransitionData } from '@barba/core/dist/core/src/src/defs';
 import { restartWebflow } from '@finsweet/ts-utils';
 import { Flip, gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
-import { DOMAIN } from 'src';
-import { Animations } from 'src/animations/animations';
 
+import { Animations } from '../animations/animations';
+import { DOMAIN } from '../index';
 import { Stats } from './sentry';
 
 export class Utils {
@@ -79,6 +79,7 @@ export class Utils {
         this.scrollFlipInit();
         Animations.initNavLinks();
         await Animations.initHomePage(initTime, isFirstLoad);
+        Animations.cursorHover();
         Animations.animateToc();
       }
     };
