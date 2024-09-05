@@ -8,11 +8,6 @@ import { DOMAIN } from '../index';
 import { Stats } from './sentry';
 
 export class Utils {
-  //private static scriptUrls: URL[] = [
-  //  new URL('https://cdnjs.cloudflare.com/ajax/libs/three.js/r125/three.min.js'),
-  //  new URL('https://cdn.jsdelivr.net/npm/@finsweet/3dglobes@1/OrbitControls.min.js'),
-  //  new URL('https://cdn.jsdelivr.net/npm/@finsweet/3dglobes@1/FsGlobe.min.js'),
-  //];
 
   public static initStats = () => {
     Stats.init();
@@ -25,27 +20,6 @@ export class Utils {
       }
     });
   };
-
-  //public static globeScriptHandler = async (scripts?: URL[]): Promise<void> => {
-  //  const targetScripts = scripts || this.scriptUrls;
-  //
-  //  // This will allow for the concurrent execution of the fetch
-  //  await Promise.all(
-  //    targetScripts.map((scriptUrl) => {
-  //      return this.loadScript(scriptUrl);
-  //    })
-  //  )
-  //    .then((scripts) => {
-  //      scripts.forEach((script) => {
-  //        const scriptElement = document.createElement('script');
-  //        scriptElement.textContent = script;
-  //        document.body.append(scriptElement);
-  //      });
-  //    })
-  //    .catch((error) => {
-  //      console.log(error);
-  //    });
-  //};
 
   /** Function to load a script and return a promise */
   public static loadScript = async (url: URL): Promise<string> => {
