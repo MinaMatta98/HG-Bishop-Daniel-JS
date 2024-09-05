@@ -279,7 +279,6 @@ export class HomePageAnimations {
       Animations.displayShow(References.transitionClasses.pageLoadClass, true, 'flex');
     this.initScheduleAnimation();
     this.logoAnimation();
-    this.swiperAnimation();
     this.initGlobe();
     this.animateScheduleCursor();
     this._navBarAnimator.animateScrollButton($(References.homePageClasses.openingHeroClass));
