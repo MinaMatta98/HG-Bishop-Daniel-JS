@@ -149,6 +149,58 @@ class scheduleAnimations {
   };
 }
 
+class OpeningHeroAnimations {
+  private _openingHero: JQuery<HTMLElement>;
+  private _progressBar: JQuery<HTMLElement>;
+
+  constructor() {
+    $(() => {
+      this._openingHero = $(References.homePageClasses.openingHeroClass);
+      this._progressBar = $(References.ancillaryClasses.progressBar);
+    });
+  }
+
+  animateProgressFade = () => {
+    const duration = 0.5;
+    $(() => {
+      gsap.from(this._progressBar, {
+        scrollTrigger: {
+          trigger: this._openingHero,
+          start: 'top top',
+          end: 'bottom top',
+          onEnter: () => {
+            gsap.to(this._progressBar, { opacity: 0, duration });
+          },
+          onEnterBack: () => {
+            gsap.to(this._progressBar, { opacity: 0, duration });
+          },
+          onLeave: () => {
+            gsap.to(this._progressBar, { opacity: 1, duration });
+          },
+        },
+        opacity: 0,
+        duration: 0.5,
+      });
+    });
+  };
+
+  VideoAnimation = async (): Promise<void> => {
+    gsap.set(References.logoClasses.topLogoClass, { translateY: '-15em' });
+    gsap.set(References.logoClasses.centerLogoClass, { opacity: 0, translateY: 150 });
+    gsap.set(References.homePageClasses.heroHeadingClass, { opacity: 0, translateY: 150 });
+
+    gsap.to(References.logoClasses.centerLogoClass, { opacity: 1, duration: 0.5 });
+    gsap.to(References.logoClasses.centerLogoClass, { translateY: 0, duration: 4 });
+    await gsap.to(References.logoClasses.topLogoClass, { translateY: '0', duration: 3 });
+
+    gsap.to(References.homePageClasses.heroHeadingClass, { opacity: 1, duration: 0.5 });
+    await gsap.to(References.homePageClasses.heroHeadingClass, { translateY: 0, duration: 3 });
+
+    gsap.to(References.homePageClasses.heroHeadingClass, { opacity: 0, duration: 1 });
+    await gsap.to(References.logoClasses.centerLogoClass, { opacity: 0, duration: 1 });
+  };
+}
+
 /**
  * @module Keep Private. This is simply a definition of the
  * LogoAnimations class to ensure strong typing.
@@ -240,26 +292,11 @@ export class HomePageAnimations {
   private static _navBarAnimator: NavBarAnimations = new NavBarAnimations();
   private static _scheduleAnimator = new scheduleAnimations();
   private static _newsAnimator = new NewsAnimations();
+  private static _openingHeroAnimator = new OpeningHeroAnimations();
   private static _globeTL: GSAPTween;
 
   private static logoAnimation = () => {
     LogoAnimations.logoAnimation();
-  };
-
-  private static VideoAnimation = async (): Promise<void> => {
-    gsap.set(References.logoClasses.topLogoClass, { translateY: '-15em' });
-    gsap.set(References.logoClasses.centerLogoClass, { opacity: 0, translateY: 150 });
-    gsap.set(References.homePageClasses.heroHeadingClass, { opacity: 0, translateY: 150 });
-
-    gsap.to(References.logoClasses.centerLogoClass, { opacity: 1, duration: 0.5 });
-    gsap.to(References.logoClasses.centerLogoClass, { translateY: 0, duration: 4 });
-    await gsap.to(References.logoClasses.topLogoClass, { translateY: '0', duration: 3 });
-
-    gsap.to(References.homePageClasses.heroHeadingClass, { opacity: 1, duration: 0.5 });
-    await gsap.to(References.homePageClasses.heroHeadingClass, { translateY: 0, duration: 3 });
-
-    gsap.to(References.homePageClasses.heroHeadingClass, { opacity: 0, duration: 1 });
-    await gsap.to(References.logoClasses.centerLogoClass, { opacity: 0, duration: 1 });
   };
 
   private static hidePageLoader = async (initTime: number): Promise<void> => {
@@ -373,8 +410,9 @@ export class HomePageAnimations {
     this._navBarAnimator.animateScrollButton($(References.homePageClasses.openingHeroClass));
     this._scheduleAnimator.animateScheduleSection();
     this._newsAnimator.animateNewsSection();
+    this._openingHeroAnimator.animateProgressFade();
     await this.hidePageLoader(initTime);
     this.swiperAnimation();
-    this.VideoAnimation();
+    this._openingHeroAnimator.VideoAnimation();
   };
 }
