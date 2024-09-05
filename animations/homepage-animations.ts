@@ -1,16 +1,16 @@
 // import Swiper styles
 import 'swiper/css';
 import 'swiper/css/effect-cards';
-import 'src/animations.css';
+import '../animations.css';
 
 import { Flip, gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
-import { References } from 'src/animations/references';
-import Swiper from 'swiper';
-
-import { Utils } from '$utils/utils';
-
 import { Animations } from './animations';
+import { References } from './references';
+import Swiper from 'swiper/bundle';
+
+import { Utils } from '../utils/utils';
+
 import { GlobeAnimation } from './globe';
 import { NavBarAnimations } from './navbar-animations';
 
