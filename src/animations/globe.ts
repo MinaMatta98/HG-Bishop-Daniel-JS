@@ -212,7 +212,6 @@ export class GlobeAnimation {
       const globeG = $('.globe-svg').find('g');
       gsap.set(globeG.children(), { fill: 'white', opacity: 0 });
       if (this._tl) {
-        console.log('killing timeline');
         this._tl.kill();
       }
       this._tl = gsap.timeline({ repeat: -1 }); // Create a timeline with infinite repetition
