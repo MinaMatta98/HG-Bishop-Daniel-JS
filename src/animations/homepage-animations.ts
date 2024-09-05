@@ -71,7 +71,6 @@ class NewsAnimations {
       });
 
       this._buttons.each((_, button) => {
-        console.log('button clicked');
         const { _agendaItems } = this;
 
         $(button).on('click', function () {
