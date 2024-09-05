@@ -29,6 +29,7 @@ export const barbaInit = () => {
         },
         async enter(_data) {
           await Animations.animateToc();
+	  Animations.showProgress();
           Utils.linkHandler();
         },
         async after(data) {

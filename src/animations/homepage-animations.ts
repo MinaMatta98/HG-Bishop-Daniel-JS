@@ -155,14 +155,19 @@ class OpeningHeroAnimations {
 
   constructor() {
     $(() => {
-      this._openingHero = $(References.homePageClasses.openingHeroClass);
-      this._progressBar = $(References.ancillaryClasses.progressBar);
+      this.init();
     });
+  }
+
+  init() {
+    this._openingHero = $(References.homePageClasses.openingHeroClass);
+    this._progressBar = $(References.ancillaryClasses.progressBar);
   }
 
   animateProgressFade = () => {
     const duration = 0.5;
     $(() => {
+      this.init();
       gsap.from(this._progressBar, {
         scrollTrigger: {
           trigger: this._openingHero,
@@ -401,18 +406,20 @@ export class HomePageAnimations {
   };
 
   public static animateHomePage = async (initTime: number, isFirstLoad: boolean) => {
-    if (isFirstLoad)
-      Animations.displayShow(References.transitionClasses.pageLoadClass, true, 'flex');
-    this.initScheduleAnimation();
-    this.logoAnimation();
-    this.initGlobe();
-    this.animateScheduleCursor();
-    this._navBarAnimator.animateScrollButton($(References.homePageClasses.openingHeroClass));
-    this._scheduleAnimator.animateScheduleSection();
-    this._newsAnimator.animateNewsSection();
-    this._openingHeroAnimator.animateProgressFade();
-    await this.hidePageLoader(initTime);
-    this.swiperAnimation();
-    this._openingHeroAnimator.VideoAnimation();
+    $(async () => {
+      if (isFirstLoad)
+        Animations.displayShow(References.transitionClasses.pageLoadClass, true, 'flex');
+      this.initScheduleAnimation();
+      this.logoAnimation();
+      this.initGlobe();
+      this.animateScheduleCursor();
+      this._navBarAnimator.animateScrollButton($(References.homePageClasses.openingHeroClass));
+      this._scheduleAnimator.animateScheduleSection();
+      this._newsAnimator.animateNewsSection();
+      this._openingHeroAnimator.animateProgressFade();
+      await this.hidePageLoader(initTime);
+      this.swiperAnimation();
+      this._openingHeroAnimator.VideoAnimation();
+    });
   };
 }
