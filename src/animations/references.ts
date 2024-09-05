@@ -81,6 +81,10 @@ class MinistryPageReferences {
   public static highlightCardClass: string = '.highlight_card.white';
 }
 
+class AncillaryReferences {
+  public static progressBar: string = '.progress';
+}
+
 class NavBarReferences {
   public static navLinksClass: string = '.link-block';
   public static scrollButton: string = '.outer-parent';
@@ -95,6 +99,7 @@ class FooterReferences {
 
 export class References {
   public static navBarClasses = NavBarReferences;
+  public static ancillaryClasses = AncillaryReferences;
   public static tocClasses = TocReferences;
   public static footerClasses = FooterReferences;
   public static bioClasses = BioReferences;
