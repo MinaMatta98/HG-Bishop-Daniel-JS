@@ -69,7 +69,7 @@ export class BioAnimations {
   public static animateBio = async () => {
     this.animateBioLogo();
     this.animateHeading();
-    this._navBarAnimator.scrollButtonInit($(References.bioClasses.bioHeroClass));
+    this._navBarAnimator.animateScrollButton($(References.bioClasses.bioHeroClass));
     await this.animateTimeline();
   };
 }
