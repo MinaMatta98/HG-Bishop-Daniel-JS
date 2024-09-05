@@ -1,5 +1,5 @@
 import Globe, { type GlobeInstance } from 'globe.gl';
-import gsap from 'gsap';
+import gsap from 'gsap/all';
 import $ from 'jquery';
 import { MeshPhysicalMaterial } from 'three';
 import * as THREE from 'three';
@@ -21,6 +21,7 @@ export class GlobeAnimation {
   private _GLOBE: GlobeInstance;
   private _size: { innerHeight: number; innerWidth: number };
   private _timeout: number;
+  private _tl: GSAPTimeline;
   /**
    *
    */
@@ -36,7 +37,7 @@ export class GlobeAnimation {
   }
 
   private initGlobe = (): GlobeInstance => {
-    return Globe()
+    return Globe({ rendererConfig: { powerPreference: 'low-power' } })
       .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
       .globeMaterial(
         new MeshPhysicalMaterial({
@@ -138,9 +139,10 @@ export class GlobeAnimation {
   };
 
   private initControls = () => {
-    this._GLOBE.controls().autoRotateSpeed = 0.3;
-    this._GLOBE.controls().autoRotate = true;
-    this._GLOBE.controls().enableZoom = false;
+    const { controls } = this._GLOBE;
+    controls().autoRotateSpeed = 0.3;
+    controls().autoRotate = true;
+    controls().enableZoom = false;
   };
 
   private initCamera = () => {
@@ -209,9 +211,13 @@ export class GlobeAnimation {
     $(() => {
       const globeG = $('.globe-svg').find('g');
       gsap.set(globeG.children(), { fill: 'white', opacity: 0 });
-      const tl = gsap.timeline({ repeat: -1 }); // Create a timeline with infinite repetition
-      tl.to(globeG.children(), { opacity: 0.5, stagger: 0.15 }, 'timeline');
-      tl.to(globeG.children(), { opacity: 0, stagger: 0.2 }, 'timeline+=0.3'); // Adjust the delay as needed
+      if (this._tl) {
+        console.log('killing timeline');
+        this._tl.kill();
+      }
+      this._tl = gsap.timeline({ repeat: -1 }); // Create a timeline with infinite repetition
+      this._tl.to(globeG.children(), { opacity: 0.5, stagger: 0.15 }, 'timeline');
+      this._tl.to(globeG.children(), { opacity: 0, stagger: 0.2 }, 'timeline+=0.3'); // Adjust the delay as needed
       $(References.homePageClasses.ministryWrapper).on('mouseenter', () =>
         CursorAnimations.cursorWhite()
       );
@@ -221,7 +227,7 @@ export class GlobeAnimation {
     });
   };
 
-  private initStarGeometry = () => {
+  private animateStarGeometry = () => {
     const starGeometry = new THREE.BufferGeometry();
     const starCount = 1000;
     const starVerticies = new Float32Array(starCount * 3);
@@ -280,20 +286,28 @@ export class GlobeAnimation {
       this.addAtmosphere();
       this.addHexPolygonData();
       this.addPolygonData();
-      this.initStarGeometry();
+      this.animateStarGeometry();
       this.initCamera();
 
       const c = this._GLOBE(this._canvas[0]);
       this.initControls();
+      this.resize(c);
+    });
+  };
 
-      $(window).on('resize', () => {
-        this._size.innerWidth = this._canvas.width();
-        this._size.innerHeight = this._canvas.height();
-        const renderer = c.renderer();
-        c.width(this._size.innerWidth * this._RATIO);
-        c.height(this._size.innerHeight * this._RATIO);
-        renderer.setSize(this._size.innerWidth * this._RATIO, this._size.innerHeight * this._RATIO);
-      });
+  private resize = (c: GlobeInstance) => {
+    $(window).on('resize', () => {
+      this._size.innerWidth = this._canvas.width();
+      this._size.innerHeight = this._canvas.height();
+      //if (this._GLOBE) this._GLOBE._destructor();
+      //this._GLOBE = null;
+      //this.init();
+      //this._canvas = $(References.homePageClasses.globeDiv);
+      //const c = this._GLOBE(this._canvas[0]);
+      const renderer = c.renderer();
+      c.width(this._size.innerWidth * this._RATIO);
+      c.height(this._size.innerHeight * this._RATIO);
+      renderer.setSize(this._size.innerWidth * this._RATIO, this._size.innerHeight * this._RATIO);
     });
   };
 }
