@@ -37,6 +37,6 @@
 		"noFallthroughCasesInSwitch": false,
 		"noImplicitAny": false
 	},
-  	"include": ["src/**/*"],
+  	"include": ["src/**/*", "bin/inject.js"],
     	"types": ["@finsweet/ts-utils"]
 }
