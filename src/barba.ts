@@ -1,7 +1,6 @@
 import barba from '@barba/core';
 
 import { Animations } from './animations/animations';
-import { References } from './animations/references';
 import { Utils } from './utils/utils';
 
 export const barbaInit = () => {
