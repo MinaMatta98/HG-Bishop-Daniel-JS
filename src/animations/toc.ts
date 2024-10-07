@@ -1,5 +1,4 @@
 import { gsap } from 'gsap/all';
-
 import $ from 'jquery';
 
 import { References } from './references';
