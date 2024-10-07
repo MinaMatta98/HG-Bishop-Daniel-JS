@@ -22,10 +22,11 @@ export class GlobeAnimation {
   private _size: { innerHeight: number; innerWidth: number };
   private _timeout: number;
   private _tl: GSAPTimeline;
+  private _lightBG: boolean;
   /**
    *
    */
-  constructor() {
+  constructor(lightBg: boolean) {
     $(() => {
       this._canvas = $(References.homePageClasses.globeDiv);
       this._GLOBE = this.initGlobe();
@@ -33,6 +34,7 @@ export class GlobeAnimation {
         innerHeight: this._canvas.width(),
         innerWidth: this._canvas.height(),
       };
+      this._lightBG = lightBg;
     });
   }
 
@@ -211,19 +213,25 @@ export class GlobeAnimation {
     $(() => {
       const globeG = $('.globe-svg').find('g');
       gsap.set(globeG.children(), { fill: 'white', opacity: 0 });
-      if (this._tl) {
-        this._tl.kill();
-      }
+
+      this.destroyGlobeBlockAnimation();
       this._tl = gsap.timeline({ repeat: -1 }); // Create a timeline with infinite repetition
       this._tl.to(globeG.children(), { opacity: 0.5, stagger: 0.15 }, 'timeline');
       this._tl.to(globeG.children(), { opacity: 0, stagger: 0.2 }, 'timeline+=0.3'); // Adjust the delay as needed
+      const defaultCursor = () =>
+        this._lightBG ? CursorAnimations.cursorBlue() : CursorAnimations.cursorWhite();
+
+
       $(References.homePageClasses.ministryWrapper).on('mouseenter', () =>
         CursorAnimations.cursorWhite()
       );
-      $(References.homePageClasses.ministryWrapper).on('mouseleave', () =>
-        CursorAnimations.cursorBlue()
-      );
+
+      $(References.homePageClasses.ministryWrapper).on('mouseleave', () => defaultCursor());
     });
+  };
+
+  public destroyGlobeBlockAnimation = () => {
+    if (this._tl) this._tl.kill();
   };
 
   private animateStarGeometry = () => {
