@@ -1,13 +1,14 @@
 import type { ISchemaPage } from '@barba/core/dist/core/src/src/defs';
 import { gsap } from 'gsap/all';
-import $ from 'jquery';
 
 import { BioAnimations } from './bio-animations';
 import { CursorAnimations } from './cursor-animations';
 import { FooterAnimations } from './footerAnimations';
 import { HomePageAnimations } from './homepage-animations';
+import { MinistryPageAnimations } from './ministrypage-animations';
 import { NavBarAnimations } from './navbar-animations';
 import { References } from './references';
+import { SermonPageAnimations } from './sermon-animations';
 import { TOCAnimations } from './toc';
 
 export class Animations {
@@ -17,9 +18,27 @@ export class Animations {
   private static _footerAnimator = FooterAnimations;
   private static _tocAnimator = new TOCAnimations();
   private static _homePageAnimator = HomePageAnimations;
+  private static _ministryPageAnimator = new MinistryPageAnimations();
+  private static _sermonPageAnimator = new SermonPageAnimations();
 
-  public static disposeGlobe = () => {
+  public static disposeHomepageGlobe = () => {
     this._homePageAnimator.disposeGlobe();
+  };
+
+  public static disposeHomepageAnimations = () => {
+    this._homePageAnimator.gsapGlobeContainerDestroy();
+  };
+
+  public static disposeMinistrypageGlobe = () => {
+    this._ministryPageAnimator.disposeGlobe();
+  };
+
+  public static initMinistryPage = () => {
+    this._ministryPageAnimator.animateMinistryPage(this._navBarAnimator);
+  };
+
+  public static initSermonPage = () => {
+    this._sermonPageAnimator.animateSermonPage(this._navBarAnimator);
   };
 
   public static showProgress = () => {
@@ -28,7 +47,7 @@ export class Animations {
   };
 
   public static initHomePage = async (initTime: number, isFirstLoad: boolean) => {
-    await this._homePageAnimator.animateHomePage(initTime, isFirstLoad);
+    await this._homePageAnimator.animateHomePage(initTime, isFirstLoad, this._navBarAnimator);
   };
 
   public static cursorWhite = (): void => {
@@ -52,20 +71,6 @@ export class Animations {
 
   public static setOpaque = (identifier: gsap.TweenTarget): void => {
     gsap.set(identifier, { opacity: '1' });
-  };
-
-  public static handleMinistrySlider = (): void => {
-    gsap.fromTo(
-      References.ministryPageClasses.ministrySliderClass,
-      { left: '-100%' },
-      { left: '0', duration: 1.5 }
-    );
-    const ministryCards = $(References.ministryPageClasses.highlightCardClass);
-    const tl = gsap.timeline();
-    ministryCards.each((index, card) => {
-      gsap.set(card, { left: '100%' });
-      tl.to(card, { left: '0', duration: 0.2, delay: 1.5 + 0.2 * (index + 1) });
-    });
   };
 
   public static initNavLinks = (): void => {
@@ -123,7 +128,7 @@ export class Animations {
     this._footerAnimator.animateFooterWhite();
   };
 
-  public static animateToc = async () => {
+  public static animateToc = () => {
     this._tocAnimator.tocAnimation();
   };
 }

@@ -3,13 +3,14 @@ import 'swiper/css';
 import 'swiper/css/effect-cards';
 import '../animations.css';
 
-import { Flip, gsap, ScrollTrigger } from 'gsap/all';
+import { gsap } from 'gsap/all';
 import $ from 'jquery';
 import Swiper from 'swiper/bundle';
 
 import { Utils } from '../utils/utils';
 import { Animations } from './animations';
 import { GlobeAnimation } from './globe';
+import { LogoAnimations } from './logo-animations';
 import { NavBarAnimations } from './navbar-animations';
 import { References } from './references';
 
@@ -381,6 +382,11 @@ export class HomePageAnimations {
     });
   };
 
+  public static gsapGlobeContainerDestroy = () => {
+    if (this._globeTL) this._globeTL.kill();
+    this._globeAnimation.destroyGlobeBlockAnimation();
+  };
+
   private static initGlobe = () => {
     this._globeAnimation.init();
     this._globeAnimation.animateGlobeBlock();
@@ -405,7 +411,11 @@ export class HomePageAnimations {
     this._globeAnimation.dispose();
   };
 
-  public static animateHomePage = async (initTime: number, isFirstLoad: boolean) => {
+  public static animateHomePage = async (
+    initTime: number,
+    isFirstLoad: boolean,
+    navbarAnimator: NavBarAnimations
+  ) => {
     $(async () => {
       if (isFirstLoad)
         Animations.displayShow(References.transitionClasses.pageLoadClass, true, 'flex');
@@ -413,7 +423,7 @@ export class HomePageAnimations {
       this.logoAnimation();
       this.initGlobe();
       this.animateScheduleCursor();
-      this._navBarAnimator.animateScrollButton($(References.homePageClasses.openingHeroClass));
+      navbarAnimator.animateScrollButton($(References.homePageClasses.openingHeroClass));
       this._scheduleAnimator.animateScheduleSection();
       this._newsAnimator.animateNewsSection();
       this._openingHeroAnimator.animateProgressFade();
