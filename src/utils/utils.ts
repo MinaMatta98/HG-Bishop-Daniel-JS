@@ -1,6 +1,6 @@
 import type { ITransitionData } from '@barba/core/dist/core/src/src/defs';
 import { restartWebflow } from '@finsweet/ts-utils';
-import { Flip, gsap, ScrollTrigger } from 'gsap/all';
+import { Flip, gsap, ScrollTrigger, ScrollToPlugin } from 'gsap/all';
 import $ from 'jquery';
 
 import { Animations } from '../animations/animations';
@@ -8,7 +8,6 @@ import { DOMAIN } from '../index';
 import { Stats } from './sentry';
 
 export class Utils {
-
   public static initStats = () => {
     Stats.init();
   };
@@ -61,7 +60,7 @@ export class Utils {
   };
 
   private static scrollFlipInit = () => {
-    gsap.registerPlugin(ScrollTrigger, Flip);
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, Flip);
     ScrollTrigger.normalizeScroll(true);
   };
 
