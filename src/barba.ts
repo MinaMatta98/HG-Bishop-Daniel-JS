@@ -26,15 +26,17 @@ export const barbaInit = () => {
           Animations.disableNavLinks();
           await Animations.handleTransitionAnimation(true);
           Animations.underlineNav(data.current.namespace, false);
+          //gsap.globalTimeline.clear();
         },
         async enter(_data) {
-          await Animations.animateToc();
           Utils.linkHandler();
         },
         async after(data) {
-          data.next.namespace !== 'ministry'
-            ? (data.next.container.style.display = 'block')
-            : (data.next.container.style.display = 'flex');
+          Animations.animateToc();
+          data.next.container.style.display = 'block';
+          //data.next.namespace !== 'ministry'
+          //  ? (data.next.container.style.display = 'block')
+          //  : (data.next.container.style.display = 'flex');
           Animations.enableNavLinks();
           Animations.showProgress();
           await Animations.handleTransitionAnimation(false);
@@ -49,12 +51,16 @@ export const barbaInit = () => {
         from: { namespace: ['bio'] },
         to: { namespace: 'home' },
         async after(data) {
-          await Animations.animateToc();
+          data.next.container.style.display = 'block';
+          Animations.animateToc();
           Animations.footerAnimateWhite();
           Animations.showProgress();
+          await Animations.handleTransitionAnimation(false);
           await Animations.underlineNav(data.next.namespace, true);
         },
         async leave(data) {
+          data.next.container.style.display = 'none';
+          await Animations.handleTransitionAnimation(true);
           Animations.underlineNav(data.current.namespace, false);
         },
       },
@@ -69,7 +75,8 @@ export const barbaInit = () => {
           });
         },
         beforeLeave() {
-          Animations.disposeGlobe();
+          Animations.disposeHomepageGlobe();
+          Animations.disposeHomepageAnimations();
         },
       },
       {
@@ -78,8 +85,19 @@ export const barbaInit = () => {
           Animations.cursorBlue();
         },
         async afterEnter() {
-          Animations.animateBio();
+          await Animations.animateBio();
           Animations.cursorWhite();
+          Animations.footerAnimateBlue();
+        },
+      },
+      {
+        namespace: 'sermons',
+        async afterLeave() {
+          Animations.cursorBlue();
+        },
+        async afterEnter() {
+          Animations.initSermonPage();
+          Animations.cursorBlue();
           Animations.footerAnimateBlue();
         },
       },
@@ -87,12 +105,10 @@ export const barbaInit = () => {
         namespace: 'ministry',
         async afterLeave() {
           Animations.cursorBlue();
+          Animations.disposeMinistrypageGlobe();
         },
         async afterEnter() {
-          await Utils.globeScriptHandler();
-          Animations.cursorWhite();
-          Animations.handleMinistrySlider();
-          Animations.setOpaque(References.ministryPageClasses.globeAttributeSelector);
+          Animations.initMinistryPage();
         },
       },
     ],
