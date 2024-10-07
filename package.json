@@ -53,7 +53,6 @@
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "globe.gl": "^2.32.5",
-    "jquery": "^3.7.1",
     "prettier": "^3.3.3",
     "style-loader": "^4.0.0",
     "three": "^0.167.1",
@@ -68,9 +67,28 @@
   "dependencies": {
     "@finsweet/ts-utils": "^0.40.0",
     "@sentry/browser": "^8.24.0",
+    "@tsparticles/engine": "^3.5.0",
+    "@tsparticles/interaction-external-trail": "^3.5.0",
+    "@tsparticles/jquery": "^3.0.0",
+    "@tsparticles/plugin-absorbers": "^3.5.0",
+    "@tsparticles/plugin-polygon-mask": "^3.5.0",
+    "@tsparticles/shape-text": "^3.5.0",
+    "@tsparticles/slim": "^3.5.0",
+    "@tsparticles/updater-destroy": "^3.5.0",
+    "@tsparticles/updater-roll": "^3.5.0",
+    "@tsparticles/updater-tilt": "^3.5.0",
+    "@tsparticles/updater-twinkle": "^3.5.0",
+    "@tsparticles/updater-wobble": "^3.5.0",
     "gsap": "^3.12.5",
+    "jquery": "^3.7.1",
+    "lettering.js": "^0.8.2",
+    "pagepiling.js": "^1.5.6",
     "split-type": "^0.3.4",
-    "swiper": "^11.1.11"
+    "swiper": "^11.1.11",
+    "textillate": "^0.4.1",
+    "tsparticles": "^3.5.0",
+    "tsparticles-engine": "^2.12.0",
+    "universal-tilt.js": "^2.0.6"
   },
   "engines": {
     "pnpm": ">=9"
