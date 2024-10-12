@@ -110,6 +110,12 @@ export const barbaInit = () => {
           Animations.initMinistryPage();
         },
       },
+      {
+        namespace: 'churches',
+        async afterEnter() {
+          Animations.initChurchesPage();
+        },
+      },
     ],
   });
   barba.hooks.after(async (data) => {

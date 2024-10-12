@@ -2,6 +2,7 @@ import type { ISchemaPage } from '@barba/core/dist/core/src/src/defs';
 import { gsap } from 'gsap/all';
 
 import { BioAnimations } from './bio-animations';
+import { ChurchAnimations } from './churchpage-animations';
 import { CursorAnimations } from './cursor-animations';
 import { FooterAnimations } from './footerAnimations';
 import { HomePageAnimations } from './homepage-animations';
@@ -20,6 +21,7 @@ export class Animations {
   private static _homePageAnimator = HomePageAnimations;
   private static _ministryPageAnimator = new MinistryPageAnimations();
   private static _sermonPageAnimator = new SermonPageAnimations();
+  private static _churchesPageAnimator = new ChurchAnimations();
 
   public static disposeHomepageGlobe = () => {
     this._homePageAnimator.disposeGlobe();
@@ -39,6 +41,10 @@ export class Animations {
 
   public static initSermonPage = () => {
     this._sermonPageAnimator.animateSermonPage(this._navBarAnimator);
+  };
+
+  public static initChurchesPage = () => {
+    this._churchesPageAnimator.animateChurchPage(this._navBarAnimator);
   };
 
   public static showProgress = () => {
