@@ -1,7 +1,7 @@
 // import Swiper styles
 import 'swiper/css';
 import 'swiper/css/effect-cards';
-import '../animations.css';
+import '../../animations.css';
 
 import { gsap } from 'gsap/all';
 import $ from 'jquery';

@@ -2,8 +2,8 @@ import 'lettering.js';
 import 'textillate';
 import 'textillate/assets/animate.css';
 import 'leaflet/dist/leaflet.css';
-import '../timeline.min.css';
-import './timeline/timeline.min.js';
+import '../../timeline.min.css';
+import '../Components/timeline/timeline.min.js';
 
 import { Flip, gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
