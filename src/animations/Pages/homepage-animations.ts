@@ -7,12 +7,12 @@ import { gsap } from 'gsap/all';
 import $ from 'jquery';
 import Swiper from 'swiper/bundle';
 
-import { Utils } from '../utils/utils';
-import { Animations } from './animations';
-import { GlobeAnimation } from './globe';
-import { LogoAnimations } from './logo-animations';
-import { NavBarAnimations } from './navbar-animations';
-import { References } from './references';
+import { Utils } from '../../utils/utils';
+import { Animations } from '../animations';
+import { GlobeAnimation } from '../Components/globe';
+import { LogoAnimations } from '../Components/logo-animations';
+import { References } from '../references';
+import { NavBarAnimations } from '../UI/navbar-animations';
 
 class NewsAnimations {
   private _articles: JQuery<HTMLElement>;

@@ -2,7 +2,7 @@ import type { ISchemaPage } from '@barba/core/dist/core/src/src/defs';
 import { gsap } from 'gsap/all';
 import $ from 'jquery';
 
-import { References } from './references';
+import { References } from '../references';
 
 export class NavBarAnimations {
   private _links: JQuery<HTMLElement>;

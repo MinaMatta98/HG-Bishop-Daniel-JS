@@ -1,7 +1,7 @@
 import { gsap } from 'gsap/all';
 import $ from 'jquery';
 
-import { References } from './references';
+import { References } from '../references';
 
 export class TOCAnimations {
   /** Page sections with attr*/

@@ -5,9 +5,9 @@ import 'textillate/assets/animate.css';
 import { gsap } from 'gsap/all';
 import $ from 'jquery';
 
-import { Animations } from './animations';
-import { LogoAnimations } from './logo-animations';
-import { NavBarAnimations } from './navbar-animations';
+import { Animations } from '../animations';
+import { LogoAnimations } from '../Components/logo-animations';
+import { NavBarAnimations } from '../UI/navbar-animations';
 
 export class SermonPageAnimations {
   private _sermonsHeading: JQuery<HTMLHeadingElement>;

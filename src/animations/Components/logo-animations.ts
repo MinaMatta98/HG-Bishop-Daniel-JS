@@ -1,7 +1,7 @@
 import { Flip, gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
 
-import { References } from './references';
+import { References } from '../references';
 /**
  * @module Keep Private. This is simply a definition of the
  * LogoAnimations class to ensure strong typing.

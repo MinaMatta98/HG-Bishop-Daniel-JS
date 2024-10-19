@@ -1,6 +1,6 @@
 import gsap from 'gsap';
 
-import { References } from './references';
+import { References } from '../references';
 
 export class CursorAnimations {
   public static cursorWhite = () => {

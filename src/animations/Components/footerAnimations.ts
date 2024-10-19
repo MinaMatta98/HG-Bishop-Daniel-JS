@@ -1,5 +1,5 @@
-import { Animations } from './animations';
-import { References } from './references';
+import { Animations } from '../animations';
+import { References } from '../references';
 
 export class FooterAnimations {
   public static animateFooterBlue = (): void => {

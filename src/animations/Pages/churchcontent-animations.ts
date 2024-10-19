@@ -10,10 +10,10 @@ import $ from 'jquery';
 import LeaderLine from 'leader-line';
 import leaflet from 'leaflet';
 
-import { CursorAnimations } from './cursor-animations';
-import * as geoJson from './GeoJson-Data/australian-states.json';
-import { LogoAnimations } from './logo-animations';
-import type { NavBarAnimations } from './navbar-animations';
+import * as geoJson from '../../public/state-GeoJson/australian-states.json';
+import { LogoAnimations } from '../Components/logo-animations';
+import { CursorAnimations } from '../UI/cursor-animations';
+import type { NavBarAnimations } from '../UI/navbar-animations';
 
 export class ChurchContentAnimations {
   private _heading: JQuery<HTMLElement>;

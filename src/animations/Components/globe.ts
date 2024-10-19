@@ -4,9 +4,9 @@ import $ from 'jquery';
 import { MeshPhysicalMaterial } from 'three';
 import * as THREE from 'three';
 
-import countries from '../public/custom.geo.json';
-import { CursorAnimations } from './cursor-animations';
-import { References } from './references';
+import countries from '../../public/custom.geo.json';
+import { CursorAnimations } from '../UI/cursor-animations';
+import { References } from '../references';
 
 export class GlobeAnimation {
   private _RATIO = 0.95;

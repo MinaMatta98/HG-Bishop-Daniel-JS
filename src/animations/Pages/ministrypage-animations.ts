@@ -4,11 +4,11 @@ import $ from 'jquery';
 import { loadFull } from 'tsparticles';
 
 //import UniversalTilt from 'universal-tilt.js';
-import * as animation from './animation.json';
-import { Animations } from './animations';
-import { GlobeAnimation } from './globe';
-import { LogoAnimations } from './logo-animations';
-import type { NavBarAnimations } from './navbar-animations';
+import * as animation from '../animation.json';
+import { Animations } from '../animations';
+import { GlobeAnimation } from '../Components/globe';
+import { LogoAnimations } from '../Components/logo-animations';
+import type { NavBarAnimations } from '../UI/navbar-animations';
 
 export class MinistryPageAnimations {
   private _globeAnimation: GlobeAnimation;

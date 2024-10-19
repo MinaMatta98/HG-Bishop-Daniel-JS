@@ -2,8 +2,8 @@ import gsap from 'gsap/all';
 import $ from 'jquery';
 import SplitType from 'split-type';
 
-import { NavBarAnimations } from './navbar-animations';
-import { References } from './references';
+import { References } from '../references';
+import { NavBarAnimations } from '../UI/navbar-animations';
 
 export class BioAnimations {
   private static _navBarAnimator = new NavBarAnimations();

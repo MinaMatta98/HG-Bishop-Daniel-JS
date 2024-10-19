@@ -1,17 +1,17 @@
 import type { ISchemaPage } from '@barba/core/dist/core/src/src/defs';
 import { gsap } from 'gsap/all';
 
-import { BioAnimations } from './bio-animations';
-import { ChurchContentAnimations } from './churchcontent-animations';
-import { ChurchAnimations } from './churchpage-animations';
-import { CursorAnimations } from './cursor-animations';
-import { FooterAnimations } from './footerAnimations';
-import { HomePageAnimations } from './homepage-animations';
-import { MinistryPageAnimations } from './ministrypage-animations';
-import { NavBarAnimations } from './navbar-animations';
+import { BioAnimations } from './Pages/bio-animations';
+import { ChurchContentAnimations } from './Pages/churchcontent-animations';
+import { ChurchAnimations } from './Pages/churchpage-animations';
+import { CursorAnimations } from './UI/cursor-animations';
+import { FooterAnimations } from './Components/footerAnimations';
+import { HomePageAnimations } from './Pages/homepage-animations';
+import { MinistryPageAnimations } from './Pages/ministrypage-animations';
+import { NavBarAnimations } from './UI/navbar-animations';
 import { References } from './references';
-import { SermonPageAnimations } from './sermon-animations';
-import { TOCAnimations } from './toc';
+import { SermonPageAnimations } from './Pages/sermon-animations';
+import { TOCAnimations } from './UI/toc';
 
 export class Animations {
   private static _cursorAnimator = CursorAnimations;

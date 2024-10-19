@@ -4,9 +4,9 @@ import { gsap } from 'gsap';
 import $ from 'jquery';
 import leaflet from 'leaflet';
 
-import * as geoJson from './GeoJson-Data/australian-states.json';
-import { LogoAnimations } from './logo-animations';
-import type { NavBarAnimations } from './navbar-animations';
+import * as geoJson from '../../public/state-GeoJson/australian-states.json';
+import { LogoAnimations } from '../Components/logo-animations';
+import type { NavBarAnimations } from '../UI/navbar-animations';
 
 export class ChurchAnimations {
   private _map: L.Map;
