@@ -147,3 +147,32 @@ input[type="password"],
 	height: 100%;
 
 }
+
+.map {
+	background: #1098ff;
+}
+
+.leaflet-interactive {
+  	filter: drop-shadow(0.35rem 0.35rem 0.4rem rgba(0, 0, 0, 0.5));
+}
+
+.leaflet-marker-icon {
+	height: 0px !important;
+	width: 0px !important;
+}
+
+.timeline__year {
+	color: white !important;
+	font-size: 1.5em !important;
+	margin-bottom: 1em !important;
+}
+
+.timeline__content {
+	color: white !important;
+	background: var(--cursor-inner) !important;
+
+}
+/**/
+/*.timeline__content::before {*/
+/*	border-top-color: var(--cursor-inner) !important;*/
+/*}*/

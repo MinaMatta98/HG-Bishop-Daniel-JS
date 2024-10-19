@@ -18,7 +18,7 @@ export class NavBarAnimations {
 
   underlineNav = async (identifier: ISchemaPage['namespace'], underline: boolean) => {
     const width = underline ? '105%' : '0%';
-    await gsap.to(`.underline-${identifier}`, { width: width, duration: 1 });
+    await gsap.to(`.underline-${identifier.split('-')[0]}`, { width: width, duration: 1 });
   };
 
   initNavLinks = () => {

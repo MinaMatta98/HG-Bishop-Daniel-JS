@@ -1,9 +1,9 @@
 {
 	"extends": "@finsweet/tsconfig",
 	"compilerOptions": {
-		"target": "esnext",
+		"target": "ES2020",
 		"useDefineForClassFields": true,
-		"module": "esnext",
+		"module": "ES2020",
 		"rootDir": ".",
 		"baseUrl": ".",
 		"paths": {
@@ -16,9 +16,6 @@
 			"DOM",
 			"DOM.Iterable"
 		],
-		//"types": [
-		//	"@finsweet/ts-utils", "node"
-		//],
 		"skipLibCheck": false,
 		"checkJs": true,
 		"allowJs": true,

@@ -20,16 +20,14 @@ const context = await esbuild.context({
   entryPoints : ENTRY_POINTS,
   outdir : BUILD_DIRECTORY,
   minify : PRODUCTION,
-  keepNames : true,
+  // keepNames : true,
+  format : 'iife',
   // platform : 'browser',
   sourcemap : !PRODUCTION,
-  // external : [ 'jquery' ],
   target : PRODUCTION ? 'es2020' : 'esnext',
   inject : LIVE_RELOAD ? [ './bin/live-reload.js', './bin/inject.js' ]
                        : [ './bin/inject.js' ],
-  loader : {
-    '.png' : 'file',
-  },
+  loader : {'.png' : 'file', '.svg' : 'file'},
   define : {
     SERVE_ORIGIN : JSON.stringify(SERVE_ORIGIN),
   },

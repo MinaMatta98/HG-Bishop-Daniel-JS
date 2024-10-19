@@ -33,9 +33,6 @@ export const barbaInit = () => {
         async after(data) {
           Animations.animateToc();
           data.next.container.style.display = 'block';
-          //data.next.namespace !== 'ministry'
-          //  ? (data.next.container.style.display = 'block')
-          //  : (data.next.container.style.display = 'flex');
           Animations.enableNavLinks();
           Animations.showProgress();
           await Animations.handleTransitionAnimation(false);
@@ -114,6 +111,15 @@ export const barbaInit = () => {
         namespace: 'churches',
         async afterEnter() {
           Animations.initChurchesPage();
+        },
+      },
+      {
+        namespace: 'churches-content',
+        async beforeEnter() {
+          Animations.footerAnimateWhite();
+        },
+        async afterEnter() {
+          Animations.initChurchContentPage();
         },
       },
     ],

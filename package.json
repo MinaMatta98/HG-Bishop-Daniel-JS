@@ -82,6 +82,7 @@
     "@types/leaflet": "^1.9.12",
     "gsap": "^3.12.5",
     "jquery": "^3.7.1",
+    "leader-line": "^1.0.7",
     "leaflet": "^1.9.4",
     "lettering.js": "^0.8.2",
     "pagepiling.js": "^1.5.6",
