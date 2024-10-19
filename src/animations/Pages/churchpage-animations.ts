@@ -14,8 +14,6 @@ export class ChurchAnimations {
   private static _shadow = 'drop-shadow(2px 7px 15px rgba(0, 0, 0, 0.4))';
   private _shadowAnimation: gsap.core.Tween;
 
-  constructor() {}
-
   private getColor = (_d: number) => {
     return '#ffffff';
   };

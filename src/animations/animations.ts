@@ -12,6 +12,7 @@ import { NavBarAnimations } from './UI/navbar-animations';
 import { References } from './references';
 import { SermonPageAnimations } from './Pages/sermon-animations';
 import { TOCAnimations } from './UI/toc';
+import { SermonContentAnimations } from './Pages/sermoncontent-animations';
 
 export class Animations {
   private static _cursorAnimator = CursorAnimations;
@@ -24,6 +25,7 @@ export class Animations {
   private static _sermonPageAnimator = new SermonPageAnimations();
   private static _churchesPageAnimator = new ChurchAnimations();
   private static _churcheContentAnimator = new ChurchContentAnimations();
+  private static _sermonContentAnimator = new SermonContentAnimations();
 
   public static disposeHomepageGlobe = () => {
     this._homePageAnimator.disposeGlobe();

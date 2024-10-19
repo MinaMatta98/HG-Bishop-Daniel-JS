@@ -17,7 +17,6 @@ export class SermonPageAnimations {
   private _circle: JQuery<HTMLElement>;
   private _itemSection: JQuery<HTMLElement>;
   private _scrollTL: gsap.core.Tween;
-  constructor() {}
 
   private animateItemSection = (): void => {
     this._circle = $('.section-glow');

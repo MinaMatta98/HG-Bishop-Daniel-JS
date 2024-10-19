@@ -13,8 +13,6 @@ import type { NavBarAnimations } from '../UI/navbar-animations';
 export class MinistryPageAnimations {
   private _globeAnimation: GlobeAnimation;
 
-  constructor() {}
-
   public init = (): void => {
     this._globeAnimation = new GlobeAnimation(false);
     this._globeAnimation.init();
