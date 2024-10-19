@@ -7,7 +7,7 @@ import '../Components/timeline/timeline.min.js';
 
 import { Flip, gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
-import LeaderLine from 'leader-line';
+import LeaderLine from 'leader-line-new';
 import leaflet from 'leaflet';
 
 import * as geoJson from '../../public/state-GeoJson/australian-states.json';
@@ -17,23 +17,34 @@ import type { NavBarAnimations } from '../UI/navbar-animations';
 
 export class ChurchContentAnimations {
   private _heading: JQuery<HTMLElement>;
-  private _subHeading: JQuery<HTMLElement>;
-  private _ctaButton: JQuery<HTMLElement>;
-  private _churchImages: JQuery<HTMLElement>;
-  private _locationSection: JQuery<HTMLElement>;
-  private _locInvitation: JQuery<HTMLElement>;
-  private _locContent: JQuery<HTMLElement>;
-  private _heroSection: JQuery<HTMLElement>;
-  private _mapContainer: JQuery<HTMLElement>;
-  private _mapPin: JQuery<HTMLElement>;
-  private _leaderLine: LeaderLine;
-  private _map: leaflet.Map;
-  private _targetState: string;
-  //private _carousel: PriestCarousel;
 
-  private animateMinistryLogo = async (): Promise<void> => {
-    await LogoAnimations.animateLogo();
-  };
+  private _subHeading: JQuery<HTMLElement>;
+
+  private _ctaButton: JQuery<HTMLElement>;
+
+  private _churchImages: JQuery<HTMLElement>;
+
+  private _locationSection: JQuery<HTMLElement>;
+
+  private _locInvitation: JQuery<HTMLElement>;
+
+  private _locContent: JQuery<HTMLElement>;
+
+  private _heroSection: JQuery<HTMLElement>;
+
+  private _mapContainer: JQuery<HTMLElement>;
+
+  private _mapPin: JQuery<HTMLElement>;
+
+  private _leaderLine: LeaderLine;
+
+  private _map: leaflet.Map;
+
+  private _targetState: string;
+
+  private _mapTL: gsap.core.Timeline;
+
+  private _priestCarousel: PriestCarousel;
 
   private init = (): void => {
     $(() => {
@@ -48,7 +59,8 @@ export class ChurchContentAnimations {
       this._locContent = $('.loc-content');
       this._heroSection = $('.church-content-hero-section');
       this._mapContainer = $('.map');
-      new PriestCarousel();
+      this._priestCarousel = new PriestCarousel();
+      this._mapTL = gsap.timeline();
       this.LoadTimeline();
       this._heading.css('display', 'none');
       this._subHeading.css('opacity', 0);
@@ -57,8 +69,20 @@ export class ChurchContentAnimations {
     });
   };
 
+  private animateMinistryLogo = async (): Promise<void> => {
+    await LogoAnimations.animateLogo();
+  };
+
+  public disposeChurchContentPage = (): void => {
+    this._mapTL.kill();
+    this._mapTL.clear(true);
+    this._leaderLine.remove();
+    this._leaderLine = null;
+    this._priestCarousel.disposeAnimations();
+  };
+
   private animateHeading = (): void => {
-    const { _heading, _subHeading, _ctaButton, _churchImages } = this;
+    const { _heading, _subHeading, _ctaButton, _churchImages, _mapTL } = this;
     $(async () => {
       _heading.css('display', 'unset');
       await (<any>_heading).textillate({
@@ -85,11 +109,11 @@ export class ChurchContentAnimations {
           callback: function () {},
         },
         callback: async function () {
-          gsap.to(_subHeading, { opacity: 1, duration: 1 });
-          gsap.to(_ctaButton, { opacity: 1, duration: 1 });
-          gsap.to(_ctaButton, { opacity: 1, duration: 1 });
-          gsap.from(_churchImages, { translateX: '-10em', duration: 1, stagger: 0.5 });
-          gsap.to(_churchImages, { opacity: 1, duration: 1, stagger: 0.3 });
+          _mapTL.to(_subHeading, { opacity: 1, duration: 1 }, 0);
+          _mapTL.to(_ctaButton, { opacity: 1, duration: 1 }, 0);
+          _mapTL.to(_ctaButton, { opacity: 1, duration: 1 }, 0);
+          _mapTL.to(_churchImages, { opacity: 1, duration: 1, stagger: 0.3 }, 1);
+          _mapTL.from(_churchImages, { translateX: '-10em', duration: 1 }, 1);
         },
         type: 'char',
       });
@@ -173,7 +197,7 @@ export class ChurchContentAnimations {
       });
       this._leaderLine.hide();
       $(window).on('resize', () => {
-        this._leaderLine.position();
+        if (this._leaderLine) this._leaderLine.position();
       });
     });
   };
@@ -197,10 +221,10 @@ export class ChurchContentAnimations {
               duration: 1,
             }
           );
-          this._leaderLine.show('draw', { duration: 2000 });
+          if (this._leaderLine) this._leaderLine.show('draw', { duration: 2000 });
         },
         onLeaveBack: () => {
-          this._leaderLine.hide();
+          if (this._leaderLine) this._leaderLine.hide();
         },
       },
     });
@@ -244,11 +268,17 @@ export class ChurchContentAnimations {
 
 class PriestCarousel {
   private _priestContainer: JQuery<HTMLElement>;
+
   private _carouselContainer: JQuery<HTMLElement>;
+
   private _controls: JQuery<HTMLElement>;
-  private _pauseButton: JQuery<HTMLElement>;
+
+  private _pauseButton: JQuery<HTMLButtonElement>;
+
   private _playButton: JQuery<HTMLElement>;
+
   private _animationTL: gsap.core.Timeline;
+
   private _controlsTL: gsap.core.Timeline;
 
   constructor() {
@@ -279,6 +309,11 @@ class PriestCarousel {
   private pauseCarousel = (): void => {
     this._animationTL.pause();
     this._controlsTL.pause();
+  };
+
+  public disposeAnimations = (): void => {
+    this._animationTL.kill();
+    this._controlsTL.kill();
   };
 
   private resumeCarousel = (): void => {
@@ -377,16 +412,20 @@ class PriestCarousel {
       trigger: this._carouselContainer,
       start: 'top 50%',
       onEnter: () => {
-        this.resumeCarousel();
+        //this.resumeCarousel();
+	this._playButton.trigger('click');
       },
       onEnterBack: () => {
-        this.resumeCarousel();
+        //this.resumeCarousel();
+	this._playButton.trigger('click');
       },
       onLeave: () => {
-        this.pauseCarousel();
+        //this.pauseCarousel();
+	this._pauseButton.trigger('click');
       },
       onLeaveBack: () => {
-        this.pauseCarousel();
+        //this.pauseCarousel();
+	this._pauseButton.trigger('click');
       },
     });
   };
