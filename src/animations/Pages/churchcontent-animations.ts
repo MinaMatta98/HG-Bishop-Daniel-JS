@@ -306,19 +306,9 @@ class PriestCarousel {
     });
   };
 
-  private pauseCarousel = (): void => {
-    this._animationTL.pause();
-    this._controlsTL.pause();
-  };
-
   public disposeAnimations = (): void => {
     this._animationTL.kill();
     this._controlsTL.kill();
-  };
-
-  private resumeCarousel = (): void => {
-    this._animationTL.resume();
-    this._controlsTL.resume();
   };
 
   private focusTransition = (e: HTMLElement | JQuery<HTMLElement>): void => {
