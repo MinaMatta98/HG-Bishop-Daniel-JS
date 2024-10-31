@@ -5,7 +5,6 @@ import { MeshPhysicalMaterial } from 'three';
 import * as THREE from 'three';
 
 import countries from '../../public/custom.geo.json';
-import { CursorAnimations } from '../UI/cursor-animations';
 import { References } from '../references';
 
 export class GlobeAnimation {
@@ -220,7 +219,6 @@ export class GlobeAnimation {
       this._tl.to(globeG.children(), { opacity: 0, stagger: 0.2 }, 'timeline+=0.3'); // Adjust the delay as needed
       const defaultCursor = () =>
         this._lightBG ? CursorAnimations.cursorBlue() : CursorAnimations.cursorWhite();
-
 
       $(References.homePageClasses.ministryWrapper).on('mouseenter', () =>
         CursorAnimations.cursorWhite()

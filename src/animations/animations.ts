@@ -1,31 +1,43 @@
 import type { ISchemaPage } from '@barba/core/dist/core/src/src/defs';
 import { gsap } from 'gsap/all';
 
+import { FooterAnimations } from './Components/footerAnimations';
 import { BioAnimations } from './Pages/bio-animations';
 import { ChurchContentAnimations } from './Pages/churchcontent-animations';
 import { ChurchAnimations } from './Pages/churchpage-animations';
-import { CursorAnimations } from './UI/cursor-animations';
-import { FooterAnimations } from './Components/footerAnimations';
 import { HomePageAnimations } from './Pages/homepage-animations';
 import { MinistryPageAnimations } from './Pages/ministrypage-animations';
-import { NavBarAnimations } from './UI/navbar-animations';
-import { References } from './references';
 import { SermonPageAnimations } from './Pages/sermon-animations';
-import { TOCAnimations } from './UI/toc';
 import { SermonContentAnimations } from './Pages/sermoncontent-animations';
+import { References } from './references';
+import { CursorAnimations } from './UI/cursor-animations';
+import { NavBarAnimations } from './UI/navbar-animations';
+import { TOCAnimations } from './UI/toc';
+import type { Player } from './UI/Widgets/player';
 
-export class Animations {
-  private static _cursorAnimator = CursorAnimations;
-  private static _navBarAnimator = new NavBarAnimations();
-  private static _bioAnimator = BioAnimations;
-  private static _footerAnimator = FooterAnimations;
-  private static _tocAnimator = new TOCAnimations();
-  private static _homePageAnimator = HomePageAnimations;
-  private static _ministryPageAnimator = new MinistryPageAnimations();
-  private static _sermonPageAnimator = new SermonPageAnimations();
-  private static _churchesPageAnimator = new ChurchAnimations();
-  private static _churcheContentAnimator = new ChurchContentAnimations();
-  private static _sermonContentAnimator = new SermonContentAnimations();
+export class DisposeAnimations {
+  private static _homePageAnimator: typeof HomePageAnimations;
+
+  private _ministryPageAnimator: MinistryPageAnimations;
+
+  private _sermonContentAnimator: SermonContentAnimations;
+
+  private _churchContentPageAnimations: ChurchContentAnimations;
+
+  constructor(
+  public static disposeHomepageGlobe = () => {
+    this._homePageAnimator.disposeGlobe();
+  };
+    homePageAnimator: typeof HomePageAnimations,
+    ministryPageAnimator: MinistryPageAnimations,
+    sermonContentAnimator: SermonContentAnimations,
+    churchPageAnimator: ChurchContentAnimations
+  ) {
+    DisposeAnimations._homePageAnimator = homePageAnimator;
+    this._ministryPageAnimator = ministryPageAnimator;
+    this._sermonContentAnimator = sermonContentAnimator;
+    this._churchContentPageAnimations = churchPageAnimator;
+  }
 
   public static disposeHomepageGlobe = () => {
     this._homePageAnimator.disposeGlobe();
@@ -35,9 +47,50 @@ export class Animations {
     this._homePageAnimator.gsapGlobeContainerDestroy();
   };
 
-  public static disposeMinistrypageGlobe = () => {
+  public disposeMinistrypageGlobe = () => {
     this._ministryPageAnimator.disposeGlobe();
   };
+
+  public disposeChurchLeaderLine = () => {
+    this._churchContentPageAnimations.disposeChurchContentPage();
+  };
+}
+
+export class Animations {
+  private static _cursorAnimator = CursorAnimations;
+
+  private static _navBarAnimator = new NavBarAnimations();
+
+  private static _bioAnimator = BioAnimations;
+
+  private static _footerAnimator = FooterAnimations;
+
+  private static _tocAnimator = new TOCAnimations();
+
+  private static _homePageAnimator = HomePageAnimations;
+
+  private static _ministryPageAnimator = new MinistryPageAnimations();
+
+  private static _sermonPageAnimator = new SermonPageAnimations();
+
+  private static _churchesPageAnimator = new ChurchAnimations();
+
+  private static _churcheContentAnimator = new ChurchContentAnimations();
+
+  public static disposeHomepageGlobe = () => {
+    this._homePageAnimator.disposeGlobe();
+  };
+
+  public static disposeHomepageAnimations = () => {
+    this._homePageAnimator.gsapGlobeContainerDestroy();
+  };
+
+  public static disposeAnimations = new DisposeAnimations(
+    this._homePageAnimator,
+    this._ministryPageAnimator,
+    this._sermonContentAnimator,
+    this._churcheContentAnimator
+  );
 
   public static initMinistryPage = () => {
     this._ministryPageAnimator.animateMinistryPage(this._navBarAnimator);

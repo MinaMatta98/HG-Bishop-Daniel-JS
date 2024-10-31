@@ -1,6 +1,6 @@
 import barba from '@barba/core';
 
-import { Animations } from './animations/animations';
+import { Animations, DisposeAnimations } from './animations/animations';
 import { Utils } from './utils/utils';
 
 export const barbaInit = () => {
@@ -32,7 +32,15 @@ export const barbaInit = () => {
         },
         async after(data) {
           Animations.animateToc();
-          data.next.container.style.display = 'block';
+
+          switch (data.next.namespace.toString()) {
+            case 'sermons-content':
+              data.next.container.style.display = 'flex';
+              break;
+            default:
+              data.next.container.style.display = 'block';
+          }
+
           Animations.enableNavLinks();
           Animations.showProgress();
           await Animations.handleTransitionAnimation(false);
@@ -71,8 +79,8 @@ export const barbaInit = () => {
           });
         },
         beforeLeave() {
-          Animations.disposeHomepageGlobe();
-          Animations.disposeHomepageAnimations();
+          DisposeAnimations.disposeHomepageGlobe();
+          DisposeAnimations.disposeHomepageAnimations();
         },
       },
       {
@@ -101,7 +109,7 @@ export const barbaInit = () => {
         namespace: 'ministry',
         async afterLeave() {
           Animations.cursorBlue();
-          Animations.disposeMinistrypageGlobe();
+          Animations.disposeAnimations.disposeMinistrypageGlobe();
         },
         async afterEnter() {
           Animations.initMinistryPage();
@@ -120,6 +128,9 @@ export const barbaInit = () => {
         },
         async afterEnter() {
           Animations.initChurchContentPage();
+        },
+        async beforeLeave() {
+          Animations.disposeAnimations.disposeChurchLeaderLine();
         },
       },
     ],
