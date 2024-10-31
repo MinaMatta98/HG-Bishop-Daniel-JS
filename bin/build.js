@@ -27,7 +27,7 @@ const context = await esbuild.context({
   target : PRODUCTION ? 'es2020' : 'esnext',
   inject : LIVE_RELOAD ? [ './bin/live-reload.js', './bin/inject.js' ]
                        : [ './bin/inject.js' ],
-  loader : {'.png' : 'file', '.svg' : 'file'},
+  loader : {'.png' : 'file', '.svg' : 'file', '.mp3' : 'file'},
   define : {
     SERVE_ORIGIN : JSON.stringify(SERVE_ORIGIN),
   },
