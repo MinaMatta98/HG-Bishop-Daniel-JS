@@ -133,6 +133,16 @@ export const barbaInit = () => {
           Animations.disposeAnimations.disposeChurchLeaderLine();
         },
       },
+      {
+        namespace: 'sermons-content',
+        async beforeEnter() {
+          Animations.footerAnimateWhite();
+        },
+        async afterEnter() {
+          Animations.initSermonsContentPage();
+        },
+        async beforeLeave() {},
+      },
     ],
   });
   barba.hooks.after(async (data) => {

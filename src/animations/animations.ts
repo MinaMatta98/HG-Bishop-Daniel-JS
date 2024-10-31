@@ -25,9 +25,6 @@ export class DisposeAnimations {
   private _churchContentPageAnimations: ChurchContentAnimations;
 
   constructor(
-  public static disposeHomepageGlobe = () => {
-    this._homePageAnimator.disposeGlobe();
-  };
     homePageAnimator: typeof HomePageAnimations,
     ministryPageAnimator: MinistryPageAnimations,
     sermonContentAnimator: SermonContentAnimations,
@@ -77,9 +74,7 @@ export class Animations {
 
   private static _churcheContentAnimator = new ChurchContentAnimations();
 
-  public static disposeHomepageGlobe = () => {
-    this._homePageAnimator.disposeGlobe();
-  };
+  private static _sermonContentAnimator = new SermonContentAnimations();
 
   public static disposeHomepageAnimations = () => {
     this._homePageAnimator.gsapGlobeContainerDestroy();
@@ -102,6 +97,10 @@ export class Animations {
 
   public static initChurchContentPage = () => {
     this._churcheContentAnimator.animateChurchContent(this._navBarAnimator);
+  };
+
+  public static initSermonsContentPage = () => {
+    this._sermonContentAnimator.animateSermonContent(this._navBarAnimator);
   };
 
   public static initChurchesPage = () => {
