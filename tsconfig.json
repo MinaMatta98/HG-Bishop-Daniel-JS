@@ -16,6 +16,11 @@
 			"DOM",
 			"DOM.Iterable"
 		],
+		"typeRoots": [
+			"node_modules/@types",
+			"types",
+			"node_modules/leader-line-types"
+		],
 		"skipLibCheck": false,
 		"checkJs": true,
 		"allowJs": true,
