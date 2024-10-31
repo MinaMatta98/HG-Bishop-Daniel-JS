@@ -6,6 +6,7 @@ import * as THREE from 'three';
 
 import countries from '../../public/custom.geo.json';
 import { References } from '../references';
+import { CursorAnimations } from '../UI/cursor-animations';
 
 export class GlobeAnimation {
   private _RATIO = 0.95;
