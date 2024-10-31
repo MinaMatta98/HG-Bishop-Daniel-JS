@@ -8,6 +8,7 @@ import $ from 'jquery';
 import { Animations } from '../animations';
 import { LogoAnimations } from '../Components/logo-animations';
 import { NavBarAnimations } from '../UI/navbar-animations';
+import { PortablePlayer } from '../UI/Widgets/portable-player';
 
 export class SermonPageAnimations {
   private _sermonsHeading: JQuery<HTMLHeadingElement>;
@@ -17,6 +18,7 @@ export class SermonPageAnimations {
   private _circle: JQuery<HTMLElement>;
   private _itemSection: JQuery<HTMLElement>;
   private _scrollTL: gsap.core.Tween;
+  private _playerWidget: PortablePlayer;
 
   private animateItemSection = (): void => {
     this._circle = $('.section-glow');
@@ -121,7 +123,6 @@ export class SermonPageAnimations {
             start: 'top top',
             //end: 'bottom bottom',
             //snap: 1,
-            markers: true,
             onEnter: async () => {
               if (this._pages[index + 1] !== undefined) {
                 this.scroll(index + 1);
@@ -139,6 +140,7 @@ export class SermonPageAnimations {
   public animateSermonPage = async (navbarAnimator: NavBarAnimations): Promise<void> => {
     this._sermonsHeading = $('.sermon-heading');
     this._sermonScene = $('.sermon-scene');
+    this._playerWidget = new PortablePlayer();
     this.animateNavbarButton(navbarAnimator);
     this._sermonsHeading.css('display', 'none');
     this._sermonScene.css('opacity', '0');

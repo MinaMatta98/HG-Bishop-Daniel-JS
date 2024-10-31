@@ -76,9 +76,7 @@ export class Animations {
 
   private static _sermonContentAnimator = new SermonContentAnimations();
 
-  public static disposeHomepageAnimations = () => {
-    this._homePageAnimator.gsapGlobeContainerDestroy();
-  };
+  public static player: Player;
 
   public static disposeAnimations = new DisposeAnimations(
     this._homePageAnimator,
@@ -196,5 +194,18 @@ export class Animations {
 
   public static animateToc = () => {
     this._tocAnimator.tocAnimation();
+  };
+
+  public static initPlayer = (player: Player) => {
+    if (!Animations.player) {
+      Animations.player = player;
+    } else {
+      Animations.player.initializeContainers();
+      Animations.player.initUI();
+      Animations.player.updateUI();
+      Animations.player.playList.initUI();
+      Animations.player.playList.updateUI();
+      Animations.player.playList.initalizeRender();
+    }
   };
 }
