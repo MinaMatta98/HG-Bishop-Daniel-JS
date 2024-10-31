@@ -413,19 +413,19 @@ class PriestCarousel {
       start: 'top 50%',
       onEnter: () => {
         //this.resumeCarousel();
-	this._playButton.trigger('click');
+        this._playButton.trigger('click');
       },
       onEnterBack: () => {
         //this.resumeCarousel();
-	this._playButton.trigger('click');
+        this._playButton.trigger('click');
       },
       onLeave: () => {
         //this.pauseCarousel();
-	this._pauseButton.trigger('click');
+        this._pauseButton.trigger('click');
       },
       onLeaveBack: () => {
         //this.pauseCarousel();
-	this._pauseButton.trigger('click');
+        this._pauseButton.trigger('click');
       },
     });
   };
