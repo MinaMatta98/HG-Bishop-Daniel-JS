@@ -5,11 +5,11 @@ import { References } from '../references';
 
 export class TOCAnimations {
   /** Page sections with attr*/
-  private _sections: [HTMLElement, number][];
+  private _sections: [HTMLElement, number][] = [];
   /** Element holding the divs for sidebar */
   private _sectionHolder: JQuery<HTMLElement>;
   /** the divs for sidebar */
-  private _sectionWrappers: HTMLElement[];
+  private _sectionWrappers: HTMLElement[] = [];
 
   private _sectionToc: JQuery<HTMLElement>;
 
@@ -18,15 +18,18 @@ export class TOCAnimations {
   constructor() {
     $(() => {
       this._sectionHolder = $('.' + References.tocClasses.tocSectionHolderClass);
-      this._sections = [];
-      for (const e of Array.from($(`[${References.tocClasses.sectionDescriptorAttribute}]`))) {
-        this._sections.push([e, this.indentationLevel($(e), 0)]);
-      }
-      this._sectionWrappers = [];
+      this.loadSections();
       this._sectionToc = $(References.tocClasses.tocContainer);
       this._tocButton = new TOCButton(this._sectionToc, this._sectionHolder);
+      if (this._sections.length === 0) this._tocButton.hideSidebar();
     });
   }
+
+  private loadSections = () => {
+    for (const e of Array.from($(`[${References.tocClasses.sectionDescriptorAttribute}]`))) {
+      this._sections.push([e, this.indentationLevel($(e), 0)]);
+    }
+  };
 
   private initToggleButton = () => {
     // set the initial height of the sidebar to 0
@@ -43,11 +46,11 @@ export class TOCAnimations {
 
     this._sectionToc.append(this._sectionHolder);
 
+    this._sections.length = 0;
+
     this._sections = [];
 
-    for (const e of Array.from($(`[${References.tocClasses.sectionDescriptorAttribute}]`))) {
-      this._sections.push([e, this.indentationLevel($(e), 0)]);
-    }
+    this.loadSections();
 
     this._sectionWrappers = [];
   };
@@ -150,6 +153,8 @@ export class TOCAnimations {
           },
         });
       });
+
+      this._sections.length === 0 ? this._tocButton.hideButton() : this._tocButton.showButton();
     });
   };
 }
@@ -181,6 +186,14 @@ class TOCButton {
     this._tocButton.on('click', () => {
       this.toggleSidebar();
     });
+  };
+
+  public hideButton = () => {
+    this._tocButton.css('display', 'none');
+  };
+
+  public showButton = () => {
+    this._tocButton.css('display', 'flex');
   };
 
   public setSectionHolder = (sectionHolder: JQuery<HTMLElement>) => {
