@@ -1,17 +1,14 @@
 import 'lettering.js';
 import 'textillate';
 import 'textillate/assets/animate.css';
-import 'leaflet/dist/leaflet.css';
 import '../../public/timeline.min.css';
 import '../Components/timeline/timeline.min.js';
 
 import { Flip, gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
-import LeaderLine from 'leader-line-new';
-import leaflet from 'leaflet';
 
-import * as geoJson from '../../public/state-GeoJson/australian-states.json';
 import { LogoAnimations } from '../Components/logo-animations';
+import { LeafletMapComponent } from '../Components/map';
 import { CursorAnimations } from '../UI/cursor-animations';
 import type { NavBarAnimations } from '../UI/navbar-animations';
 
@@ -36,9 +33,7 @@ export class ChurchContentAnimations {
 
   private _mapPin: JQuery<HTMLElement>;
 
-  private _leaderLine: LeaderLine;
-
-  private _map: leaflet.Map;
+  private _map: LeafletMapComponent;
 
   private _targetState: string;
 
@@ -165,48 +160,48 @@ export class ChurchContentAnimations {
     });
   };
 
-  private style = (feature: any) => {
-    return {
-      fillColor: feature.properties.STATE_NAME === this._targetState ? '#ffffff90' : '#ffffff25',
-      weight: 1,
-      opacity: 1,
-      color: '#ffffff',
-      dashArray: '0',
-      fillOpacity: 1,
-      className: feature.properties.STATE_NAME === this._targetState ? 'active-layer' : '',
-    };
-  };
+  //private style = (feature: any) => {
+  //  return {
+  //    fillColor: feature.properties.STATE_NAME === this._targetState ? '#ffffff90' : '#ffffff25',
+  //    weight: 1,
+  //    opacity: 1,
+  //    color: '#ffffff',
+  //    dashArray: '0',
+  //    fillOpacity: 1,
+  //    className: feature.properties.STATE_NAME === this._targetState ? 'active-layer' : '',
+  //  };
+  //};
 
-  private initializeMap = (): void => {
-    $(() => {
-      this._map = leaflet
-        .map(this._mapContainer[0], {
-          zoomControl: false,
-          zoom: 4.4,
-          minZoom: 4.4,
-          maxZoom: 4.4,
-          dragging: false,
-          scrollWheelZoom: false,
-        })
-        .setView([-28.2744, 133.7751], 4.4);
-
-      leaflet
-        .geoJson(
-          // @ts-ignore
-          geoJson,
-          {
-            style: this.style,
-          }
-        )
-        .addTo(this._map);
-
-      const marker = new leaflet.DivIcon({
-        html: this._mapPin[0],
-      });
-
-      leaflet.marker([-33.762282, 150.8274209], { icon: marker }).addTo(this._map);
-    });
-  };
+  //private initializeMap = (): void => {
+  //  $(() => {
+  //    this._map = leaflet
+  //      .map(this._mapContainer[0], {
+  //        zoomControl: false,
+  //        zoom: 4.4,
+  //        minZoom: 4.4,
+  //        maxZoom: 4.4,
+  //        dragging: false,
+  //        scrollWheelZoom: false,
+  //      })
+  //      .setView([-28.2744, 133.7751], 4.4);
+  //
+  //    leaflet
+  //      .geoJson(
+  //        // @ts-ignore
+  //        geoJson,
+  //        {
+  //          style: this.style,
+  //        }
+  //      )
+  //      .addTo(this._map);
+  //
+  //    const marker = new leaflet.DivIcon({
+  //      html: this._mapPin[0],
+  //    });
+  //
+  //    leaflet.marker([-33.762282, 150.8274209], { icon: marker }).addTo(this._map);
+  //  });
+  //};
 
   //
   // https://github.com/NUKnightLab/TimelineJS3/blob/master/API.md
@@ -217,23 +212,29 @@ export class ChurchContentAnimations {
       mode: 'horizontal',
       visibleItems: 4,
     });
+    this.animateTimelineHover();
   };
 
-  private animateLeaderLine = (): void => {
-    $(() => {
-      this._leaderLine = new LeaderLine(this._mapPin[0], this._locInvitation[0], {
-        color: '#ffffff',
-        size: 2,
-        dash: { animation: true, len: 10 },
-        path: 'arc',
-        startPlug: 'crosshair',
-      });
-      this._leaderLine.hide();
-      $(window).on('resize', () => {
-        if (this._leaderLine) this._leaderLine.position();
-      });
-    });
+  private animateTimelineHover = (): void => {
+    $('.timeline__content').on('mouseover', () => CursorAnimations.cursorWhite());
+    $('.timeline__content').on('mouseleave', () => CursorAnimations.cursorBlue());
   };
+
+  //private animateLeaderLine = (): void => {
+  //  $(() => {
+  //    this._leaderLine = new LeaderLine(this._mapPin[0], this._locInvitation[0], {
+  //      color: '#ffffff',
+  //      size: 2,
+  //      dash: { animation: true, len: 10 },
+  //      path: 'arc',
+  //      startPlug: 'crosshair',
+  //    });
+  //    this._leaderLine.hide();
+  //    $(window).on('resize', () => {
+  //      if (this._leaderLine) this._leaderLine.position();
+  //    });
+  //  });
+  //};
 
   private animateLocationSection = () => {
     gsap.from(this._locContent, {
