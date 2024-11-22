@@ -52,17 +52,20 @@ export class BioAnimations {
 
   private static animateTimeline = async (): Promise<void> => {
     $(async () => {
-      await new Promise((resolve) => {
-        setTimeout(resolve, 1000);
-      }).then(() => {
-        const timelineItems: JQuery<HTMLElement> = $(References.bioClasses.timelineClass);
-        $(timelineItems).each((_, item) => {
-          gsap.from(item, {
-            scrollTrigger: {
-              trigger: item,
-              start: 'top 50%',
-              end: 'top 20%',
-              scrub: 1,
+      const timelineItems: JQuery<HTMLElement> = $(References.bioClasses.timelineClass);
+      $(timelineItems).each((index, item) => {
+        gsap.from(item, {
+          scrollTrigger: {
+            trigger: item,
+            start: 'top 50%',
+            end: 'top 10%',
+            scrub: 2,
+            immediateRender: false,
+            onEnter: () => {
+              ScrollTrigger.refresh();
+              if (index > 0) {
+                timelineItems[index - 1].style.opacity = '0.3';
+              }
             },
             onEnterBack: () => {
               ScrollTrigger.refresh();
