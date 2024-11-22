@@ -40,7 +40,6 @@ export const barbaInit = () => {
             default:
               data.next.container.style.display = 'block';
           }
-
           Animations.enableNavLinks();
           Animations.showProgress();
           await Animations.handleTransitionAnimation(false);

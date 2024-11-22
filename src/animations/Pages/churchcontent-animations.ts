@@ -66,6 +66,26 @@ export class ChurchContentAnimations {
       this._subHeading.css('opacity', 0);
       this._ctaButton.css('opacity', 0);
       this._churchImages.css('opacity', 0);
+      const zoom = Math.min(($('.loc-grid').width() / 1366.1) * 4.2, 4.2);
+      this._map = new LeafletMapComponent(
+        this._mapContainer,
+        (feature: any) =>
+          feature.properties.STATE_NAME === this._targetState ? '#ffffff90' : '#ffffff25',
+        '#ffffff',
+        {
+          zoomControl: false,
+          zoom: zoom,
+          minZoom: zoom,
+          maxZoom: zoom,
+          dragging: false,
+          scrollWheelZoom: false,
+        },
+        (feature: any) =>
+          feature.properties.STATE_NAME === this._targetState ? 'active-layer' : '',
+        this._mapPin,
+        this._locInvitation
+      );
+      this.onResizeHandler();
     });
   };
 
@@ -73,11 +93,25 @@ export class ChurchContentAnimations {
     await LogoAnimations.animateLogo();
   };
 
+  private onResizeHandler = () => {
+    $(window).on('resize', () => {
+      console.log('trigger resize');
+      const zoom = Math.min(($('.loc-grid').width() / 1366.1) * 4.2, 4.2);
+      this._map.resize({
+        zoomControl: false,
+        zoom: zoom,
+        minZoom: zoom,
+        maxZoom: zoom,
+        dragging: false,
+        scrollWheelZoom: false,
+      });
+    });
+  };
+
   public disposeChurchContentPage = (): void => {
     this._mapTL.kill();
     this._mapTL.clear(true);
-    this._leaderLine.remove();
-    this._leaderLine = null;
+    this._map.disposeLeaderLines();
     this._priestCarousel.disposeAnimations();
   };
 
@@ -98,7 +132,6 @@ export class ChurchContentAnimations {
           reverse: false,
           callback: function () {},
         },
-
         out: {
           effect: 'hinge',
           delayScale: 1.5,
@@ -254,15 +287,15 @@ export class ChurchContentAnimations {
   };
 
   public animateChurchContent = async (navbarAnimator: NavBarAnimations) => {
-    this.init();
-    this.initializeMap();
-    await this.animateMinistryLogo();
-    this.animateLeaderLine();
-    this.animateHeading();
-    this.animateChurchImageHover();
-    this.animateBlueCursor();
-    this.animateLocationSection();
-    navbarAnimator.animateScrollButton(this._heroSection);
+    $(async () => {
+      this.init();
+      await this.animateMinistryLogo();
+      this.animateHeading();
+      this.animateChurchImageHover();
+      this.animateBlueCursor();
+      this.animateLocationSection();
+      navbarAnimator.animateScrollButton(this._heroSection);
+    });
   };
 }
 
