@@ -12,7 +12,7 @@ class TocReferences {
   public static sectionDescriptorAttribute: string = 'data-section-descriptor';
   public static tocSectionIconClass: string = 'current-section-icon';
   public static tocSectionTextClass: string = 'toc-section-text';
-  public static tocSectionHeadingClass: string = 'toc-section-heading';
+  public static tocSectionHeadingClass: string = 'toc-heading';
   public static tocContainer: string = '.sections-toc';
   public static tocToggleButton: string = '.toc-button';
   public static tocButtonSvg: string = '.code-embed-7';
@@ -29,7 +29,7 @@ class CursorReferences {
 }
 
 class LogoReferences {
-  public static centerLogoClass: string = '.center-logo';
+  public static centerLogoClass: string = '.video-image';
   public static topLogoClass: string = '.ths07-logo';
 }
 
