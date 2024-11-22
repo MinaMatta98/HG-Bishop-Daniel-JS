@@ -1,4 +1,4 @@
-import gsap from 'gsap/all';
+import { gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
 import SplitType from 'split-type';
 
@@ -29,6 +29,16 @@ export class BioAnimations {
     });
   };
 
+  private static loadCss = () => {
+    $('html').css('overflow-x', 'unset !important');
+    $('body').css('background', 'var(--cursor-inner)');
+  };
+
+  public static unloadCss = () => {
+    $('html').css('overflow-x', 'unset');
+    $('body').css('background', 'unset');
+  };
+
   private static animateHeading = (): void => {
     let splitHeading: SplitType;
 
@@ -54,8 +64,12 @@ export class BioAnimations {
               end: 'top 20%',
               scrub: 1,
             },
-            opacity: 0.3,
-          });
+            onEnterBack: () => {
+              ScrollTrigger.refresh();
+              gsap.to(item, { opacity: 1 });
+            },
+          },
+          opacity: 0.3,
         });
       });
     });
@@ -67,6 +81,7 @@ export class BioAnimations {
   };
 
   public static animateBio = async () => {
+    this.loadCss();
     this.animateBioLogo();
     this.animateHeading();
     this._navBarAnimator.animateScrollButton($(References.bioClasses.bioHeroClass));
