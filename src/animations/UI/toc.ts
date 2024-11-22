@@ -52,6 +52,8 @@ export class TOCAnimations {
 
     this.loadSections();
 
+    this._sectionWrappers.length = 0;
+
     this._sectionWrappers = [];
   };
 
