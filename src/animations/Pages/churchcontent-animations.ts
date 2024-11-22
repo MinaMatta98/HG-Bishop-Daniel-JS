@@ -254,10 +254,12 @@ export class ChurchContentAnimations {
               duration: 1,
             }
           );
-          if (this._leaderLine) this._leaderLine.show('draw', { duration: 2000 });
+          if (this._map.getLeaderLines().length > 0)
+            for (const line of this._map.getLeaderLines()) line.show('draw', { duration: 2000 });
         },
         onLeaveBack: () => {
-          if (this._leaderLine) this._leaderLine.hide();
+          if (this._map.getLeaderLines().length > 0)
+            for (const line of this._map.getLeaderLines()) line.hide();
         },
       },
     });
