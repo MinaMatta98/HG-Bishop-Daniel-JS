@@ -8,6 +8,7 @@ import { ChurchAnimations } from './Pages/churchpage-animations';
 import { HomePageAnimations } from './Pages/homepage-animations';
 import { MinistryContentAnimations } from './Pages/ministrycontent-animations';
 import { MinistryPageAnimations } from './Pages/ministrypage-animations';
+import { ScheduleAnimations } from './Pages/schedule-animations';
 import { SermonPageAnimations } from './Pages/sermon-animations';
 import { SermonContentAnimations } from './Pages/sermoncontent-animations';
 import { References } from './references';
@@ -130,6 +131,10 @@ export class Animations {
 
   public static initChurchesPage = () => {
     this._churchesPageAnimator.animateChurchPage(this._navBarAnimator);
+  };
+
+  public static initSchedulePage = () => {
+    this._scheduleAnimator.animateSchedulePage(this._navBarAnimator);
   };
 
   public static showProgress = () => {

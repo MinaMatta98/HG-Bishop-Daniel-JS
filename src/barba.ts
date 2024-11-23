@@ -122,6 +122,15 @@ export const barbaInit = () => {
         },
       },
       {
+        namespace: 'schedule',
+        async beforeEnter() {
+          Animations.footerAnimateWhite();
+        },
+        async afterEnter() {
+          Animations.initSchedulePage();
+        },
+      },
+      {
         namespace: 'churches-content',
         async beforeEnter() {
           Animations.footerAnimateWhite();
