@@ -6,6 +6,7 @@ import { BioAnimations } from './Pages/bio-animations';
 import { ChurchContentAnimations } from './Pages/churchcontent-animations';
 import { ChurchAnimations } from './Pages/churchpage-animations';
 import { HomePageAnimations } from './Pages/homepage-animations';
+import { MinistryContentAnimations } from './Pages/ministrycontent-animations';
 import { MinistryPageAnimations } from './Pages/ministrypage-animations';
 import { SermonPageAnimations } from './Pages/sermon-animations';
 import { SermonContentAnimations } from './Pages/sermoncontent-animations';
@@ -22,18 +23,26 @@ export class DisposeAnimations {
 
   private _sermonContentAnimator: SermonContentAnimations;
 
+  private _ministryContentAnimator: MinistryContentAnimations;
+
   private _churchContentPageAnimations: ChurchContentAnimations;
+
+  private static _bioAnimator: typeof BioAnimations;
 
   constructor(
     homePageAnimator: typeof HomePageAnimations,
     ministryPageAnimator: MinistryPageAnimations,
     sermonContentAnimator: SermonContentAnimations,
-    churchPageAnimator: ChurchContentAnimations
+    churchPageAnimator: ChurchContentAnimations,
+    ministryContentAnimator: MinistryContentAnimations,
+    bioAnimator: typeof BioAnimations
   ) {
     DisposeAnimations._homePageAnimator = homePageAnimator;
+    DisposeAnimations._bioAnimator = bioAnimator;
     this._ministryPageAnimator = ministryPageAnimator;
     this._sermonContentAnimator = sermonContentAnimator;
     this._churchContentPageAnimations = churchPageAnimator;
+    this._ministryContentAnimator = ministryContentAnimator;
   }
 
   public static disposeHomepageGlobe = () => {
@@ -50,6 +59,14 @@ export class DisposeAnimations {
 
   public disposeChurchLeaderLine = () => {
     this._churchContentPageAnimations.disposeChurchContentPage();
+  };
+
+  public disposeMinistryContentPage = () => {
+    this._ministryContentAnimator.disposePage();
+  };
+
+  public static disposeBioPage = () => {
+    this._bioAnimator.unloadCss();
   };
 }
 
@@ -76,13 +93,19 @@ export class Animations {
 
   private static _sermonContentAnimator = new SermonContentAnimations();
 
+  private static _ministryContentAnimator = new MinistryContentAnimations();
+
+  private static _scheduleAnimator = new ScheduleAnimations();
+
   public static player: Player;
 
   public static disposeAnimations = new DisposeAnimations(
     this._homePageAnimator,
     this._ministryPageAnimator,
     this._sermonContentAnimator,
-    this._churcheContentAnimator
+    this._churcheContentAnimator,
+    this._ministryContentAnimator,
+    this._bioAnimator
   );
 
   public static initMinistryPage = () => {
@@ -95,6 +118,10 @@ export class Animations {
 
   public static initChurchContentPage = () => {
     this._churcheContentAnimator.animateChurchContent(this._navBarAnimator);
+  };
+
+  public static initMinistryContentPage = () => {
+    this._ministryContentAnimator.animateMinistryContent(this._navBarAnimator);
   };
 
   public static initSermonsContentPage = () => {

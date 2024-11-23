@@ -85,6 +85,7 @@ export const barbaInit = () => {
       {
         namespace: 'bio',
         async afterLeave() {
+          DisposeAnimations.disposeBioPage();
           Animations.cursorBlue();
         },
         async afterEnter() {
@@ -141,6 +142,18 @@ export const barbaInit = () => {
           Animations.initSermonsContentPage();
         },
         async beforeLeave() {},
+      },
+      {
+        namespace: 'ministry-content',
+        async beforeEnter() {
+          Animations.footerAnimateWhite();
+        },
+        async afterEnter() {
+          Animations.initMinistryContentPage();
+        },
+        async beforeLeave() {
+          Animations.disposeAnimations.disposeMinistryContentPage();
+        },
       },
     ],
   });
