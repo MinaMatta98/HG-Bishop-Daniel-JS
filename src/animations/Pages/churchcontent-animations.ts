@@ -90,7 +90,6 @@ export class ChurchContentAnimations {
 
   private onResizeHandler = () => {
     $(window).on('resize', () => {
-      console.log('trigger resize');
       const zoom = Math.min(($('.loc-grid').width() / 1366.1) * 4.2, 4.2);
       this._map.resize({
         zoomControl: false,

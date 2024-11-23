@@ -1,13 +1,12 @@
 import { Animations } from '../animations';
-import { References } from '../references';
 
 export class FooterAnimations {
   public static animateFooterBlue = (): void => {
     $(() => {
-      const footerSection = $(References.footerClasses.footerSectionClass);
-      const footerCta = $(References.footerClasses.footerCtaClass);
-      const footerBottom = $(References.footerClasses.footerBottomClass);
-      const footerSocial = $(References.footerClasses.footerSocialClass);
+      const footerSection = $('.footer-section');
+      const footerCta = $('.footer-cta');
+      const footerBottom = $('.footer-bottom');
+      const footerSocial = $('.social-media-grid-top');
 
       footerSection.css('background-color', 'var(--cursor-inner)');
       footerCta.css('background-color', 'white');
@@ -31,10 +30,10 @@ export class FooterAnimations {
 
   public static animateFooterWhite = () => {
     $(() => {
-      const footerSection = $(References.footerClasses.footerSectionClass);
-      const footerCta = $(References.footerClasses.footerCtaClass);
-      const footerBottom = $(References.footerClasses.footerBottomClass);
-      const footerSocial = $(References.footerClasses.footerSocialClass);
+      const footerSection = $('.footer-section');
+      const footerCta = $('.footer-cta');
+      const footerBottom = $('.footer-bottom');
+      const footerSocial = $('.social-media-grid-top');
 
       footerSection.css('background-color', 'white');
       footerCta.css('background-color', 'var(--cursor-inner)');

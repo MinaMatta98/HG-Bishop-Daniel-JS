@@ -1,8 +1,6 @@
 import { gsap } from 'gsap/all';
 import $ from 'jquery';
 
-import { References } from '../references';
-
 export class TOCAnimations {
   /** Page sections with attr*/
   private _sections: [HTMLElement, number][] = [];
@@ -17,16 +15,16 @@ export class TOCAnimations {
 
   constructor() {
     $(() => {
-      this._sectionHolder = $('.' + References.tocClasses.tocSectionHolderClass);
+      this._sectionHolder = $('.section-holder');
       this.loadSections();
-      this._sectionToc = $(References.tocClasses.tocContainer);
+      this._sectionToc = $('.sections-toc');
       this._tocButton = new TOCButton(this._sectionToc, this._sectionHolder);
       if (this._sections.length === 0) this._tocButton.hideSidebar();
     });
   }
 
   private loadSections = () => {
-    for (const e of Array.from($(`[${References.tocClasses.sectionDescriptorAttribute}]`))) {
+    for (const e of Array.from($(`[data-section-descriptor]`))) {
       this._sections.push([e, this.indentationLevel($(e), 0)]);
     }
   };
@@ -40,7 +38,7 @@ export class TOCAnimations {
   private reset = () => {
     this._sectionHolder.remove();
 
-    this._sectionHolder = $('<div></div>').addClass(References.tocClasses.tocSectionHolderClass);
+    this._sectionHolder = $('<div></div>').addClass('.section-holder');
 
     this._tocButton.setSectionHolder(this._sectionHolder);
 
@@ -58,13 +56,13 @@ export class TOCAnimations {
   };
 
   private getParent = (element: JQuery<HTMLElement>): JQuery<HTMLElement> => {
-    return element.parentsUntil(`[${References.tocClasses.sectionDescriptorAttribute}]`).parent();
+    return element.parentsUntil(`[data-section-descriptor]`).parent();
   };
 
   private indentationLevel = (element: JQuery<HTMLElement>, acc: number): number => {
     const parent = this.getParent(element);
     if (parent.length > 0) {
-      if (parent.attr(References.tocClasses.sectionDescriptorAttribute) != null) {
+      if (parent.attr('data-section-descriptor') != null) {
         return this.indentationLevel(parent, acc + 1);
       }
     }
@@ -89,14 +87,10 @@ export class TOCAnimations {
   } => {
     const sectionName = $(element).attr('data-section-descriptor');
     // Create individual elements
-    const sectionWrapper = $('<div></div>').addClass(
-      References.tocClasses.individualSectionWrapper
-    );
-    const sectionIcon = $('<div></div>').addClass(References.tocClasses.tocSectionIconClass);
-    const textWrapper = $('<div></div>').addClass(References.tocClasses.tocSectionTextClass);
-    const sectionHeading = $('<h5></h5>')
-      .addClass(References.tocClasses.tocSectionHeadingClass)
-      .text(sectionName);
+    const sectionWrapper = $('<div></div>').addClass('toc-section-wrapper');
+    const sectionIcon = $('<div></div>').addClass('current-section-icon');
+    const textWrapper = $('<div></div>').addClass('toc-section-text');
+    const sectionHeading = $('<h5></h5>').addClass('toc-heading').text(sectionName);
 
     // Append elements to their respective parents
     textWrapper.append(sectionHeading);
@@ -143,14 +137,14 @@ export class TOCAnimations {
             end: 'bottom 51%',
             scrub: true,
           },
-          className: `${References.tocClasses.individualSectionWrapper} ${References.tocClasses.activeClass}`,
+          className: `current`,
           onStart: () => {
             $(sectionWrappers)
               .filter((i, e) => {
                 return parentNum <= _sections[i][1] && e !== sectionWrapper[0];
               })
               .each((_, e) => {
-                gsap.set($(e), { className: References.tocClasses.individualSectionWrapper });
+                gsap.set($(e), { className: 'toc-section-wrapper' });
               });
           },
         });
@@ -176,8 +170,8 @@ class TOCButton {
   public _toggled: boolean;
 
   constructor(sectionToc: JQuery<HTMLElement>, sectionHolder: JQuery<HTMLElement>) {
-    this._tocButton = $(References.tocClasses.tocToggleButton);
-    this._tocSvg = $(References.tocClasses.tocButtonSvg);
+    this._tocButton = $('.toc-button');
+    this._tocSvg = $('.code-embed-7');
     this._sectionTocRef = sectionToc;
     this._sectionHolderRef = sectionHolder;
     this._toggled = false;

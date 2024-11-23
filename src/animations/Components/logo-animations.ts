@@ -1,7 +1,6 @@
 import { Flip, gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
 
-import { References } from '../references';
 /**
  * @module Keep Private. This is simply a definition of the
  * LogoAnimations class to ensure strong typing.
@@ -30,8 +29,8 @@ export class LogoAnimations {
   private static _bioTransition: LogoTransition;
 
   public static animateLogo = async () => {
-    gsap.set(References.logoClasses.topLogoClass, { translateY: '-15em' });
-    await gsap.to(References.logoClasses.topLogoClass, { translateY: '0', duration: 3 });
+    gsap.set('.ths07-logo', { translateY: '-15em' });
+    await gsap.to('.ths07-logo', { translateY: '0', duration: 3 });
   };
 
   private static initLogo = () => {

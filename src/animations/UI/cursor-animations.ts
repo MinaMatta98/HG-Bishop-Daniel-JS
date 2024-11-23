@@ -1,18 +1,24 @@
 import gsap from 'gsap';
 
-import { References } from '../references';
-
 export class CursorAnimations {
+  private static _pins: string[] = ['.cursor-pin-1', '.cursor-pin-1.pin-2', '.cursor-pin-1.pin-3'];
+  private static _whitePinBg: string[] = [
+    'white',
+    'rgba(255,255,255,0.6)',
+    'rgba(255,255,255,0.4)',
+  ];
+  private static _bluePingBg: string[] = [
+    'var(--cursor-inner)',
+    'var(--cursor-center)',
+    'var(--cursor-outer)',
+  ];
+
   public static cursorWhite = () => {
-    References.cursorClasses._pins.map((pin, index) =>
-      gsap.to(pin, { background: References.cursorClasses._whitePinBg[index] })
-    );
+    this._pins.map((pin, index) => gsap.to(pin, { background: this._whitePinBg[index] }));
   };
 
   public static cursorBlue = () => {
-    References.cursorClasses._pins.map((pin, index) =>
-      gsap.to(pin, { background: References.cursorClasses._bluePingBg[index] })
-    );
+    this._pins.map((pin, index) => gsap.to(pin, { background: this._bluePingBg[index] }));
   };
 
   public static cursorHover = () => {

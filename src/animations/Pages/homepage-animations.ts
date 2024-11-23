@@ -11,7 +11,6 @@ import { Utils } from '../../utils/utils';
 import { Animations } from '../animations';
 import { GlobeAnimation } from '../Components/globe';
 import { LogoAnimations } from '../Components/logo-animations';
-import { References } from '../references';
 import { NavBarAnimations } from '../UI/navbar-animations';
 
 class NewsAnimations {
@@ -110,8 +109,8 @@ class scheduleAnimations {
   constructor() {}
 
   init() {
-    this._sideBlocks = $(References.homePageClasses.slideBlockClass);
-    this._stickyImageContainer = $(References.homePageClasses.stickyImageContainerClass);
+    this._sideBlocks = $('.slide-block');
+    this._stickyImageContainer = $('.sticky-image-container');
   }
 
   public animateScheduleSection = () => {
@@ -161,8 +160,8 @@ class OpeningHeroAnimations {
   }
 
   init() {
-    this._openingHero = $(References.homePageClasses.openingHeroClass);
-    this._progressBar = $(References.ancillaryClasses.progressBar);
+    this._openingHero = $('.opening-hero');
+    this._progressBar = $('.progress');
   }
 
   animateProgressFade = () => {
@@ -191,19 +190,19 @@ class OpeningHeroAnimations {
   };
 
   VideoAnimation = async (): Promise<void> => {
-    gsap.set(References.logoClasses.topLogoClass, { translateY: '-15em' });
-    gsap.set(References.logoClasses.centerLogoClass, { opacity: 0, translateY: 150 });
-    gsap.set(References.homePageClasses.heroHeadingClass, { opacity: 0, translateY: 150 });
+    gsap.set('.ths07-logo', { translateY: '-15em' });
+    gsap.set('.video-image', { opacity: 0, translateY: 150 });
+    gsap.set('.hero-heading', { opacity: 0, translateY: 150 });
 
-    gsap.to(References.logoClasses.centerLogoClass, { opacity: 1, duration: 0.5 });
-    gsap.to(References.logoClasses.centerLogoClass, { translateY: 0, duration: 4 });
-    await gsap.to(References.logoClasses.topLogoClass, { translateY: '0', duration: 3 });
+    gsap.to('.video-image', { opacity: 1, duration: 0.5 });
+    gsap.to('.video-image', { translateY: 0, duration: 4 });
+    await gsap.to('.ths07-logo', { translateY: '0', duration: 3 });
 
-    gsap.to(References.homePageClasses.heroHeadingClass, { opacity: 1, duration: 0.5 });
-    await gsap.to(References.homePageClasses.heroHeadingClass, { translateY: 0, duration: 3 });
+    gsap.to('.hero-heading', { opacity: 1, duration: 0.5 });
+    await gsap.to('.hero-heading', { translateY: 0, duration: 3 });
 
-    gsap.to(References.homePageClasses.heroHeadingClass, { opacity: 0, duration: 1 });
-    await gsap.to(References.logoClasses.centerLogoClass, { opacity: 0, duration: 1 });
+    gsap.to('.hero-heading', { opacity: 0, duration: 1 });
+    await gsap.to('.video-image', { opacity: 0, duration: 1 });
   };
 }
 
@@ -219,14 +218,14 @@ export class HomePageAnimations {
   };
 
   private static hidePageLoader = async (initTime: number): Promise<void> => {
-    if ($(References.transitionClasses.pageLoadClass).css('display') !== 'none') {
+    if ($('.pageload').css('display') !== 'none') {
       const currentTime = new Date().getTime();
 
       await (currentTime - initTime < 2000
         ? Utils.sleep(2000 - (currentTime - initTime))
         : Promise.resolve());
 
-      await gsap.to(References.transitionClasses.pageLoadClass, {
+      await gsap.to('.pageload', {
         display: 'none',
         delay: currentTime - initTime < 2000 ? 2 - (currentTime - initTime) / 1000 : 0,
       });
@@ -234,17 +233,17 @@ export class HomePageAnimations {
   };
 
   private static swiperAnimation = (): void => {
-    const photoSwiper = new Swiper(References.swiperClasses.swiperPhotoClass, {
+    const photoSwiper = new Swiper('.swiper.is-photos', {
       effect: 'cards',
       grabCursor: true,
       loop: true,
       keyboard: true,
       navigation: {
-        nextEl: References.swiperClasses.swiperNextElClass,
-        prevEl: References.swiperClasses.swiperPrevElClass,
+        nextEl: '.arrow.is-right',
+        prevEl: '.arrow.is-left',
       },
     });
-    const contentSwiper = new Swiper(References.swiperClasses.swiperContentClass, {
+    const contentSwiper = new Swiper('.swiper.is-content', {
       speed: 0,
       loop: true,
       followFinger: true,
@@ -258,8 +257,7 @@ export class HomePageAnimations {
   };
 
   private static initScheduleAnimation = () => {
-    //const wrapper: JQuery<HTMLElement> = $(References.homePageClasses.scheduleWrapper);
-    const blocks: JQuery<HTMLElement> = $(References.homePageClasses.slideBlockClass);
+    const blocks: JQuery<HTMLElement> = $('.slide-block');
 
     $(blocks).each((_, block) => {
       gsap.from(block, {
@@ -276,7 +274,7 @@ export class HomePageAnimations {
   };
 
   private static gsapGlobeContainerExpand = () => {
-    const container = $(References.homePageClasses.globeContainerClass);
+    const container = $('.globe-container');
 
     if (this._globeTL) {
       this._globeTL.kill();
@@ -311,13 +309,9 @@ export class HomePageAnimations {
   };
 
   private static animateScheduleCursor = () => {
-    $(References.homePageClasses.stickyImageContainerClass).on('mouseenter', () =>
-      Animations.cursorWhite()
-    );
+    $('.sticky-image-container').on('mouseenter', () => Animations.cursorWhite());
 
-    $(References.homePageClasses.stickyImageContainerClass).on('mouseleave', () =>
-      Animations.cursorBlue()
-    );
+    $('.sticky-image-container').on('mouseleave', () => Animations.cursorBlue());
   };
 
   public static disposeGlobe = () => {
@@ -331,12 +325,12 @@ export class HomePageAnimations {
   ) => {
     $(async () => {
       if (isFirstLoad)
-        Animations.displayShow(References.transitionClasses.pageLoadClass, true, 'flex');
+        Animations.displayShow('.pageload', true, 'flex');
       this.initScheduleAnimation();
       this.logoAnimation();
       this.initGlobe();
       this.animateScheduleCursor();
-      navbarAnimator.animateScrollButton($(References.homePageClasses.openingHeroClass));
+      navbarAnimator.animateScrollButton($('.opening-hero'));
       this._scheduleAnimator.animateScheduleSection();
       this._newsAnimator.animateNewsSection();
       this._openingHeroAnimator.animateProgressFade();

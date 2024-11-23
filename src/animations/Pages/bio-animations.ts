@@ -2,14 +2,13 @@ import { gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
 import SplitType from 'split-type';
 
-import { References } from '../references';
 import { NavBarAnimations } from '../UI/navbar-animations';
 
 export class BioAnimations {
   private static _navBarAnimator = new NavBarAnimations();
 
   private static splitText = (text: SplitType) => {
-    const bioHeading: JQuery<HTMLElement> = $(References.bioClasses.headingClass);
+    const bioHeading: JQuery<HTMLElement> = $( '.bio-heading');
     text = new SplitType(bioHeading, { types: ['words', 'lines'] });
 
     $(text.lines).each((_, element) => {
@@ -52,7 +51,7 @@ export class BioAnimations {
 
   private static animateTimeline = async (): Promise<void> => {
     $(async () => {
-      const timelineItems: JQuery<HTMLElement> = $(References.bioClasses.timelineClass);
+      const timelineItems: JQuery<HTMLElement> = $( '.timeline_item');
       $(timelineItems).each((index, item) => {
         gsap.from(item, {
           scrollTrigger: {
@@ -79,15 +78,15 @@ export class BioAnimations {
   };
 
   private static animateBioLogo = (): void => {
-    gsap.set(References.logoClasses.topLogoClass, { translateY: '-15em' });
-    gsap.to(References.logoClasses.topLogoClass, { translateY: '0', duration: 3 });
+    gsap.set('.ths07-logo', { translateY: '-15em' });
+    gsap.to('.ths07-logo', { translateY: '0', duration: 3 });
   };
 
   public static animateBio = async () => {
     this.loadCss();
     this.animateBioLogo();
     this.animateHeading();
-    this._navBarAnimator.animateScrollButton($(References.bioClasses.bioHeroClass));
+    this._navBarAnimator.animateScrollButton($( '.timeline_item'));
     await this.animateTimeline();
   };
 }

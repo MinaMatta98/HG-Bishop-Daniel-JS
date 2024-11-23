@@ -11,7 +11,6 @@ import { MinistryPageAnimations } from './Pages/ministrypage-animations';
 import { ScheduleAnimations } from './Pages/schedule-animations';
 import { SermonPageAnimations } from './Pages/sermon-animations';
 import { SermonContentAnimations } from './Pages/sermoncontent-animations';
-import { References } from './references';
 import { CursorAnimations } from './UI/cursor-animations';
 import { NavBarAnimations } from './UI/navbar-animations';
 import { TOCAnimations } from './UI/toc';
@@ -138,8 +137,8 @@ export class Animations {
   };
 
   public static showProgress = () => {
-    this.displayShow(References.ancillaryClasses.progressBar, true, 'block');
-    this.setOpaque(References.ancillaryClasses.progressBar);
+    this.displayShow('.progress', true, 'block');
+    this.setOpaque('.progress');
   };
 
   public static initHomePage = async (initTime: number, isFirstLoad: boolean) => {
@@ -197,19 +196,26 @@ export class Animations {
 
   public static handleTransitionAnimation = async (inView: boolean): Promise<void> => {
     const loadTl = gsap.timeline();
+    const transitionDivs = [
+      '.first-transition',
+      '.second-transition',
+      '.third-transition',
+      '.fourth-transition',
+      '.fifth-transition',
+    ];
 
     if (inView) {
-      Animations.displayShow(References.transitionClasses.transitionClass, true, 'flex');
-      for (const div of References.transitionClasses.transitionDivs) {
+      Animations.displayShow('.transition', true, 'flex');
+      for (const div of transitionDivs) {
         gsap.set(div, { marginTop: '100vh' });
       }
     }
 
-    for (const div of References.transitionClasses.transitionDivs) {
+    for (const div of transitionDivs) {
       await loadTl.to(div, { marginTop: inView ? '0vh' : '100vh', duration: 0.25 });
     }
 
-    if (!inView) this.displayShow(References.transitionClasses.transitionClass, false);
+    if (!inView) this.displayShow('.transition', false);
   };
 
   public static animateBio = async () => {

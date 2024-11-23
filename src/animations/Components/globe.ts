@@ -5,7 +5,6 @@ import { MeshPhysicalMaterial } from 'three';
 import * as THREE from 'three';
 
 import countries from '../../public/custom.geo.json';
-import { References } from '../references';
 import { CursorAnimations } from '../UI/cursor-animations';
 
 export class GlobeAnimation {
@@ -28,7 +27,7 @@ export class GlobeAnimation {
    */
   constructor(lightBg: boolean) {
     $(() => {
-      this._canvas = $(References.homePageClasses.globeDiv);
+      this._canvas = $( '#webGL');
       this._GLOBE = this.initGlobe();
       this._size = {
         innerHeight: this._canvas.width(),
@@ -221,11 +220,9 @@ export class GlobeAnimation {
       const defaultCursor = () =>
         this._lightBG ? CursorAnimations.cursorBlue() : CursorAnimations.cursorWhite();
 
-      $(References.homePageClasses.ministryWrapper).on('mouseenter', () =>
-        CursorAnimations.cursorWhite()
-      );
+      $('.ministry-wrapper').on('mouseenter', () => CursorAnimations.cursorWhite());
 
-      $(References.homePageClasses.ministryWrapper).on('mouseleave', () => defaultCursor());
+      $('.ministry-wrapper').on('mouseleave', () => defaultCursor());
     });
   };
 
@@ -280,7 +277,7 @@ export class GlobeAnimation {
       // Check to see if dispose has been called
 
       if (this._GLOBE === null) {
-        this._canvas = $(References.homePageClasses.globeDiv);
+        this._canvas = $( '#webGL');
         this._size = {
           innerHeight: this._canvas.width(),
           innerWidth: this._canvas.height(),
