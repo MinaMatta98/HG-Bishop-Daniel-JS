@@ -1,18 +1,58 @@
+import type { ITransitionData } from '@barba/core/dist/core/src/src/defs';
 import { gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
 import SplitType from 'split-type';
+import type { ICssAnimations } from 'src/interfaces/ICssAnimations';
+import type { IGsapPageAnimations } from 'src/interfaces/IGsapPageAnimations';
+import { GsapAnimations } from 'src/interfaces/IGsapPageAnimations';
+import type { IPageAnimations } from 'src/interfaces/IPageAnimations';
+import { GlobalPageAnimations } from 'src/interfaces/IPageAnimations';
+import type { IResizePageAnimations } from 'src/interfaces/IResizePageAnimations';
+import { Mapper } from 'src/utils/mapper';
 
-import { NavBarAnimations } from '../UI/navbar-animations';
+export class BioAnimations
+  implements IPageAnimations, IGsapPageAnimations, ICssAnimations, IResizePageAnimations
+{
+  private _splitType: SplitType;
 
-export class BioAnimations {
-  private static _navBarAnimator = new NavBarAnimations();
+  gsapAnimations: GsapAnimations;
 
-  private static splitText = (text: SplitType) => {
-    const bioHeading: JQuery<HTMLElement> = $( '.bio-heading');
-    text = new SplitType(bioHeading, { types: ['words', 'lines'] });
+  pageElements: Map<string, JQuery<HTMLElement>>;
+
+  supportAnimations = GlobalPageAnimations;
+
+  namespace: string = 'bio';
+
+  onResizeHandler = () => {
+    $(window).on('resize', () => {
+      if (this._splitType) this._splitType.revert();
+      this.animateHeading();
+    });
+  };
+
+  loadCss = () => {
+    $('html').css('overflow-x', 'unset !important');
+    $('body').css('background', 'var(--cursor-inner)');
+  };
+
+  unloadCss = () => {
+    $('html').css('overflow-x', 'unset');
+    $('body').css('background', 'unset');
+  };
+
+  initElements = () => {
+    this.pageElements = new Mapper(['.bio-heading', '.timeline_item']).map();
+    this.gsapAnimations = new GsapAnimations();
+  };
+
+  private animateHeading = () => {
+    const text = new SplitType(this.pageElements.get('.bio-heading'), {
+      types: ['words', 'lines'],
+    });
 
     $(text.lines).each((_, element) => {
       $(element).append('<div class="line-mask"></div>');
+
       const target = $(element).find('.line-mask');
 
       const timeline = gsap.timeline({
@@ -25,35 +65,17 @@ export class BioAnimations {
       });
 
       timeline.from(target, { width: '100%', duration: 1 });
+
+      this.gsapAnimations.newItem(timeline);
     });
   };
 
-  private static loadCss = () => {
-    $('html').css('overflow-x', 'unset !important');
-    $('body').css('background', 'var(--cursor-inner)');
-  };
-
-  public static unloadCss = () => {
-    $('html').css('overflow-x', 'unset');
-    $('body').css('background', 'unset');
-  };
-
-  private static animateHeading = (): void => {
-    let splitHeading: SplitType;
-
-    $(() => this.splitText(splitHeading));
-
-    $(window).on('resize', () => {
-      if (splitHeading) splitHeading.revert();
-      this.splitText(splitHeading);
-    });
-  };
-
-  private static animateTimeline = async (): Promise<void> => {
+  private animateTimeline = async (): Promise<void> => {
     $(async () => {
-      const timelineItems: JQuery<HTMLElement> = $( '.timeline_item');
-      $(timelineItems).each((index, item) => {
-        gsap.from(item, {
+      const timelineItems: JQuery<HTMLElement> = this.pageElements.get('.timeline_item');
+
+      timelineItems.each((index, item) => {
+        const tween = gsap.from(item, {
           scrollTrigger: {
             trigger: item,
             start: 'top 50%',
@@ -68,25 +90,36 @@ export class BioAnimations {
             },
             onEnterBack: () => {
               ScrollTrigger.refresh();
-              gsap.to(item, { opacity: 1 });
+              const enterTween = gsap.to(item, { opacity: 1 });
+              this.gsapAnimations.newItem(enterTween);
             },
           },
           opacity: 0.3,
         });
+        this.gsapAnimations.newItem(tween);
       });
     });
   };
 
-  private static animateBioLogo = (): void => {
-    gsap.set('.ths07-logo', { translateY: '-15em' });
-    gsap.to('.ths07-logo', { translateY: '0', duration: 3 });
+  public afterEnter = async (_data: ITransitionData) => {
+    $(() => {
+      this.initElements();
+      this.loadCss();
+      this.supportAnimations.logoAnimations.animateLogo();
+      this.animateHeading();
+      this.animateTimeline();
+      this.onResizeHandler();
+      this.supportAnimations.navBarAnimations.animateScrollButton(
+        this.pageElements.get('.timeline_item')
+      );
+      this.supportAnimations.cursorAnimations.cursorWhite();
+      this.supportAnimations.footerAnimations.animateFooterBlue();
+    });
   };
 
-  public static animateBio = async () => {
-    this.loadCss();
-    this.animateBioLogo();
-    this.animateHeading();
-    this._navBarAnimator.animateScrollButton($( '.timeline_item'));
-    await this.animateTimeline();
+  afterLeave = async (_data: ITransitionData) => {
+    this.unloadCss();
+    this.gsapAnimations.disposePageAnimations();
+    this.supportAnimations.cursorAnimations.cursorBlue();
   };
 }
