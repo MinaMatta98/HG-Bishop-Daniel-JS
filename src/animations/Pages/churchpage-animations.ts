@@ -26,10 +26,10 @@ export class ChurchAnimations {
     await LogoAnimations.animateLogo();
   };
 
+    this._map.animateMap();
+  };
+}
   public animateChurchPage = async (navbarAnimator: NavBarAnimations) => {
     navbarAnimator.animateScrollButton($('#map'));
     this.init();
     await this.animateMinistryLogo();
-    this._map.animateMap();
-  };
-}
