@@ -1,4 +1,3 @@
-interface IResizePageAnimations {
-  resizeableTargets: Map<string, JQuery<HTMLElement>>;
-  onResizeHandler: (resizeElement: JQuery<HTMLElement>) => void;
+export interface IResizePageAnimations {
+  onResizeHandler: (resizeElement?: JQuery<HTMLElement>) => void;
 }
