@@ -3,6 +3,7 @@ import { gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
 import SplitType from 'split-type';
 import type { ICssAnimations } from 'src/interfaces/ICssAnimations';
+import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
 import type { IGsapPageAnimations } from 'src/interfaces/IGsapPageAnimations';
 import { GsapAnimations } from 'src/interfaces/IGsapPageAnimations';
 import type { IPageAnimations } from 'src/interfaces/IPageAnimations';
@@ -11,7 +12,12 @@ import type { IResizePageAnimations } from 'src/interfaces/IResizePageAnimations
 import { Mapper } from 'src/utils/mapper';
 
 export class BioAnimations
-  implements IPageAnimations, IGsapPageAnimations, ICssAnimations, IResizePageAnimations
+  implements
+    IPageAnimations,
+    IGsapPageAnimations,
+    ICssAnimations,
+    IResizePageAnimations,
+    IDisposableAnimations
 {
   private _splitType: SplitType;
 
@@ -38,6 +44,10 @@ export class BioAnimations
   unloadCss = () => {
     $('html').css('overflow-x', 'unset');
     $('body').css('background', 'unset');
+  };
+
+  disposePageAnimations = () => {
+    this.gsapAnimations.disposePageAnimations();
   };
 
   initElements = () => {
@@ -71,33 +81,29 @@ export class BioAnimations
   };
 
   private animateTimeline = async (): Promise<void> => {
-    $(async () => {
-      const timelineItems: JQuery<HTMLElement> = this.pageElements.get('.timeline_item');
+    const timelineItems: JQuery<HTMLElement> = this.pageElements.get('.timeline_item');
 
-      timelineItems.each((index, item) => {
-        const tween = gsap.from(item, {
-          scrollTrigger: {
-            trigger: item,
-            start: 'top 50%',
-            end: 'top 10%',
-            scrub: 2,
-            immediateRender: false,
-            onEnter: () => {
-              ScrollTrigger.refresh();
-              if (index > 0) {
-                timelineItems[index - 1].style.opacity = '0.3';
-              }
-            },
-            onEnterBack: () => {
-              ScrollTrigger.refresh();
-              const enterTween = gsap.to(item, { opacity: 1 });
-              this.gsapAnimations.newItem(enterTween);
-            },
+    timelineItems.each((index, item) => {
+      const tween = gsap.from(item, {
+        scrollTrigger: {
+          trigger: item,
+          start: 'top 50%',
+          end: 'top 10%',
+          scrub: 2,
+          immediateRender: false,
+          onEnter: () => {
+            ScrollTrigger.refresh();
+            if (index > 0) $(timelineItems).get(index - 1).style.opacity = '0.3';
           },
-          opacity: 0.3,
-        });
-        this.gsapAnimations.newItem(tween);
+          onEnterBack: () => {
+            ScrollTrigger.refresh();
+            const enterTween = gsap.to(item, { opacity: 1 });
+            this.gsapAnimations.newItem(enterTween);
+          },
+        },
+        opacity: 0.3,
       });
+      this.gsapAnimations.newItem(tween);
     });
   };
 
@@ -117,9 +123,12 @@ export class BioAnimations
     });
   };
 
+  beforeEnter = async (_data: ITransitionData) => {
+    this.disposePageAnimations();
+  };
+
   afterLeave = async (_data: ITransitionData) => {
     this.unloadCss();
-    this.gsapAnimations.disposePageAnimations();
     this.supportAnimations.cursorAnimations.cursorBlue();
   };
 }
