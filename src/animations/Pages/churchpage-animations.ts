@@ -21,34 +21,29 @@ export class ChurchAnimations implements IPageAnimations {
   }
 
   afterEnter = async () => {
-    this.initElements();
+    $(async () => {
+      this.initElements();
 
-    this.supportAnimations.navBarAnimations.animateScrollButton(this.pageElements.get('#map'));
+      this.supportAnimations.navBarAnimations.animateScrollButton(this.pageElements.get('#map'));
 
-    await this.supportAnimations.logoAnimations.animateLogo();
+      await this.supportAnimations.logoAnimations.animateLogo();
 
-    this._map.animateMap();
+      this._map.animateMap();
+    });
   };
 
   initElements = () => {
-    $(() => {
-      this.namespace = 'churches';
-      this.supportAnimations = GlobalPageAnimations;
-      this.pageElements = new Mapper(['#map']).map();
-      this.supportAnimations;
-      this._map = new LeafletMapComponent(
-        this.pageElements.get('#map'),
-        () => '#ffffff',
-        '#1098ff',
-        {
-          zoom: 5.2,
-          zoomControl: false,
-          maxZoom: 5.2,
-          minZoom: 5.2,
-          dragging: false,
-          scrollWheelZoom: false,
-        }
-      );
+    this.namespace = 'churches';
+    this.supportAnimations = GlobalPageAnimations;
+    this.pageElements = new Mapper(['#map']).map();
+    this.supportAnimations;
+    this._map = new LeafletMapComponent(this.pageElements.get('#map'), () => '#ffffff', '#1098ff', {
+      zoom: 5.2,
+      zoomControl: false,
+      maxZoom: 5.2,
+      minZoom: 5.2,
+      dragging: false,
+      scrollWheelZoom: false,
     });
   };
 }
