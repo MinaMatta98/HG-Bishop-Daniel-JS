@@ -4,116 +4,146 @@ import 'textillate/assets/animate.css';
 import '../../public/timeline.min.css';
 import '../Components/timeline/timeline.min.js';
 
+import type { ITransitionData } from '@barba/core/dist/core/src/src/defs';
 import { Flip, gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
+import type { ICarouselAnimations } from 'src/interfaces/ICarouselAnimations';
+import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
+import type { IGsapPageAnimations } from 'src/interfaces/IGsapPageAnimations';
+import { GsapAnimations } from 'src/interfaces/IGsapPageAnimations';
+import type { IMouseEventAnimations } from 'src/interfaces/IMouseEventAnimations';
+import type { IPageAnimations } from 'src/interfaces/IPageAnimations';
+import { GlobalPageAnimations } from 'src/interfaces/IPageAnimations';
+import type { IResizePageAnimations } from 'src/interfaces/IResizePageAnimations';
 
-import { LogoAnimations } from '../Components/logo-animations';
+import { Mapper } from '$utils/mapper';
+
 import { LeafletMapComponent } from '../Components/map';
 import { CursorAnimations } from '../UI/cursor-animations';
-import type { NavBarAnimations } from '../UI/navbar-animations';
 
-export class ChurchContentAnimations {
-  private _heading: JQuery<HTMLElement>;
-
-  private _subHeading: JQuery<HTMLElement>;
-
-  private _ctaButton: JQuery<HTMLElement>;
-
-  private _churchImages: JQuery<HTMLElement>;
-
-  private _locationSection: JQuery<HTMLElement>;
-
-  private _locInvitation: JQuery<HTMLElement>;
-
-  private _locContent: JQuery<HTMLElement>;
-
-  private _heroSection: JQuery<HTMLElement>;
-
-  private _mapContainer: JQuery<HTMLElement>;
-
-  private _mapPin: JQuery<HTMLElement>;
-
-  private _map: LeafletMapComponent;
-
+export class ChurchContentAnimations
+  implements
+    IPageAnimations,
+    IResizePageAnimations,
+    IDisposableAnimations,
+    IGsapPageAnimations,
+    IMouseEventAnimations
+{
   private _targetState: string;
-
-  private _mapTL: gsap.core.Timeline;
 
   private _priestCarousel: PriestCarousel;
 
-  private init = (): void => {
-    $(() => {
-      this._targetState = 'New South Wales';
-      this._heading = $('.churches-content');
-      this._subHeading = $('.churches-content-subheading');
-      this._ctaButton = $('.church-content-cta');
-      this._churchImages = $('.churches-content-images');
-      this._mapPin = $('.map-pin');
-      this._locationSection = $('.find-us');
-      this._locInvitation = $('.loc-invitation');
-      this._locContent = $('.loc-content');
-      this._heroSection = $('.church-content-hero-section');
-      this._mapContainer = $('.map');
-      this._priestCarousel = new PriestCarousel();
-      this._mapTL = gsap.timeline();
-      this.LoadTimeline();
-      this._heading.css('display', 'none');
-      this._subHeading.css('opacity', 0);
-      this._ctaButton.css('opacity', 0);
-      this._churchImages.css('opacity', 0);
+  private _map: LeafletMapComponent;
+
+  private _mapTL: gsap.core.Timeline;
+
+  gsapAnimations: GsapAnimations;
+
+  disposePageAnimations = () => {
+    this.disposePageAnimations();
+    this._map.disposeLeaderLines();
+  };
+
+  onResizeHandler = () => {
+    $(window).on('resize', () => {
       const zoom = Math.min(($('.loc-grid').width() / 1366.1) * 4.2, 4.2);
-      this._map = new LeafletMapComponent(
-        this._mapContainer,
-        (feature: any) =>
-          feature.properties.STATE_NAME === this._targetState ? '#ffffff90' : '#ffffff25',
-        '#ffffff',
-        {
+      if (this._map)
+        this._map.resize({
           zoomControl: false,
           zoom: zoom,
           minZoom: zoom,
           maxZoom: zoom,
           dragging: false,
           scrollWheelZoom: false,
-        },
-        (feature: any) =>
-          feature.properties.STATE_NAME === this._targetState ? 'active-layer' : '',
-        this._mapPin,
-        this._locInvitation
-      );
-      this.onResizeHandler();
+        });
     });
   };
 
-  private animateMinistryLogo = async (): Promise<void> => {
-    await LogoAnimations.animateLogo();
+  pageElements: Map<string, JQuery<HTMLElement>>;
+
+  supportAnimations: typeof GlobalPageAnimations;
+
+  namespace: string;
+
+  private LoadTimeline = () => {
+    // @ts-ignore
+    this.pageElements.get('.timeline').timeline({
+      forceVerticalMode: 800,
+      mode: 'horizontal',
+      visibleItems: 4,
+    });
   };
 
-  private onResizeHandler = () => {
-    $(window).on('resize', () => {
-      const zoom = Math.min(($('.loc-grid').width() / 1366.1) * 4.2, 4.2);
-      this._map.resize({
+  initElements = () => {
+    this.supportAnimations = GlobalPageAnimations;
+
+    this.gsapAnimations = new GsapAnimations();
+
+    this._targetState = 'New South Wales';
+
+    this.namespace = 'church-content';
+
+    this.pageElements = new Mapper([
+      '.churches-content',
+      '.churches-content-subheading',
+      '.church-content-cta',
+      '.churches-content-images',
+      '.map-pin',
+      '.find-us',
+      '.loc-invitation',
+      '.loc-content',
+      '.church-content-hero-section',
+      '.map',
+      '.timeline',
+      '.timeline__content',
+    ]).map();
+
+    this._priestCarousel = new PriestCarousel(this.gsapAnimations);
+
+    this._mapTL = gsap.timeline();
+
+    this.gsapAnimations.newItem(this._mapTL);
+
+    this.pageElements.get('.churches-content').css('display', 'none');
+
+    this.pageElements.get('.churches-content-subheading').css('opacity', 0);
+
+    this.pageElements.get('.church-content-cta').css('opacity', 0);
+
+    this.pageElements.get('.churches-content-images').css('opacity', 0);
+
+    const zoom = Math.min(($('.loc-grid').width() / 1366.1) * 4.2, 4.2);
+
+    this._map = new LeafletMapComponent(
+      this.pageElements.get('.map'),
+      (feature: any) =>
+        feature.properties.STATE_NAME === this._targetState ? '#ffffff90' : '#ffffff25',
+      '#ffffff',
+      {
         zoomControl: false,
         zoom: zoom,
         minZoom: zoom,
         maxZoom: zoom,
         dragging: false,
         scrollWheelZoom: false,
-      });
-    });
-  };
+      },
+      (feature: any) => (feature.properties.STATE_NAME === this._targetState ? 'active-layer' : ''),
 
-  public disposeChurchContentPage = (): void => {
-    this._mapTL.kill();
-    this._mapTL.clear(true);
-    this._map.disposeLeaderLines();
-    this._priestCarousel.disposeAnimations();
+      this.pageElements.get('.map-pin'),
+
+      this.pageElements.get('.loc-invitation')
+    );
   };
 
   private animateHeading = (): void => {
-    const { _heading, _subHeading, _ctaButton, _churchImages, _mapTL } = this;
+    const heading = this.pageElements.get('.churches-content');
+    const subHeading = this.pageElements.get('.churches-content-subheading');
+    const ctaButton = this.pageElements.get('.church-content-cta');
+    const churchImages = this.pageElements.get('.churches-content-images');
+    const { _mapTL } = this;
     $(async () => {
-      _heading.css('display', 'unset');
-      await (<any>_heading).textillate({
+      heading.css('display', 'unset');
+      await (<any>heading).textillate({
         minDisplayTime: 2000,
         autoStart: true,
         outEffects: ['hinge'],
@@ -136,113 +166,26 @@ export class ChurchContentAnimations {
           callback: function () {},
         },
         callback: async function () {
-          _mapTL.to(_subHeading, { opacity: 1, duration: 1 }, 0);
-          _mapTL.to(_ctaButton, { opacity: 1, duration: 1 }, 0);
-          _mapTL.to(_ctaButton, { opacity: 1, duration: 1 }, 0);
-          _mapTL.to(_churchImages, { opacity: 1, duration: 1, stagger: 0.3 }, 1);
-          _mapTL.from(_churchImages, { translateX: '-10em', duration: 1 }, 1);
+          _mapTL.to(subHeading, { opacity: 1, duration: 1 }, 0);
+          _mapTL.to(ctaButton, { opacity: 1, duration: 1 }, 0);
+          _mapTL.to(ctaButton, { opacity: 1, duration: 1 }, 0);
+          _mapTL.to(churchImages, { opacity: 1, duration: 1, stagger: 0.3 }, 1);
+          _mapTL.from(churchImages, { translateX: '-10em', duration: 1 }, 1);
         },
         type: 'char',
       });
     });
   };
 
-  private animateBlueCursor = (): void => {
-    $(() => {
-      this._locationSection.on('mouseover', () => {
-        CursorAnimations.cursorWhite();
-      });
-
-      this._locationSection.on('mouseleave', () => {
-        CursorAnimations.cursorBlue();
-      });
-    });
-  };
-
-  //private style = (feature: any) => {
-  //  return {
-  //    fillColor: feature.properties.STATE_NAME === this._targetState ? '#ffffff90' : '#ffffff25',
-  //    weight: 1,
-  //    opacity: 1,
-  //    color: '#ffffff',
-  //    dashArray: '0',
-  //    fillOpacity: 1,
-  //    className: feature.properties.STATE_NAME === this._targetState ? 'active-layer' : '',
-  //  };
-  //};
-
-  //private initializeMap = (): void => {
-  //  $(() => {
-  //    this._map = leaflet
-  //      .map(this._mapContainer[0], {
-  //        zoomControl: false,
-  //        zoom: 4.4,
-  //        minZoom: 4.4,
-  //        maxZoom: 4.4,
-  //        dragging: false,
-  //        scrollWheelZoom: false,
-  //      })
-  //      .setView([-28.2744, 133.7751], 4.4);
-  //
-  //    leaflet
-  //      .geoJson(
-  //        // @ts-ignore
-  //        geoJson,
-  //        {
-  //          style: this.style,
-  //        }
-  //      )
-  //      .addTo(this._map);
-  //
-  //    const marker = new leaflet.DivIcon({
-  //      html: this._mapPin[0],
-  //    });
-  //
-  //    leaflet.marker([-33.762282, 150.8274209], { icon: marker }).addTo(this._map);
-  //  });
-  //};
-
-  //
-  // https://github.com/NUKnightLab/TimelineJS3/blob/master/API.md
-  private LoadTimeline = () => {
-    // @ts-ignore
-    $('.timeline').timeline({
-      forceVerticalMode: 800,
-      mode: 'horizontal',
-      visibleItems: 4,
-    });
-    this.animateTimelineHover();
-  };
-
-  private animateTimelineHover = (): void => {
-    $('.timeline__content').on('mouseover', () => CursorAnimations.cursorWhite());
-    $('.timeline__content').on('mouseleave', () => CursorAnimations.cursorBlue());
-  };
-
-  //private animateLeaderLine = (): void => {
-  //  $(() => {
-  //    this._leaderLine = new LeaderLine(this._mapPin[0], this._locInvitation[0], {
-  //      color: '#ffffff',
-  //      size: 2,
-  //      dash: { animation: true, len: 10 },
-  //      path: 'arc',
-  //      startPlug: 'crosshair',
-  //    });
-  //    this._leaderLine.hide();
-  //    $(window).on('resize', () => {
-  //      if (this._leaderLine) this._leaderLine.position();
-  //    });
-  //  });
-  //};
-
   private animateLocationSection = () => {
-    gsap.from(this._locContent, {
+    const locContent = this.pageElements.get('.loc-content');
+    gsap.from(locContent, {
       scrollTrigger: {
-        trigger: this._locContent,
+        trigger: locContent,
         start: 'top 40%',
         onEnter: () => {
           gsap.fromTo(
-            this._locContent.children(),
+            locContent.children(),
             {
               opacity: 0,
               translateY: '2em',
@@ -264,215 +207,269 @@ export class ChurchContentAnimations {
       },
     });
 
-    gsap.set(this._locContent.children(), { opacity: 0 });
+    gsap.set(locContent.children(), { opacity: 0 });
   };
 
-  private animateChurchImageHover = (): void => {
-    const children = this._churchImages.children();
-    children.each((_, e) => {
-      $(e).on('mouseover', () => {
-        const state = Flip.getState(e);
-        children.each((_, child) => {
-          $(child).removeClass('secondary');
-          $(child).removeClass('tertiary');
-        });
-        const otherImages = this._churchImages.children().filter((_, el) => el !== e);
-        $(otherImages[0]).addClass('secondary');
-        $(otherImages[1]).addClass('tertiary');
-        Flip.from(state, {
-          duration: 1,
-          ease: 'power1.inOut',
-          absolute: true,
+  afterEnter = async (_data: ITransitionData) => {
+    $(async () => {
+      this.initElements();
+
+      this.onResizeHandler();
+
+      this.LoadTimeline();
+
+      await this.supportAnimations.logoAnimations.animateLogo();
+
+      this.animateHeading();
+
+      this.onMouseEnterHandler();
+
+      this.onMouseLeaveHandler();
+
+      this.animateLocationSection();
+
+      this.supportAnimations.navBarAnimations.animateScrollButton(
+        this.pageElements.get('.church-content-hero-section')
+      );
+    });
+  };
+
+  beforeEnter = async (_data: ITransitionData) => {
+    this.supportAnimations.footerAnimations.animateFooterWhite();
+  };
+
+  afterLeave = async (_data: ITransitionData) => {
+    this.disposePageAnimations();
+  };
+
+  onMouseEnterHandler = () => {
+    const animateChurchImageHover = (): void => {
+      const children = this.pageElements.get('.churches-content-images').children();
+      children.each((_, e) => {
+        $(e).on('mouseover', () => {
+          const state = Flip.getState(e);
+          children.each((_, child) => {
+            $(child).removeClass('secondary');
+            $(child).removeClass('tertiary');
+          });
+          const otherImages = this.pageElements
+            .get('.churches-content-images')
+            .children()
+            .filter((_, el) => el !== e);
+          $(otherImages[0]).addClass('secondary');
+          $(otherImages[1]).addClass('tertiary');
+          Flip.from(state, {
+            duration: 1,
+            ease: 'power1.inOut',
+            absolute: true,
+          });
         });
       });
-    });
+    };
+
+    this.pageElements
+      .get('.timeline__content')
+      .on('mouseover', () => CursorAnimations.cursorWhite());
+
+    this.pageElements.get('.find-us').on('mouseover', () => CursorAnimations.cursorWhite());
+
+    animateChurchImageHover();
   };
 
-  public animateChurchContent = async (navbarAnimator: NavBarAnimations) => {
-    $(async () => {
-      this.init();
-      await this.animateMinistryLogo();
-      this.animateHeading();
-      this.animateChurchImageHover();
-      this.animateBlueCursor();
-      this.animateLocationSection();
-      navbarAnimator.animateScrollButton(this._heroSection);
-    });
+  onMouseLeaveHandler = () => {
+    this.pageElements
+      .get('.timeline__content')
+      .on('mouseleave', () => CursorAnimations.cursorBlue());
+
+    this.pageElements.get('.find-us').on('mouseleave', () => CursorAnimations.cursorBlue());
   };
 }
 
-class PriestCarousel {
-  private _priestContainer: JQuery<HTMLElement>;
-
-  private _carouselContainer: JQuery<HTMLElement>;
-
-  private _controls: JQuery<HTMLElement>;
-
-  private _pauseButton: JQuery<HTMLButtonElement>;
-
-  private _playButton: JQuery<HTMLElement>;
-
+class PriestCarousel implements ICarouselAnimations {
   private _animationTL: gsap.core.Timeline;
 
   private _controlsTL: gsap.core.Timeline;
 
-  constructor() {
-    this._priestContainer = $('.priest-container');
-    this._carouselContainer = $('.priests-carousel');
-    this._controls = $('.controls');
-    this._pauseButton = $('.pause');
-    this._playButton = $('.play');
-    this._animationTL = gsap.timeline({ repeat: -1, repeatDelay: 0, paused: true });
-    this._controlsTL = gsap.timeline({ repeat: -1, repeatDelay: 1, paused: true });
-    this._controls.children().remove();
-    this.initializePins();
-    this.animateBlueCursor();
-    this.initializeButtons();
-    this.animateCarousel();
+  pageElemets: Map<string, JQuery<HTMLElement>>;
+
+  gsapAnimations: GsapAnimations;
+
+  initElements = () => {
+    this.pageElemets = new Mapper([
+      '.priest-container',
+      '.priests-carousel',
+      '.controls',
+      '.pause',
+      '.play',
+    ]).map();
+  };
+
+  constructor(gsapAnimations: GsapAnimations) {
+    $(() => {
+      this.initElements();
+      this._animationTL = gsap.timeline({ repeat: -1, repeatDelay: 0, paused: true });
+      this._controlsTL = gsap.timeline({ repeat: -1, repeatDelay: 1, paused: true });
+      this.gsapAnimations = gsapAnimations;
+      this.gsapAnimations.newItems([this._animationTL, this._controlsTL]);
+      this.pageElemets.get('.controls').children().remove();
+      this.onMouseEnterHandler();
+      this.onMouseLeaveHandler();
+      this.onMouseClickHandler();
+      this.animateButtons();
+      this.animateCarousel();
+    });
   }
 
-  private animateBlueCursor = (): void => {
-    this._priestContainer.on('mouseover', () => {
-      CursorAnimations.cursorWhite();
+  animateCarousel = () => {
+    const priestContainer = this.pageElemets.get('.priest-container');
+    const carouselContainer = this.pageElemets.get('.priests-carousel');
+    const playButton = this.pageElemets.get('.play');
+    const pauseButton = this.pageElemets.get('.pause');
+
+    priestContainer.each((i, e) => {
+      this.animatePriestContainer(i, $(e));
+      this.animatePins(i, $(e));
     });
 
-    this._priestContainer.on('mouseleave', () => {
-      CursorAnimations.cursorBlue();
+    ScrollTrigger.create({
+      trigger: carouselContainer,
+      start: 'top 50%',
+      onEnter: () => {
+        //this.resumeCarousel();
+        playButton.trigger('click');
+      },
+      onEnterBack: () => {
+        //this.resumeCarousel();
+        playButton.trigger('click');
+      },
+      onLeave: () => {
+        //this.pauseCarousel();
+        pauseButton.trigger('click');
+      },
+      onLeaveBack: () => {
+        //this.pauseCarousel();
+        pauseButton.trigger('click');
+      },
     });
   };
 
-  public disposeAnimations = (): void => {
-    this._animationTL.kill();
-    this._controlsTL.kill();
+  nextSlide = (i: number, el: JQuery<HTMLElement>) => {
+    const priestContainer = this.pageElemets.get('.priest-container');
+    const carouselContainer = this.pageElemets.get('.priests-carousel');
+    const width = priestContainer.width();
+    const playDuration = 5;
+
+    const tween = this._animationTL.to(
+      carouselContainer,
+      {
+        translateX: i !== priestContainer.length - 1 ? -width * (i + 1) : 0,
+        duration: 1,
+        onStart: () => {
+          this.animateUnfocusedSlide($(el));
+          i !== priestContainer.length - 1
+            ? this.animateFocusedSlide($(priestContainer.get(i + 1)))
+            : this.animateFocusedSlide($(priestContainer.get(0)));
+        },
+      },
+      playDuration * (i + 1)
+    );
+
+    this.gsapAnimations.newItem(tween);
   };
 
-  private focusTransition = (e: HTMLElement | JQuery<HTMLElement>): void => {
-    gsap.to(e, {
+  private animatePriestContainer = (i: number, e: JQuery<HTMLElement>): void => {
+    const priestContainer = this.pageElemets.get('.priest-container');
+
+    this._animationTL.addLabel(`slide-${i}`);
+
+    this.nextSlide(i, e);
+
+    $(e).on('click', () => {
+      this.animateFocusedSlide($(priestContainer));
+      this.animateFocusedSlide($(e));
+      this._animationTL.seek(`slide-${i}`, false);
+    });
+  };
+
+  onMouseEnterHandler = () => {
+    this.pageElemets.get('.priest-container').on('mouseover', () => CursorAnimations.cursorWhite());
+  };
+
+  onMouseLeaveHandler = () => {
+    this.pageElemets.get('.priest-container').on('mouseleave', () => CursorAnimations.cursorBlue());
+  };
+
+  animateFocusedControls = (e: HTMLElement | JQuery<HTMLElement>): void => {
+    this.gsapAnimations.newItem(
+      gsap.to(e, { overflow: 'hidden', width: '4rem', borderRadius: '1rem', duration: 1 })
+    );
+  };
+
+  animateUnfocusedControls = (e: HTMLElement | JQuery<HTMLElement>): void => {
+    const firstTween = gsap.set(e, {
+      overflow: 'unset',
+      width: '1rem',
+      borderRadius: '100%',
+      duration: 1,
+    });
+    const secondTween = gsap.set($(e).children(), { width: 0 });
+    this.gsapAnimations.newItems([firstTween, secondTween]);
+  };
+
+  animateFocusedSlide = (el: JQuery<HTMLElement>) => {
+    const tween = gsap.to(el, {
       backgroundColor: 'var(--cursor-inner)',
       boxShadow:
         '0 0 0 0 rgba(0,0,0,0), 0 1.8px 5.8px 0 rgba(0,0,0,0.042), 0 3.9px 11.7px 0 rgba(0,0,0,0.05), 0 6.7px 18px 0 rgba(0,0,0,0.054), 0 11.5px 25.3px 0 rgba(0,0,0,0.057), 0 22.6px 35.9px 0 rgba(0,0,0,0.062)',
       opacity: 1,
       duration: 2,
     });
+    this.gsapAnimations.newItem(tween);
   };
 
-  private unfocusTransition = (e: HTMLElement | JQuery<HTMLElement>): void => {
-    gsap.to(e, {
+  animateUnfocusedSlide = (el: JQuery<HTMLElement>) => {
+    const tween = gsap.to(el, {
       backgroundColor: 'var(--cursor-center)',
       boxShadow: 'unset',
       opacity: 0.5,
       duration: 1,
     });
+    this.gsapAnimations.newItem(tween);
   };
 
-  private activeTransition = (e: HTMLElement | JQuery<HTMLElement>): void => {
-    gsap.to(e, { overflow: 'hidden', width: '4rem', borderRadius: '1rem', duration: 1 });
-  };
+  animatePins = (i: number, el: JQuery<HTMLElement>) => {
+    const playDuration = 5;
+    const controls = this.pageElemets.get('.controls');
 
-  private inactiveTransition = (e: HTMLElement | JQuery<HTMLElement>): void => {
-    gsap.set(e, { overflow: 'unset', width: '1rem', borderRadius: '100%', duration: 1 });
-    gsap.set($(e).children(), { width: 0 });
-  };
-
-  private animatePriestContainer = (i: number, playDuration: number, e: HTMLElement): void => {
-    const width = this._priestContainer.width();
-    this._animationTL.addLabel(`slide-${i}`);
-    this._animationTL.to(
-      this._carouselContainer,
-      {
-        translateX: i !== this._priestContainer.length - 1 ? -width * (i + 1) : 0,
-        duration: 1,
-        onStart: () => {
-          this.unfocusTransition($(e));
-          i !== this._priestContainer.length - 1
-            ? this.focusTransition($(this._priestContainer[i + 1]))
-            : this.focusTransition($(this._priestContainer[0]));
-        },
-      },
-      playDuration * (i + 1)
-    );
-
-    $(e).on('click', () => {
-      this.unfocusTransition($(this._priestContainer));
-      this.focusTransition($(e));
-      this._animationTL.seek(`slide-${i}`, false);
-    });
-  };
-
-  private animateCarouselControls = (i: number, playDuration: number, e: HTMLElement): void => {
-    this._controlsTL.addLabel(`slide-${i}`);
     this._controlsTL.to(
-      $(this._controls.children()[i]).children(),
+      $(controls.children()[i]).children(),
       {
         duration: playDuration,
         width: '100%',
         onStart: () => {
-          this.activeTransition($(this._controls.children()[i]));
+          this.animateFocusedControls($(controls.children()[i]));
         },
         onComplete: () => {
-          this.inactiveTransition($(this._controls.children()[i]));
-          $(this._controls.children()[i]).children().width(0);
+          this.animateUnfocusedControls($(controls.children()[i]));
+          $(controls.children()[i]).children().width(0);
         },
       },
       playDuration * i
     );
 
-    $(e).on('click', () => {
-      const children = $(this._controls.children());
-      this.inactiveTransition(children);
+    $(el).on('click', () => {
+      const children = $(controls.children());
+      this.animateFocusedControls(children);
       children.children().width(0);
       this._controlsTL.seek(`slide-${i}`, false);
     });
   };
 
-  private animateCarousel = (): void => {
-    const playDuration = 5;
+  animateButtons = () => {
+    const priestContainer = this.pageElemets.get('.priest-container');
+    const controls = this.pageElemets.get('.controls');
 
-    this._priestContainer.each((i, e) => {
-      this.animatePriestContainer(i, playDuration, e);
-      this.animateCarouselControls(i, playDuration, e);
-    });
-
-    ScrollTrigger.create({
-      trigger: this._carouselContainer,
-      start: 'top 50%',
-      onEnter: () => {
-        //this.resumeCarousel();
-        this._playButton.trigger('click');
-      },
-      onEnterBack: () => {
-        //this.resumeCarousel();
-        this._playButton.trigger('click');
-      },
-      onLeave: () => {
-        //this.pauseCarousel();
-        this._pauseButton.trigger('click');
-      },
-      onLeaveBack: () => {
-        //this.pauseCarousel();
-        this._pauseButton.trigger('click');
-      },
-    });
-  };
-
-  private initializeButtons = (): void => {
-    this._pauseButton.on('click', () => {
-      if (this._animationTL) this._animationTL.pause();
-      if (this._controlsTL) this._controlsTL.pause();
-      this._pauseButton.css('display', 'none');
-      this._playButton.css('display', 'block');
-    });
-
-    this._playButton.on('click', () => {
-      if (this._animationTL) this._animationTL.resume();
-      if (this._controlsTL) this._controlsTL.resume();
-      this._playButton.css('display', 'none');
-      this._pauseButton.css('display', 'unset');
-    });
-  };
-
-  private initializePins = (): void => {
-    this._priestContainer.each((i, _) => {
+    priestContainer.each((i, _) => {
       const pin = document.createElement('div');
       const pinFiller = document.createElement('div');
       $(pinFiller).addClass('slide-pin-filler');
@@ -481,7 +478,26 @@ class PriestCarousel {
         $(pin).addClass('active');
       }
       $(pin).append(pinFiller);
-      this._controls.append(pin);
+      controls.append(pin);
+    });
+  };
+
+  onMouseClickHandler = () => {
+    const pauseButton = this.pageElemets.get('.pause');
+    const playButton = this.pageElemets.get('.play');
+
+    pauseButton.on('click', () => {
+      if (this._animationTL) this._animationTL.pause();
+      if (this._controlsTL) this._controlsTL.pause();
+      pauseButton.css('display', 'none');
+      playButton.css('display', 'block');
+    });
+
+    playButton.on('click', () => {
+      if (this._animationTL) this._animationTL.resume();
+      if (this._controlsTL) this._controlsTL.resume();
+      playButton.css('display', 'none');
+      pauseButton.css('display', 'unset');
     });
   };
 }
