@@ -50,27 +50,14 @@ export class GenericAnimations implements IGenericAnimations {
 }
 
 export class GlobalPageAnimations {
-  public static namespace: ISchemaPage['namespace'];
-  public static footerAnimations: typeof FooterAnimations;
-  public static logoAnimations: typeof LogoAnimations;
-  public static cursorAnimations: typeof CursorAnimations;
-  public static navBarAnimations: NavBarAnimations;
-  public static transitionAnimations: typeof TransitionAnimations;
-  public static tocAnimations: TOCAnimations;
-  public static progressBarAnimations: typeof ProgressBarAnimations;
-  public static genericAnimations: GenericAnimations;
-
-  constructor() {
-    GlobalPageAnimations.footerAnimations = FooterAnimations;
-    GlobalPageAnimations.logoAnimations = LogoAnimations;
-    GlobalPageAnimations.cursorAnimations = CursorAnimations;
-    GlobalPageAnimations.navBarAnimations = new NavBarAnimations();
-    GlobalPageAnimations.transitionAnimations = TransitionAnimations;
-    GlobalPageAnimations.tocAnimations = new TOCAnimations();
-    GlobalPageAnimations.progressBarAnimations = ProgressBarAnimations;
-    /** Property insertion despite static status of props is to ensure initialization prior to usage */
-    GlobalPageAnimations.genericAnimations = new GenericAnimations(GlobalPageAnimations);
-  }
+  public static footerAnimations = FooterAnimations;
+  public static logoAnimations = LogoAnimations;
+  public static cursorAnimations = CursorAnimations;
+  public static transitionAnimations = TransitionAnimations;
+  public static progressBarAnimations = ProgressBarAnimations;
+  public static navBarAnimations = new NavBarAnimations();
+  public static tocAnimations = new TOCAnimations();
+  public static genericAnimations = new GenericAnimations(GlobalPageAnimations);
 }
 
 interface IGenericAnimations {
@@ -95,9 +82,15 @@ export interface IPageAnimations {
 
   initElements: () => void;
 
-  once?: (data: ITransitionData) => Promise<void>;
+  initializeBaseState?: () => void;
 
-  afterEnter?: (data: ITransitionData) => Promise<void>;
+  once?: (data: ITransitionData, ...args: any[]) => Promise<void>;
+
+  afterEnter?: (data: ITransitionData, ...args: any[]) => Promise<void>;
 
   afterLeave?: (data: ITransitionData) => Promise<void>;
+
+  beforeEnter?: (data: ITransitionData) => Promise<void>;
+
+  beforeLeave?: (data: ITransitionData) => Promise<void>;
 }
