@@ -19,6 +19,7 @@ export class TransitionAnimations {
 
   public static handleTransitionAnimation = async (inView: boolean): Promise<void> => {
     const loadTl = gsap.timeline();
+
     const transitionDivs = [
       '.first-transition',
       '.second-transition',
