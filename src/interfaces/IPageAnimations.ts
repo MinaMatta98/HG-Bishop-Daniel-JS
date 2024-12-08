@@ -7,7 +7,6 @@ import { TransitionAnimations } from 'src/animations/Components/transition';
 import { CursorAnimations } from 'src/animations/UI/cursor-animations';
 import { NavBarAnimations } from 'src/animations/UI/navbar-animations';
 import { TOCAnimations } from 'src/animations/UI/toc';
-import { Utils } from 'src/utils/utils';
 
 import type { ICssAnimations } from './ICssAnimations';
 import type { IDisposableAnimations } from './IDisposableAnimations';
@@ -26,8 +25,24 @@ export class GenericAnimations implements IGenericAnimations {
     this.globalPageAnimations = globalPageAnimations;
   }
 
+  private handleLinks = () => {
+    const links = $('a[href]');
+    const cbk = (e: JQuery.ClickEvent<HTMLElement>) => {
+      const target = e.currentTarget as HTMLAnchorElement;
+
+      if (target.href === window.location.href) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      links.each((_, link) => {
+        $(link).on('click', cbk);
+      });
+    };
+  };
+
   enter = async <C extends ICssAnimations>(obj: { data: ITransitionData; cssTransClass?: C }) => {
-    Utils.linkHandler();
+    this.handleLinks();
     this.globalPageAnimations.tocAnimations.onResizeHandler.handler();
     if (obj.cssTransClass) obj.cssTransClass.loadCss();
   };
