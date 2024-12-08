@@ -2,58 +2,55 @@ import 'lettering.js';
 import 'textillate';
 import 'textillate/assets/animate.css';
 
+import type { ITransitionData } from '@barba/core/dist/core/src/src/defs';
 import { gsap } from 'gsap/all';
 import $ from 'jquery';
+import type { IGsapPageAnimations } from 'src/interfaces/IGsapPageAnimations';
+import { GsapAnimations } from 'src/interfaces/IGsapPageAnimations';
+import type { IMouseEventAnimations } from 'src/interfaces/IMouseEventAnimations';
+import type { IPageAnimations } from 'src/interfaces/IPageAnimations';
+import { PageElements } from 'src/interfaces/IPageAnimations';
+import { GlobalPageAnimations } from 'src/interfaces/IPageAnimations';
 
-import { Animations } from '../animations';
-import { LogoAnimations } from '../Components/logo-animations';
-import { NavBarAnimations } from '../UI/navbar-animations';
 import { PortablePlayer } from '../UI/Widgets/portable-player';
 
-export class SermonPageAnimations {
-  private _sermonsHeading: JQuery<HTMLHeadingElement>;
-  private _sermonScene: JQuery<HTMLElement>;
-  private _sermonBlock: JQuery<HTMLDivElement>;
-  private _pages: JQuery<HTMLElement>;
-  private _circle: JQuery<HTMLElement>;
-  private _itemSection: JQuery<HTMLElement>;
+export class SermonPageAnimations
+  implements IPageAnimations, IMouseEventAnimations, IGsapPageAnimations
+{
   private _scrollTL: gsap.core.Tween;
+
   private _playerWidget: PortablePlayer;
 
-  private animateItemSection = (): void => {
-    this._circle = $('.section-glow');
-    this._itemSection = $('.item-section');
-    gsap.set(this._circle, { display: 'none' });
+  gsapAnimations: GsapAnimations;
 
-    this._itemSection.on('mouseenter', () => {
-      Animations.cursorWhite();
-      if (this._circle !== undefined) gsap.set(this._circle, { display: 'block' });
+  supportAnimations = GlobalPageAnimations;
+
+  namespace: string = 'sermons';
+
+  afterEnter = async (_data: ITransitionData) => {
+    $(async () => {
+      this.initElements();
+      this.supportAnimations.navBarAnimations.animateScrollButton(
+        this.pageElements.el.sermonContainer
+      );
+      this.pageElements.el.sermonHeading.css('display', 'none');
+      this.pageElements.el.sermonScene.css('opacity', '0');
+      this.onScrollEventHandler.handler(this);
+      await this.supportAnimations.logoAnimations.animateLogo();
+      const { onMouseEnterHandler, onMouseLeaveHandler, onMouseMoveHandler } = this;
+      onMouseMoveHandler.handler(this);
+      onMouseEnterHandler.handler(this);
+      onMouseLeaveHandler.handler(this);
+      this.animateHeading();
     });
-
-    this._itemSection.on('mouseleave', () => {
-      if (this._circle !== undefined) gsap.set(this._circle, { display: 'none' });
-    });
-
-    const onMouseMove = (e: MouseEvent) => {
-      if (this._circle === undefined) return;
-      const centerX = e.pageX - this._circle.width();
-      const centerY = e.pageY - this._itemSection.position().top - this._circle[0].offsetHeight / 2;
-      this._circle.css('left', centerX + 'px');
-      this._circle.css('top', centerY + 'px');
-    };
-
-    document.addEventListener('mousemove', onMouseMove);
-  };
-
-  private animateNavbarButton = (navbarAnimator: NavBarAnimations): void => {
-    navbarAnimator.animateScrollButton($('.sermon-container'));
   };
 
   private animateHeading = async (): Promise<void> => {
     $(async () => {
-      let { _sermonScene, _sermonsHeading, _sermonBlock } = this;
-      _sermonsHeading.css('display', 'unset');
-      await (<any>_sermonsHeading).textillate({
+      const { sermonScene, sermonHeading, sermonTitleBlock } = this.pageElements.el;
+      const { gsapAnimations } = this;
+      sermonHeading.css('display', 'unset');
+      await (<any>sermonHeading).textillate({
         loop: false,
         minDisplayTime: 2000,
         initialDelay: 0,
@@ -80,10 +77,11 @@ export class SermonPageAnimations {
           callback: function () {},
         },
         callback: async function () {
-          _sermonBlock = $('.sermon-title-block');
+          //sermonBlock = $('.sermon-title-block');
 
-          await gsap.to(_sermonsHeading, { opacity: 0, duration: 1 });
-          gsap.set(_sermonBlock, {
+          const tween = await gsap.to(sermonHeading, { opacity: 0, duration: 1 });
+
+          const secondTween = gsap.set(sermonTitleBlock, {
             width: '0%',
             translateY: '-15em',
             left: '0',
@@ -92,61 +90,135 @@ export class SermonPageAnimations {
             position: 'relative',
           });
 
-          _sermonsHeading.text('');
+          sermonHeading.text('');
 
-          //gsap.to(_sermonBlock, { translateY: '0', duration: 3 });
-          gsap.to(_sermonsHeading, { opacity: 1, duration: 1 });
-          gsap.to(_sermonScene, { opacity: 1, duration: 1 });
-          //await animateHero();
+          const thirdTween = gsap.to(sermonHeading, { opacity: 1, duration: 1 });
+
+          const fourthTween = gsap.to(sermonScene, { opacity: 1, duration: 1 });
+
+          gsapAnimations.newItems([tween, secondTween, thirdTween, fourthTween]);
         },
         type: 'char',
       });
     });
   };
 
-  private scroll = (index: number) => {
-    if (this._scrollTL !== undefined) this._scrollTL.kill();
-    this._scrollTL = gsap.to(window, {
-      scrollTo: { y: $(this._pages[index]).position().top },
-      duration: 1,
-      ease: 'power2.inOut',
-    });
+  afterLeave?: (data: ITransitionData) => Promise<void>;
+
+  beforeEnter?: (data: ITransitionData) => Promise<void>;
+
+  beforeLeave?: (data: ITransitionData) => Promise<void>;
+
+  pageElements: PageElements<
+    [
+      '.section-glow',
+      '.item-section',
+      '.sermon-container',
+      '.sermon-scene',
+      '.piling',
+      '.sermon-heading',
+      '.sermon-title-block',
+    ]
+  >;
+
+  initializeBaseState = () => {
+    const { sectionGlow } = this.pageElements.el;
+    this.gsapAnimations.newItem(gsap.set(sectionGlow, { display: 'none' }));
   };
 
-  private animatePagePiling = () => {
-    $(() => {
-      this._pages = $('.piling');
-      this._pages.each((index, page) => {
-        gsap.to(page, {
+  initElements = () => {
+    this.namespace = 'sermons';
+    this.pageElements = new PageElements([
+      '.section-glow',
+      '.item-section',
+      '.sermon-container',
+      '.sermon-scene',
+      '.piling',
+      '.sermon-heading',
+      '.sermon-title-block',
+    ] as const);
+    this.gsapAnimations = new GsapAnimations();
+    this._playerWidget = new PortablePlayer();
+  };
+
+  onMouseEnterHandler = {
+    handler(self: SermonPageAnimations) {
+      const { itemSection, sectionGlow } = self.pageElements.el;
+
+      itemSection.on('mouseenter', () => {
+        if (sectionGlow !== undefined)
+          self.gsapAnimations.newItem(gsap.set(sectionGlow, { display: 'block' }));
+      });
+    },
+    dispose(self: SermonPageAnimations) {
+      self.pageElements.el.itemSection.off('mouseenter');
+    },
+  };
+
+  onMouseLeaveHandler = {
+    handler(self: SermonPageAnimations) {
+      const { sectionGlow, itemSection } = self.pageElements.el;
+
+      itemSection.on('mouseleave', () => {
+        if (sectionGlow !== undefined)
+          self.gsapAnimations.newItem(gsap.set(sectionGlow, { display: 'none' }));
+      });
+    },
+    dispose(self: SermonPageAnimations) {
+      self.pageElements.el.itemSection.off('mouseleave');
+    },
+  };
+
+  onMouseMoveHandler = {
+    handler(self: SermonPageAnimations) {
+      const { sectionGlow, itemSection } = self.pageElements.el;
+      const onMouseMove = (e: MouseEvent) => {
+        if (sectionGlow === undefined) return;
+        const centerX = e.pageX - sectionGlow.width();
+        const centerY = e.pageY - itemSection.position().top - sectionGlow[0].offsetHeight / 2;
+        sectionGlow.css('left', centerX + 'px');
+        sectionGlow.css('top', centerY + 'px');
+      };
+
+      document.addEventListener('mousemove', onMouseMove);
+    },
+    dispose(_self: SermonPageAnimations) {
+      $(document).off('mousemove');
+    },
+  };
+
+  onScrollEventHandler = {
+    handler(self: SermonPageAnimations) {
+      const scroll = (index: number) => {
+        if (self._scrollTL !== undefined) self._scrollTL.kill();
+        self._scrollTL = gsap.to(window, {
+          scrollTo: { y: $(self.pageElements.el.piling[index]).position().top },
+          duration: 1,
+          ease: 'power2.inOut',
+        });
+        self.gsapAnimations.newItem(self._scrollTL);
+      };
+
+      self.pageElements.el.piling.each((index, page) => {
+        const scrollTween = gsap.to(page, {
           scrollTrigger: {
             trigger: page,
             start: 'top top',
             //end: 'bottom bottom',
             //snap: 1,
             onEnter: async () => {
-              if (this._pages[index + 1] !== undefined) {
-                this.scroll(index + 1);
+              if (self.pageElements.el.piling[index + 1] !== undefined) {
+                scroll(index + 1);
               }
             },
             onEnterBack: () => {
-              this.scroll(index);
+              scroll(index);
             },
           },
         });
+        self.gsapAnimations.newItem(scrollTween);
       });
-    });
-  };
-
-  public animateSermonPage = async (navbarAnimator: NavBarAnimations): Promise<void> => {
-    this._sermonsHeading = $('.sermon-heading');
-    this._sermonScene = $('.sermon-scene');
-    this._playerWidget = new PortablePlayer();
-    this.animateNavbarButton(navbarAnimator);
-    this._sermonsHeading.css('display', 'none');
-    this._sermonScene.css('opacity', '0');
-    this.animatePagePiling();
-    await LogoAnimations.animateLogo();
-    this.animateItemSection();
-    this.animateHeading();
+    },
+    dispose(_self: SermonPageAnimations) {},
   };
 }

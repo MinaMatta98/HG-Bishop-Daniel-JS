@@ -98,7 +98,6 @@ class Playlist {
   };
 
   public checkExists = (id: string): boolean => {
-    console.log(this._playlistItems);
     return this._playlistItems.some((item) => item.id === id);
   };
 
@@ -359,7 +358,6 @@ export class Player {
   public addTrack = (id: string): void => {
     id = id.toString();
     if (this.playList.checkExists(id)) {
-      console.log('Item already exists in playlist');
       return;
     }
     const playListItem = new PlayListItem(id);

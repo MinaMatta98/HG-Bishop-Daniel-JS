@@ -1,95 +1,130 @@
+import type { ITransitionData } from '@barba/core/dist/core/src/src/defs';
 import { tsParticles } from '@tsparticles/engine';
 import { gsap } from 'gsap/all';
 import $ from 'jquery';
+import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
+import type { IGsapPageAnimations } from 'src/interfaces/IGsapPageAnimations';
+import { GsapAnimations } from 'src/interfaces/IGsapPageAnimations';
+import type { IMouseEventAnimations } from 'src/interfaces/IMouseEventAnimations';
+import type { IPageAnimations } from 'src/interfaces/IPageAnimations';
+import { PageElements } from 'src/interfaces/IPageAnimations';
+import { GlobalPageAnimations } from 'src/interfaces/IPageAnimations';
 import { loadFull } from 'tsparticles';
 
-//import UniversalTilt from 'universal-tilt.js';
 import * as animation from '../animation.json';
-import { Animations } from '../animations';
 import { GlobeAnimation } from '../Components/globe';
-import { LogoAnimations } from '../Components/logo-animations';
-import type { NavBarAnimations } from '../UI/navbar-animations';
 
-export class MinistryPageAnimations {
+export class MinistryPageAnimations
+  implements IPageAnimations, IMouseEventAnimations, IGsapPageAnimations, IDisposableAnimations
+{
+  disposePageAnimations = () => {
+    this.gsapAnimations.disposePageAnimations();
+    this._globeAnimation.disposePageAnimations();
+  };
+
+  gsapAnimations: GsapAnimations;
+
+  onMouseEnterHandler = {
+    handler(self: MinistryPageAnimations) {
+      const { itemSection, sectionGlow } = self.pageElements.el;
+
+      const tween = gsap.set(sectionGlow, { display: 'none' });
+
+      self.gsapAnimations.newItem(tween);
+
+      itemSection.on('mouseenter', () => {
+        self.supportAnimations.cursorAnimations.cursorWhite();
+        self.gsapAnimations.newItem(gsap.set(sectionGlow, { display: 'block' }));
+      });
+    },
+    dispose(self: MinistryPageAnimations) {
+      self.pageElements.el.itemSection.off('mouseenter');
+    },
+  };
+
+  onMouseMoveHandler = {
+    handler(self: MinistryPageAnimations) {
+      const { itemSection, sectionGlow } = self.pageElements.el;
+
+      const onMouseMove = (e: MouseEvent) => {
+        // Calculate the center coordinates of the circle
+        const centerX = e.pageX - sectionGlow.width();
+        const centerY = e.pageY - itemSection.position().top - sectionGlow[0].offsetHeight / 2;
+
+        // Update the position of the sectionGlow based on the center coordinates
+        sectionGlow.css('left', centerX + 'px');
+        sectionGlow.css('top', centerY + 'px');
+      };
+
+      document.addEventListener('mousemove', onMouseMove);
+    },
+    dispose(_self: MinistryPageAnimations) {
+      console.log('dispose');
+      $(document).off('mousemove');
+    },
+  };
+
+  onMouseLeaveHandler = {
+    handler(self: MinistryPageAnimations) {
+      const circle = self.pageElements.el.sectionGlow;
+
+      self.pageElements.el.itemSection.on('mouseleave', () =>
+        gsap.set(circle, { display: 'none' })
+      );
+    },
+    dispose(self: MinistryPageAnimations) {
+      self.pageElements.el.itemSection.off('mouseleave');
+    },
+  };
+
+  pageElements: PageElements<['.section-glow', '.item-section', '.webgl']>;
+
+  supportAnimations = GlobalPageAnimations;
+
+  namespace: string = 'ministry';
+
   private _globeAnimation: GlobeAnimation;
 
-  public init = (): void => {
-    this._globeAnimation = new GlobeAnimation(false);
-    this._globeAnimation.init();
+  initElements = () => {
+    this.namespace = 'ministry';
+    this.gsapAnimations = new GsapAnimations();
+    this.pageElements = new PageElements(['.section-glow', '.item-section', '.webgl'] as const);
+    this._globeAnimation = new GlobeAnimation(false, this.gsapAnimations);
   };
 
-  public disposeGlobe = (): void => {
-    this._globeAnimation.dispose();
-  };
+  initializeBaseState = async () => {
+    this._globeAnimation.animateComponent();
 
-  private animateMinistryLogo = (): void => {
-    LogoAnimations.animateLogo();
-  };
-
-  private animateItemSection = (): void => {
-    const circle = $('.section-glow');
-    const itemSection = $('.item-section');
-    gsap.set(circle, { display: 'none' });
-
-    itemSection.on('mouseenter', () => {
-      Animations.cursorWhite();
-      gsap.set(circle, { display: 'block' });
+    await loadFull(tsParticles);
+    tsParticles.load({
+      id: 'item-container',
+      // @ts-ignore
+      options: animation,
+      // url: "http://foo.bar/particles.js // this can be used as an alternative to options property
     });
-    itemSection.on('mouseleave', () => gsap.set(circle, { display: 'none' }));
-
-    const onMouseMove = (e: MouseEvent) => {
-      // Calculate the center coordinates of the circle
-      const centerX = e.pageX - circle.width();
-      const centerY = e.pageY - itemSection.position().top - circle[0].offsetHeight / 2;
-
-      // Update the position of the circle based on the center coordinates
-      circle.css('left', centerX + 'px');
-      circle.css('top', centerY + 'px');
-    };
-
-    document.addEventListener('mousemove', onMouseMove);
   };
 
-  private tiltContainer = () => {
-    //UniversalTilt.init({
-    //  elements: $('.item-section'),
-    //  settings: {
-    //    shine: true,
-    //    'shine-opacity': 0.5,
-    //    'shine-save': true,
-    //  },
-    //  callbacks: {
-    //    // callbacks...
-    //  },
-    //});
-  };
-
-  private animateContainer = (): void => {
+  afterEnter = async (_data: ITransitionData) => {
     $(async () => {
-      await loadFull(tsParticles);
-      tsParticles.load({
-        id: 'item-container',
-        // @ts-ignore
-        options: animation,
-        // url: "http://foo.bar/particles.js // this can be used as an alternative to options property
-      });
+      this.initElements();
+      this.supportAnimations.navBarAnimations.animateScrollButton(this.pageElements.el.webgl!);
+      this.supportAnimations.logoAnimations.animateLogo();
+      await this.initializeBaseState();
+      this.onMouseEnterHandler.handler(this);
+      this.onMouseLeaveHandler.handler(this);
+      this.onMouseMoveHandler.handler(this);
+      this.supportAnimations.footerAnimations.animateFooterBlue();
+      this.supportAnimations.cursorAnimations.cursorWhite();
     });
   };
 
-  private animateNavbarButton = (navbarAnimator: NavBarAnimations): void => {
-    navbarAnimator.animateScrollButton($('.webgl'));
+  beforeEnter = async (_data: ITransitionData) => {
+    this.supportAnimations.footerAnimations.animateFooterBlue();
   };
 
-  public animateMinistryPage = async (navbarAnimator: NavBarAnimations): Promise<void> => {
-    $(() => {
-      this.animateNavbarButton(navbarAnimator);
-      this.animateMinistryLogo();
-      this.init();
-      this.animateItemSection();
-      this.tiltContainer();
-      this.animateContainer();
-      Animations.footerAnimateBlue();
-      Animations.cursorWhite();
-    });
+  afterLeave = async () => {
+    this.supportAnimations.cursorAnimations.cursorBlue();
+    this.supportAnimations.footerAnimations.animateFooterWhite();
+    this.disposePageAnimations();
   };
 }

@@ -1,21 +1,31 @@
+import type { ITransitionData } from '@barba/core/dist/core/src/src/defs';
 import $ from 'jquery';
+import type { IPageAnimations } from 'src/interfaces/IPageAnimations';
+import { GlobalPageAnimations, PageElements } from 'src/interfaces/IPageAnimations';
 
-import { LogoAnimations } from '../Components/logo-animations';
-import { NavBarAnimations } from '../UI/navbar-animations';
+export class ScheduleAnimations implements IPageAnimations {
+  supportAnimations = GlobalPageAnimations;
 
-export class ScheduleAnimations {
-  private _calendarEl: JQuery<HTMLElement>;
+  namespace: string = 'schedule';
 
-  private initializeElements = () => {
-    this._calendarEl = $('#calendar');
+  afterEnter = async (_data: ITransitionData) => {
+    $(async () => {
+      this.initElements();
+      this.supportAnimations.navBarAnimations.animateScrollButton(this.pageElements.el.calendar);
+      await this.supportAnimations.logoAnimations.animateLogo();
+    });
   };
 
-  public animateSchedulePage = async (navbarAnimator: NavBarAnimations) => {
-    $(async () => {
-      this.initializeElements();
-      navbarAnimator.animateScrollButton(this._calendarEl);
-      //this.initSchedule();
-      await LogoAnimations.animateLogo();
-    });
+  afterLeave?: (data: ITransitionData) => Promise<void>;
+
+  beforeEnter?: (data: ITransitionData) => Promise<void>;
+
+  beforeLeave?: (data: ITransitionData) => Promise<void>;
+
+  pageElements: PageElements<readonly ['#calendar']>;
+
+  initElements = () => {
+    this.namespace = 'schedule';
+    this.pageElements = new PageElements(['#calendar'] as const);
   };
 }

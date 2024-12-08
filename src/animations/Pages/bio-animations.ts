@@ -3,13 +3,13 @@ import { gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
 import SplitType from 'split-type';
 import type { ICssAnimations } from 'src/interfaces/ICssAnimations';
-import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
 import type { IGsapPageAnimations } from 'src/interfaces/IGsapPageAnimations';
 import { GsapAnimations } from 'src/interfaces/IGsapPageAnimations';
+import type { IMouseEventAnimations } from 'src/interfaces/IMouseEventAnimations';
 import type { IPageAnimations } from 'src/interfaces/IPageAnimations';
+import { PageElements } from 'src/interfaces/IPageAnimations';
 import { GlobalPageAnimations } from 'src/interfaces/IPageAnimations';
 import type { IResizePageAnimations } from 'src/interfaces/IResizePageAnimations';
-import { Mapper } from 'src/utils/mapper';
 
 export class BioAnimations
   implements
@@ -17,118 +17,140 @@ export class BioAnimations
     IGsapPageAnimations,
     ICssAnimations,
     IResizePageAnimations,
-    IDisposableAnimations
+    IMouseEventAnimations
 {
   private _splitType: SplitType;
 
   gsapAnimations: GsapAnimations;
 
-  pageElements: Map<string, JQuery<HTMLElement>>;
+  pageElements: PageElements<readonly ['.bio-heading', '.timeline_item', '.timeline-hero-section']>;
 
   supportAnimations = GlobalPageAnimations;
 
   namespace: string = 'bio';
 
-  onResizeHandler = () => {
-    $(window).on('resize', () => {
-      if (this._splitType) this._splitType.revert();
-      this.animateHeading();
-    });
+  onResizeHandler = {
+    handler(self: BioAnimations) {
+      $(window).on('resize', () => {
+        if (self._splitType) this._splitType.revert();
+        self.onScrollEventHandler.handler(self);
+      });
+    },
+    dispose() {
+      $(window).off('resize');
+    },
   };
 
   loadCss = () => {
     $('html').css('overflow-x', 'unset !important');
-    $('body').css('background', 'var(--cursor-inner)');
   };
 
   unloadCss = () => {
     $('html').css('overflow-x', 'unset');
-    $('body').css('background', 'unset');
-  };
-
-  disposePageAnimations = () => {
-    this.gsapAnimations.disposePageAnimations();
   };
 
   initElements = () => {
-    this.pageElements = new Mapper(['.bio-heading', '.timeline_item']).map();
+    this.pageElements = new PageElements([
+      '.bio-heading',
+      '.timeline_item',
+      '.timeline-hero-section',
+    ] as const);
+
     this.gsapAnimations = new GsapAnimations();
   };
 
-  private animateHeading = () => {
-    const text = new SplitType(this.pageElements.get('.bio-heading'), {
-      types: ['words', 'lines'],
-    });
+  onScrollEventHandler = {
+    handler: (self: BioAnimations) => {
+      const animateTimeline = () => {
+        const timelineItems: JQuery<HTMLElement> = self.pageElements.el.timeline_item;
 
-    $(text.lines).each((_, element) => {
-      $(element).append('<div class="line-mask"></div>');
+        timelineItems.each((index, item) => {
+          const tween = gsap.from(item, {
+            scrollTrigger: {
+              trigger: item,
+              start: 'top 50%',
+              end: 'top 10%',
+              scrub: 2,
+              immediateRender: false,
+              onEnter: () => {
+                try {
+                  ScrollTrigger.refresh();
+                } catch (e) {}
+                if (index > 0) $(timelineItems).get(index - 1).style.opacity = '0.3';
+              },
+              onEnterBack: () => {
+                try {
+                  ScrollTrigger.refresh();
+                } catch (e) {}
+                const enterTween = gsap.to(item, { opacity: 1 });
+                self.gsapAnimations.newItem(enterTween);
+              },
+            },
+            opacity: 0.3,
+          });
+          self.gsapAnimations.newItem(tween);
+        });
+      };
 
-      const target = $(element).find('.line-mask');
+      const animateHeading = () => {
+        const text = new SplitType(self.pageElements.el.bioHeading, {
+          types: ['words', 'lines'],
+        });
 
-      const timeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: element,
-          start: 'top center',
-          end: 'bottom center',
-          scrub: 1,
-        },
-      });
+        $(text.lines).each((_, element) => {
+          $(element).append('<div class="line-mask"></div>');
 
-      timeline.from(target, { width: '100%', duration: 1 });
+          const target = $(element).find('.line-mask');
 
-      this.gsapAnimations.newItem(timeline);
-    });
-  };
+          const timeline = gsap.timeline({
+            scrollTrigger: {
+              trigger: element,
+              start: 'top center',
+              end: 'bottom center',
+              scrub: 1,
+            },
+          });
 
-  private animateTimeline = async (): Promise<void> => {
-    const timelineItems: JQuery<HTMLElement> = this.pageElements.get('.timeline_item');
+          timeline.from(target, { width: '100%', duration: 1 });
 
-    timelineItems.each((index, item) => {
-      const tween = gsap.from(item, {
-        scrollTrigger: {
-          trigger: item,
-          start: 'top 50%',
-          end: 'top 10%',
-          scrub: 2,
-          immediateRender: false,
-          onEnter: () => {
-            ScrollTrigger.refresh();
-            if (index > 0) $(timelineItems).get(index - 1).style.opacity = '0.3';
-          },
-          onEnterBack: () => {
-            ScrollTrigger.refresh();
-            const enterTween = gsap.to(item, { opacity: 1 });
-            this.gsapAnimations.newItem(enterTween);
-          },
-        },
-        opacity: 0.3,
-      });
-      this.gsapAnimations.newItem(tween);
-    });
+          self.gsapAnimations.newItem(timeline);
+        });
+      };
+
+      animateHeading();
+
+      animateTimeline();
+    },
+    dispose: () => {},
   };
 
   public afterEnter = async (_data: ITransitionData) => {
-    $(() => {
+    $(async () => {
       this.initElements();
+
       this.loadCss();
+
       this.supportAnimations.logoAnimations.animateLogo();
-      this.animateHeading();
-      this.animateTimeline();
-      this.onResizeHandler();
+
+      this.onScrollEventHandler.handler(this);
+
+      this.onResizeHandler.handler(this);
+
       this.supportAnimations.navBarAnimations.animateScrollButton(
-        this.pageElements.get('.timeline_item')
+        this.pageElements.el.timelineHeroSection
       );
+
       this.supportAnimations.cursorAnimations.cursorWhite();
+
       this.supportAnimations.footerAnimations.animateFooterBlue();
     });
   };
 
-  beforeEnter = async (_data: ITransitionData) => {
-    this.disposePageAnimations();
-  };
-
   afterLeave = async (_data: ITransitionData) => {
     this.unloadCss();
+
     this.supportAnimations.cursorAnimations.cursorBlue();
+
+    this.supportAnimations.footerAnimations.animateFooterWhite();
   };
 }

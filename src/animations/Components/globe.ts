@@ -1,20 +1,27 @@
 import Globe, { type GlobeInstance } from 'globe.gl';
 import gsap from 'gsap/all';
 import $ from 'jquery';
+import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
+import type { GsapAnimations, IGsapComponentAnimations } from 'src/interfaces/IGsapPageAnimations';
+import { GsapComponentAnimations } from 'src/interfaces/IGsapPageAnimations';
+import { GlobalPageAnimations } from 'src/interfaces/IPageAnimations';
+import { PageElements } from 'src/interfaces/IPageAnimations';
+import type { IResizePageAnimations } from 'src/interfaces/IResizePageAnimations';
 import { MeshPhysicalMaterial } from 'three';
 import * as THREE from 'three';
 
 import countries from '../../public/custom.geo.json';
-import { CursorAnimations } from '../UI/cursor-animations';
+//import { CursorAnimations } from '../UI/cursor-animations';
 
-export class GlobeAnimation {
+export class GlobeAnimation
+  implements IGsapComponentAnimations, IDisposableAnimations, IResizePageAnimations
+{
   private _RATIO = 0.95;
   private _ARC_REL_LEN = 0.4;
   private _FLIGHT_TIME = 1000;
   private _NUM_RINGS = 3;
   private _RINGS_MAX_R = 5;
   private _RING_PROPAGATION_SPEED = 5;
-  private _canvas: JQuery<HTMLElement>;
   private _currentPolygon: object;
   private prevCoords = { lat: 0, lng: 0 };
   private _GLOBE: GlobeInstance;
@@ -25,20 +32,43 @@ export class GlobeAnimation {
   /**
    *
    */
-  constructor(lightBg: boolean) {
+  constructor(lightBg: boolean, gsapAnimations: GsapAnimations) {
     $(() => {
-      this._canvas = $( '#webGL');
+      this.gsapComponentAnimations = new GsapComponentAnimations(gsapAnimations);
+
+      this.initElements();
+
+      this.supportingAnimations = GlobalPageAnimations;
+
       this._GLOBE = this.initGlobe();
+
       this._size = {
-        innerHeight: this._canvas.width(),
-        innerWidth: this._canvas.height(),
+        innerHeight: this.pageElements.el.webGL.width(),
+        innerWidth: this.pageElements.el.webGL.height(),
       };
+
       this._lightBG = lightBg;
     });
   }
 
+  supportingAnimations: typeof GlobalPageAnimations;
+
+  gsapComponentAnimations: GsapComponentAnimations;
+
+  pageElements: PageElements<readonly ['#webGL', '.globe-svg', '.ministry-wrapper']>;
+
+  initElements = () => {
+    this.pageElements = new PageElements(['#webGL', '.globe-svg', '.ministry-wrapper'] as const);
+  };
+
   private initGlobe = (): GlobeInstance => {
-    return Globe({ rendererConfig: { powerPreference: 'low-power' } })
+    return Globe({
+      rendererConfig: {
+        powerPreference: 'low-power',
+        antialias: false,
+        precision: 'lowp',
+      },
+    })
       .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
       .globeMaterial(
         new MeshPhysicalMaterial({
@@ -51,16 +81,18 @@ export class GlobeAnimation {
           emissiveIntensity: 0.5,
         })
       )
-      .width(this._canvas.width() * this._RATIO)
-      .height(this._canvas.height() * this._RATIO)
+      .width(this.pageElements.el.webGL.width() * this._RATIO)
+      .height(this.pageElements.el.webGL.height() * this._RATIO)
       .backgroundColor('#ffffff00')
       .pointsMerge(true);
   };
 
-  public dispose = () => {
-    this._GLOBE._destructor();
+  public disposePageAnimations = () => {
+    if (this._GLOBE) this._GLOBE._destructor();
     this._GLOBE = null;
     if (this._timeout) clearTimeout(this._timeout);
+    this.gsapComponentAnimations.disposePageAnimations();
+    this.onResizeHandler.dispose();
   };
 
   private emitArc = ({
@@ -105,6 +137,7 @@ export class GlobeAnimation {
 
   private addArcsData = () => {
     const N = 40;
+
     type ArcsData = {
       startLat: number;
       startLng: number;
@@ -113,6 +146,7 @@ export class GlobeAnimation {
       color: string;
       gap: number;
     };
+
     const arcsData = [...Array(N).keys()].map(() => ({
       startLat: (Math.random() - 0.5) * 180,
       startLng: (Math.random() - 0.5) * 360,
@@ -150,10 +184,6 @@ export class GlobeAnimation {
     $(() => {
       const renderer = this._GLOBE.renderer();
       renderer.setPixelRatio(1.1);
-      // const camera = this._GLOBE.camera();
-      // camera.position.setZ(camera.position.z);
-      // const pov = this._GLOBE.camera();
-      // this._GLOBE.pointOfView({ lat: pov.position.x, lng: pov.position.y, altitude: pov.position.z });
     });
   };
 
@@ -193,7 +223,9 @@ export class GlobeAnimation {
           .polygonAltitude((d) => (d === hoverD ? 0.12 : 0.01))
           .polygonCapColor((d) => (d === hoverD ? '#206ff0' : '#206ff030'));
 
-        hoverD ? CursorAnimations.cursorWhite() : CursorAnimations.cursorBlue();
+        hoverD
+          ? this.supportingAnimations.cursorAnimations.cursorWhite()
+          : this.supportingAnimations.cursorAnimations.cursorBlue();
       })
       .polygonsTransitionDuration(300);
     this.polygonHeightSetter();
@@ -210,24 +242,25 @@ export class GlobeAnimation {
 
   public animateGlobeBlock = () => {
     $(() => {
-      const globeG = $('.globe-svg').find('g');
+      const globeG = this.pageElements.el.globeSvg.find('g');
       gsap.set(globeG.children(), { fill: 'white', opacity: 0 });
 
-      this.destroyGlobeBlockAnimation();
+      this.gsapComponentAnimations.clearAnimation(this._tl);
       this._tl = gsap.timeline({ repeat: -1 }); // Create a timeline with infinite repetition
       this._tl.to(globeG.children(), { opacity: 0.5, stagger: 0.15 }, 'timeline');
       this._tl.to(globeG.children(), { opacity: 0, stagger: 0.2 }, 'timeline+=0.3'); // Adjust the delay as needed
+      this.gsapComponentAnimations.newItem(this._tl);
       const defaultCursor = () =>
-        this._lightBG ? CursorAnimations.cursorBlue() : CursorAnimations.cursorWhite();
+        this._lightBG
+          ? this.supportingAnimations.cursorAnimations.cursorBlue()
+          : this.supportingAnimations.cursorAnimations.cursorWhite();
 
-      $('.ministry-wrapper').on('mouseenter', () => CursorAnimations.cursorWhite());
+      this.pageElements.el.ministryWrapper.on('mouseenter', () =>
+        this.supportingAnimations.cursorAnimations.cursorWhite()
+      );
 
-      $('.ministry-wrapper').on('mouseleave', () => defaultCursor());
+      this.pageElements.el.ministryWrapper.on('mouseleave', () => defaultCursor());
     });
-  };
-
-  public destroyGlobeBlockAnimation = () => {
-    if (this._tl) this._tl.kill();
   };
 
   private animateStarGeometry = () => {
@@ -269,19 +302,16 @@ export class GlobeAnimation {
     this._GLOBE.scene().add(stars);
   };
 
-  public init = () => {
-    /**
-     * Ensure that the DOM has loaded with JQuery ready
-     */
+  public animateComponent = () => {
     $(async () => {
-      // Check to see if dispose has been called
-
       if (this._GLOBE === null) {
-        this._canvas = $( '#webGL');
+        this.initElements();
+
         this._size = {
-          innerHeight: this._canvas.width(),
-          innerWidth: this._canvas.height(),
+          innerHeight: this.pageElements.el.webGL.width(),
+          innerWidth: this.pageElements.el.webGL.height(),
         };
+
         this._GLOBE = this.initGlobe();
       }
 
@@ -292,25 +322,25 @@ export class GlobeAnimation {
       this.animateStarGeometry();
       this.initCamera();
 
-      const c = this._GLOBE(this._canvas[0]);
+      const c = this._GLOBE(this.pageElements.el.webGL[0]);
       this.initControls();
-      this.resize(c);
+      this.onResizeHandler.handler(this, c);
     });
   };
 
-  private resize = (c: GlobeInstance) => {
-    $(window).on('resize', () => {
-      this._size.innerWidth = this._canvas.width();
-      this._size.innerHeight = this._canvas.height();
-      //if (this._GLOBE) this._GLOBE._destructor();
-      //this._GLOBE = null;
-      //this.init();
-      //this._canvas = $(References.homePageClasses.globeDiv);
-      //const c = this._GLOBE(this._canvas[0]);
-      const renderer = c.renderer();
-      c.width(this._size.innerWidth * this._RATIO);
-      c.height(this._size.innerHeight * this._RATIO);
-      renderer.setSize(this._size.innerWidth * this._RATIO, this._size.innerHeight * this._RATIO);
-    });
+  onResizeHandler = {
+    handler(self: GlobeAnimation, c: GlobeInstance) {
+      $(window).on('resize', () => {
+        self._size.innerWidth = self.pageElements.el.webGL.width();
+        self._size.innerHeight = self.pageElements.el.webGL.height();
+        const renderer = c.renderer();
+        c.width(self._size.innerWidth * self._RATIO);
+        c.height(self._size.innerHeight * self._RATIO);
+        renderer.setSize(self._size.innerWidth * self._RATIO, self._size.innerHeight * self._RATIO);
+      });
+    },
+    dispose() {
+      $(window).off('resize');
+    },
   };
 }

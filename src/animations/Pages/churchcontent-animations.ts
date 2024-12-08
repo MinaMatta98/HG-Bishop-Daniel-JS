@@ -14,12 +14,10 @@ import { GsapAnimations } from 'src/interfaces/IGsapPageAnimations';
 import type { IMouseEventAnimations } from 'src/interfaces/IMouseEventAnimations';
 import type { IPageAnimations } from 'src/interfaces/IPageAnimations';
 import { GlobalPageAnimations } from 'src/interfaces/IPageAnimations';
+import { PageElements } from 'src/interfaces/IPageAnimations';
 import type { IResizePageAnimations } from 'src/interfaces/IResizePageAnimations';
 
-import { Mapper } from '$utils/mapper';
-
 import { LeafletMapComponent } from '../Components/map';
-import { CursorAnimations } from '../UI/cursor-animations';
 
 export class ChurchContentAnimations
   implements
@@ -40,50 +38,23 @@ export class ChurchContentAnimations
   gsapAnimations: GsapAnimations;
 
   disposePageAnimations = () => {
-    this.disposePageAnimations();
-    this._map.disposeLeaderLines();
+    this.gsapAnimations.disposePageAnimations();
+    this._map.disposePageAnimations();
   };
 
-  onResizeHandler = () => {
-    $(window).on('resize', () => {
-      const zoom = Math.min(($('.loc-grid').width() / 1366.1) * 4.2, 4.2);
-      if (this._map)
-        this._map.resize({
-          zoomControl: false,
-          zoom: zoom,
-          minZoom: zoom,
-          maxZoom: zoom,
-          dragging: false,
-          scrollWheelZoom: false,
-        });
-    });
+  onResizeHandler = {
+    handler: (self: ChurchContentAnimations) => {
+      $(window).on('resize', () => {
+        if (self._map) self._map.onResizeHandler.handler(self._map);
+      });
+    },
+    dispose: () => {
+      $(window).off('resize');
+    },
   };
 
-  pageElements: Map<string, JQuery<HTMLElement>>;
-
-  supportAnimations: typeof GlobalPageAnimations;
-
-  namespace: string;
-
-  private LoadTimeline = () => {
-    // @ts-ignore
-    this.pageElements.get('.timeline').timeline({
-      forceVerticalMode: 800,
-      mode: 'horizontal',
-      visibleItems: 4,
-    });
-  };
-
-  initElements = () => {
-    this.supportAnimations = GlobalPageAnimations;
-
-    this.gsapAnimations = new GsapAnimations();
-
-    this._targetState = 'New South Wales';
-
-    this.namespace = 'church-content';
-
-    this.pageElements = new Mapper([
+  pageElements: PageElements<
+    readonly [
       '.churches-content',
       '.churches-content-subheading',
       '.church-content-cta',
@@ -96,26 +67,66 @@ export class ChurchContentAnimations
       '.map',
       '.timeline',
       '.timeline__content',
-    ]).map();
+    ]
+  >;
 
-    this._priestCarousel = new PriestCarousel(this.gsapAnimations);
+  supportAnimations: typeof GlobalPageAnimations;
+
+  namespace: string = 'churches-content';
+
+  private LoadTimeline = () => {
+    // @ts-ignore
+    this.pageElements.el.timeline.timeline({
+      forceVerticalMode: 800,
+      mode: 'horizontal',
+      visibleItems: 4,
+    });
+  };
+
+  initializeBaseState = () => {
+    this.pageElements.el.churchesContent.css('display', 'none');
+
+    this.pageElements.el.churchesContentSubheading.css('opacity', 0);
+
+    this.pageElements.el.churchContentCta.css('opacity', 0);
+
+    this.pageElements.el.churchesContentImages.css('opacity', 0);
+  };
+
+  initElements = () => {
+    this.supportAnimations = GlobalPageAnimations;
+
+    this.gsapAnimations = new GsapAnimations();
+
+    this._targetState = 'New South Wales';
+
+    this.pageElements = new PageElements([
+      '.churches-content',
+      '.churches-content-subheading',
+      '.church-content-cta',
+      '.churches-content-images',
+      '.map-pin',
+      '.find-us',
+      '.loc-invitation',
+      '.loc-content',
+      '.church-content-hero-section',
+      '.map',
+      '.timeline',
+      '.timeline__content',
+    ] as const);
+
+    this._priestCarousel = new PriestCarousel(this.gsapAnimations, this.supportAnimations);
 
     this._mapTL = gsap.timeline();
 
     this.gsapAnimations.newItem(this._mapTL);
 
-    this.pageElements.get('.churches-content').css('display', 'none');
-
-    this.pageElements.get('.churches-content-subheading').css('opacity', 0);
-
-    this.pageElements.get('.church-content-cta').css('opacity', 0);
-
-    this.pageElements.get('.churches-content-images').css('opacity', 0);
+    this.initializeBaseState();
 
     const zoom = Math.min(($('.loc-grid').width() / 1366.1) * 4.2, 4.2);
 
     this._map = new LeafletMapComponent(
-      this.pageElements.get('.map'),
+      this.pageElements.el.map,
       (feature: any) =>
         feature.properties.STATE_NAME === this._targetState ? '#ffffff90' : '#ffffff25',
       '#ffffff',
@@ -127,23 +138,23 @@ export class ChurchContentAnimations
         dragging: false,
         scrollWheelZoom: false,
       },
+      this.gsapAnimations,
       (feature: any) => (feature.properties.STATE_NAME === this._targetState ? 'active-layer' : ''),
 
-      this.pageElements.get('.map-pin'),
+      this.pageElements.el.mapPin,
 
-      this.pageElements.get('.loc-invitation')
+      this.pageElements.el.locInvitation
     );
   };
 
   private animateHeading = (): void => {
-    const heading = this.pageElements.get('.churches-content');
-    const subHeading = this.pageElements.get('.churches-content-subheading');
-    const ctaButton = this.pageElements.get('.church-content-cta');
-    const churchImages = this.pageElements.get('.churches-content-images');
+    const { churchesContent, churchesContentImages, churchContentCta, churchesContentSubheading } =
+      this.pageElements.el;
+
     const { _mapTL } = this;
     $(async () => {
-      heading.css('display', 'unset');
-      await (<any>heading).textillate({
+      churchesContent.css('display', 'unset');
+      await (<any>churchesContent).textillate({
         minDisplayTime: 2000,
         autoStart: true,
         outEffects: ['hinge'],
@@ -166,11 +177,11 @@ export class ChurchContentAnimations
           callback: function () {},
         },
         callback: async function () {
-          _mapTL.to(subHeading, { opacity: 1, duration: 1 }, 0);
-          _mapTL.to(ctaButton, { opacity: 1, duration: 1 }, 0);
-          _mapTL.to(ctaButton, { opacity: 1, duration: 1 }, 0);
-          _mapTL.to(churchImages, { opacity: 1, duration: 1, stagger: 0.3 }, 1);
-          _mapTL.from(churchImages, { translateX: '-10em', duration: 1 }, 1);
+          _mapTL.to(churchesContentSubheading, { opacity: 1, duration: 1 }, 0);
+          _mapTL.to(churchContentCta, { opacity: 1, duration: 1 }, 0);
+          _mapTL.to(churchContentCta, { opacity: 1, duration: 1 }, 0);
+          _mapTL.to(churchesContentImages, { opacity: 1, duration: 1, stagger: 0.3 }, 1);
+          _mapTL.from(churchesContentImages, { translateX: '-10em', duration: 1 }, 1);
         },
         type: 'char',
       });
@@ -178,7 +189,8 @@ export class ChurchContentAnimations
   };
 
   private animateLocationSection = () => {
-    const locContent = this.pageElements.get('.loc-content');
+    const { locContent } = this.pageElements.el;
+
     gsap.from(locContent, {
       scrollTrigger: {
         trigger: locContent,
@@ -214,7 +226,7 @@ export class ChurchContentAnimations
     $(async () => {
       this.initElements();
 
-      this.onResizeHandler();
+      this.onResizeHandler.handler(this);
 
       this.LoadTimeline();
 
@@ -222,66 +234,94 @@ export class ChurchContentAnimations
 
       this.animateHeading();
 
-      this.onMouseEnterHandler();
+      this.onMouseEnterHandler.handler(this);
 
-      this.onMouseLeaveHandler();
+      this.onMouseLeaveHandler.handler(this);
 
       this.animateLocationSection();
 
       this.supportAnimations.navBarAnimations.animateScrollButton(
-        this.pageElements.get('.church-content-hero-section')
+        this.pageElements.el.churchContentHeroSection
       );
     });
   };
 
-  beforeEnter = async (_data: ITransitionData) => {
-    this.supportAnimations.footerAnimations.animateFooterWhite();
-  };
+  //beforeEnter = async (_data: ITransitionData) => {
+  //  this.supportAnimations.footerAnimations.animateFooterWhite();
+  //};
 
-  afterLeave = async (_data: ITransitionData) => {
+  beforeLeave = async (_data: ITransitionData) => {
     this.disposePageAnimations();
   };
 
-  onMouseEnterHandler = () => {
-    const animateChurchImageHover = (): void => {
-      const children = this.pageElements.get('.churches-content-images').children();
-      children.each((_, e) => {
-        $(e).on('mouseover', () => {
-          const state = Flip.getState(e);
-          children.each((_, child) => {
-            $(child).removeClass('secondary');
-            $(child).removeClass('tertiary');
-          });
-          const otherImages = this.pageElements
-            .get('.churches-content-images')
-            .children()
-            .filter((_, el) => el !== e);
-          $(otherImages[0]).addClass('secondary');
-          $(otherImages[1]).addClass('tertiary');
-          Flip.from(state, {
-            duration: 1,
-            ease: 'power1.inOut',
-            absolute: true,
-          });
-        });
-      });
-    };
-
-    this.pageElements
-      .get('.timeline__content')
-      .on('mouseover', () => CursorAnimations.cursorWhite());
-
-    this.pageElements.get('.find-us').on('mouseover', () => CursorAnimations.cursorWhite());
-
-    animateChurchImageHover();
+  afterLeave = async (_data: ITransitionData) => {
+    this.supportAnimations.cursorAnimations.cursorBlue();
   };
 
-  onMouseLeaveHandler = () => {
-    this.pageElements
-      .get('.timeline__content')
-      .on('mouseleave', () => CursorAnimations.cursorBlue());
+  onMouseEnterHandler = {
+    handler(self: ChurchContentAnimations) {
+      const animateChurchImageHover = (): void => {
+        const children = self.pageElements.el.churchesContentImages.children();
+        children.each((_, e) => {
+          $(e).on('mouseover', () => {
+            const state = Flip.getState(e);
+            children.each((_, child) => {
+              $(child).removeClass('secondary');
+              $(child).removeClass('tertiary');
+            });
+            const otherImages = self.pageElements.el.churchesContentImages
+              .children()
+              .filter((_, el) => el !== e);
+            $(otherImages[0]).addClass('secondary');
+            $(otherImages[1]).addClass('tertiary');
+            Flip.from(state, {
+              duration: 1,
+              ease: 'power1.inOut',
+              absolute: true,
+            });
+          });
+        });
+      };
 
-    this.pageElements.get('.find-us').on('mouseleave', () => CursorAnimations.cursorBlue());
+      self.pageElements.el.timeline__content.on('mouseover', () =>
+        self.supportAnimations.cursorAnimations.cursorWhite()
+      );
+
+      self.pageElements.el.findUs.on('mouseover', () =>
+        self.supportAnimations.cursorAnimations.cursorWhite()
+      );
+
+      animateChurchImageHover();
+    },
+    dispose(self: ChurchContentAnimations) {
+      const children = self.pageElements.el.churchesContentImages.children();
+      children.each((_, e) => {
+        $(e).off('mouseover');
+      });
+      self.pageElements.el.timeline__content.off('mouseover');
+      self.pageElements.el.findUs.off('mouseover');
+    },
+  };
+
+  onMouseLeaveHandler = {
+    handler(self: ChurchContentAnimations) {
+      self.pageElements.el.timeline__content.on('mouseleave', () =>
+        self.supportAnimations.cursorAnimations.cursorBlue()
+      );
+
+      self.pageElements.el.findUs.on('mouseleave', () =>
+        self.supportAnimations.cursorAnimations.cursorBlue()
+      );
+    },
+    dispose(self: ChurchContentAnimations) {
+      self.pageElements.el.timeline__content.on('mouseleave', () =>
+        self.supportAnimations.cursorAnimations.cursorBlue()
+      );
+
+      self.pageElements.el.findUs.on('mouseleave', () =>
+        self.supportAnimations.cursorAnimations.cursorBlue()
+      );
+    },
   };
 }
 
@@ -290,41 +330,43 @@ class PriestCarousel implements ICarouselAnimations {
 
   private _controlsTL: gsap.core.Timeline;
 
-  pageElemets: Map<string, JQuery<HTMLElement>>;
+  private _supportingAnimations: typeof GlobalPageAnimations;
+
+  pageElemets: PageElements<
+    ['.priest-container', '.priests-carousel', '.controls', '.pause', '.play']
+  >;
 
   gsapAnimations: GsapAnimations;
 
   initElements = () => {
-    this.pageElemets = new Mapper([
+    this.pageElemets = new PageElements([
       '.priest-container',
       '.priests-carousel',
       '.controls',
       '.pause',
       '.play',
-    ]).map();
+    ] as const);
   };
 
-  constructor(gsapAnimations: GsapAnimations) {
+  constructor(gsapAnimations: GsapAnimations, supportAnimations: typeof GlobalPageAnimations) {
     $(() => {
       this.initElements();
       this._animationTL = gsap.timeline({ repeat: -1, repeatDelay: 0, paused: true });
       this._controlsTL = gsap.timeline({ repeat: -1, repeatDelay: 1, paused: true });
       this.gsapAnimations = gsapAnimations;
+      this._supportingAnimations = supportAnimations;
       this.gsapAnimations.newItems([this._animationTL, this._controlsTL]);
-      this.pageElemets.get('.controls').children().remove();
-      this.onMouseEnterHandler();
-      this.onMouseLeaveHandler();
-      this.onMouseClickHandler();
+      this.pageElemets.el.controls.children().remove();
+      this.onMouseEnterHandler.handler(this);
+      this.onMouseLeaveHandler.handler(this);
+      this.onMouseClickHandler.handler(this);
       this.animateButtons();
       this.animateCarousel();
     });
   }
 
   animateCarousel = () => {
-    const priestContainer = this.pageElemets.get('.priest-container');
-    const carouselContainer = this.pageElemets.get('.priests-carousel');
-    const playButton = this.pageElemets.get('.play');
-    const pauseButton = this.pageElemets.get('.pause');
+    const { priestContainer, priestsCarousel, play, pause } = this.pageElemets.el;
 
     priestContainer.each((i, e) => {
       this.animatePriestContainer(i, $(e));
@@ -332,35 +374,34 @@ class PriestCarousel implements ICarouselAnimations {
     });
 
     ScrollTrigger.create({
-      trigger: carouselContainer,
+      trigger: priestsCarousel,
       start: 'top 50%',
       onEnter: () => {
         //this.resumeCarousel();
-        playButton.trigger('click');
+        play.trigger('click');
       },
       onEnterBack: () => {
         //this.resumeCarousel();
-        playButton.trigger('click');
+        play.trigger('click');
       },
       onLeave: () => {
         //this.pauseCarousel();
-        pauseButton.trigger('click');
+        pause.trigger('click');
       },
       onLeaveBack: () => {
         //this.pauseCarousel();
-        pauseButton.trigger('click');
+        pause.trigger('click');
       },
     });
   };
 
   nextSlide = (i: number, el: JQuery<HTMLElement>) => {
-    const priestContainer = this.pageElemets.get('.priest-container');
-    const carouselContainer = this.pageElemets.get('.priests-carousel');
+    const { priestContainer, priestsCarousel } = this.pageElemets.el;
     const width = priestContainer.width();
     const playDuration = 5;
 
     const tween = this._animationTL.to(
-      carouselContainer,
+      priestsCarousel,
       {
         translateX: i !== priestContainer.length - 1 ? -width * (i + 1) : 0,
         duration: 1,
@@ -378,25 +419,38 @@ class PriestCarousel implements ICarouselAnimations {
   };
 
   private animatePriestContainer = (i: number, e: JQuery<HTMLElement>): void => {
-    const priestContainer = this.pageElemets.get('.priest-container');
+    //const { priestContainer } = this.pageElemets.el;
 
     this._animationTL.addLabel(`slide-${i}`);
 
     this.nextSlide(i, e);
 
     $(e).on('click', () => {
-      this.animateFocusedSlide($(priestContainer));
       this.animateFocusedSlide($(e));
       this._animationTL.seek(`slide-${i}`, false);
     });
   };
 
-  onMouseEnterHandler = () => {
-    this.pageElemets.get('.priest-container').on('mouseover', () => CursorAnimations.cursorWhite());
+  onMouseEnterHandler = {
+    handler(self: PriestCarousel) {
+      self.pageElemets.el.priestContainer.on('mouseover', () =>
+        self._supportingAnimations.cursorAnimations.cursorWhite()
+      );
+    },
+    dispose(self: PriestCarousel) {
+      self.pageElemets.el.priestContainer.off('mouseleave');
+    },
   };
 
-  onMouseLeaveHandler = () => {
-    this.pageElemets.get('.priest-container').on('mouseleave', () => CursorAnimations.cursorBlue());
+  onMouseLeaveHandler = {
+    handler(self: PriestCarousel) {
+      self.pageElemets.el.priestContainer.on('mouseleave', () =>
+        self._supportingAnimations.cursorAnimations.cursorBlue()
+      );
+    },
+    dispose(self: PriestCarousel) {
+      self.pageElemets.el.priestContainer.off('mouseleave');
+    },
   };
 
   animateFocusedControls = (e: HTMLElement | JQuery<HTMLElement>): void => {
@@ -412,11 +466,22 @@ class PriestCarousel implements ICarouselAnimations {
       borderRadius: '100%',
       duration: 1,
     });
+
     const secondTween = gsap.set($(e).children(), { width: 0 });
+
     this.gsapAnimations.newItems([firstTween, secondTween]);
   };
 
   animateFocusedSlide = (el: JQuery<HTMLElement>) => {
+    const siblings = el
+      .parent()
+      .children()
+      .filter((_, e) => e !== el[0]);
+
+    siblings.each((_, e) => {
+      this.animateUnfocusedSlide($(e));
+    });
+
     const tween = gsap.to(el, {
       backgroundColor: 'var(--cursor-inner)',
       boxShadow:
@@ -439,7 +504,10 @@ class PriestCarousel implements ICarouselAnimations {
 
   animatePins = (i: number, el: JQuery<HTMLElement>) => {
     const playDuration = 5;
-    const controls = this.pageElemets.get('.controls');
+
+    const { controls } = this.pageElemets.el;
+
+    this._controlsTL.addLabel(`slide-${i}`);
 
     this._controlsTL.to(
       $(controls.children()[i]).children(),
@@ -458,46 +526,55 @@ class PriestCarousel implements ICarouselAnimations {
     );
 
     $(el).on('click', () => {
-      const children = $(controls.children());
-      this.animateFocusedControls(children);
-      children.children().width(0);
+      controls
+        .children()
+        .filter((index) => index !== i)
+        .each((_, e) => {
+          this.animateUnfocusedControls($(e));
+        });
+      //const children = $(controls.children());
+      //this.animateFocusedControls(children[i]);
+      //$(children.children()[i]).width(0);
       this._controlsTL.seek(`slide-${i}`, false);
     });
   };
 
   animateButtons = () => {
-    const priestContainer = this.pageElemets.get('.priest-container');
-    const controls = this.pageElemets.get('.controls');
+    const { priestContainer, controls } = this.pageElemets.el;
 
     priestContainer.each((i, _) => {
       const pin = document.createElement('div');
       const pinFiller = document.createElement('div');
       $(pinFiller).addClass('slide-pin-filler');
       $(pin).addClass('slide-pin');
-      if (i === 0) {
-        $(pin).addClass('active');
-      }
+      if (i === 0) $(pin).addClass('active');
       $(pin).append(pinFiller);
       controls.append(pin);
     });
   };
 
-  onMouseClickHandler = () => {
-    const pauseButton = this.pageElemets.get('.pause');
-    const playButton = this.pageElemets.get('.play');
+  onMouseClickHandler = {
+    handler(self: PriestCarousel) {
+      const { pause, play } = self.pageElemets.el;
 
-    pauseButton.on('click', () => {
-      if (this._animationTL) this._animationTL.pause();
-      if (this._controlsTL) this._controlsTL.pause();
-      pauseButton.css('display', 'none');
-      playButton.css('display', 'block');
-    });
+      pause.on('click', () => {
+        if (self._animationTL) self._animationTL.pause();
+        if (self._controlsTL) self._controlsTL.pause();
+        pause.css('display', 'none');
+        play.css('display', 'block');
+      });
 
-    playButton.on('click', () => {
-      if (this._animationTL) this._animationTL.resume();
-      if (this._controlsTL) this._controlsTL.resume();
-      playButton.css('display', 'none');
-      pauseButton.css('display', 'unset');
-    });
+      play.on('click', () => {
+        if (self._animationTL) self._animationTL.resume();
+        if (self._controlsTL) self._controlsTL.resume();
+        play.css('display', 'none');
+        pause.css('display', 'block');
+      });
+    },
+    dispose(self: PriestCarousel) {
+      const { pause, play } = self.pageElemets.el;
+      pause.off('click');
+      play.off('click');
+    },
   };
 }

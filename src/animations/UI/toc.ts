@@ -1,66 +1,29 @@
 import { gsap } from 'gsap/all';
 import $ from 'jquery';
+import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
+import type { IGsapComponentAnimations } from 'src/interfaces/IGsapPageAnimations';
+import { GsapAnimations } from 'src/interfaces/IGsapPageAnimations';
+import { GsapComponentAnimations } from 'src/interfaces/IGsapPageAnimations';
+import type { IMouseEventAnimations } from 'src/interfaces/IMouseEventAnimations';
+import { GlobalPageAnimations, PageElements } from 'src/interfaces/IPageAnimations';
+import type { IResizePageAnimations } from 'src/interfaces/IResizePageAnimations';
 
-export class TOCAnimations {
+export class TOCAnimations
+  implements
+    IGsapComponentAnimations,
+    IMouseEventAnimations,
+    IDisposableAnimations,
+    IResizePageAnimations
+{
+  public _tocButton: TOCButton;
+
   /** Page sections with attr*/
   private _sections: [HTMLElement, number][] = [];
-  /** Element holding the divs for sidebar */
-  private _sectionHolder: JQuery<HTMLElement>;
-  /** the divs for sidebar */
+
   private _sectionWrappers: HTMLElement[] = [];
 
-  private _sectionToc: JQuery<HTMLElement>;
-
-  private _tocButton: TOCButton;
-
-  constructor() {
-    $(() => {
-      this._sectionHolder = $('.section-holder');
-      this.loadSections();
-      this._sectionToc = $('.sections-toc');
-      this._tocButton = new TOCButton(this._sectionToc, this._sectionHolder);
-      if (this._sections.length === 0) this._tocButton.hideSidebar();
-    });
-  }
-
-  private loadSections = () => {
-    for (const e of Array.from($(`[data-section-descriptor]`))) {
-      this._sections.push([e, this.indentationLevel($(e), 0)]);
-    }
-  };
-
-  private initToggleButton = () => {
-    // set the initial height of the sidebar to 0
-    this._tocButton._toggled ? this._tocButton.hideSidebarAsync() : this._tocButton.hideSidebar();
-  };
-
-  /** This results in the children being cleared */
-  private reset = () => {
-    this._sectionHolder.remove();
-
-    this._sectionHolder = $('<div></div>').addClass('.section-holder');
-
-    this._tocButton.setSectionHolder(this._sectionHolder);
-
-    this._sectionToc.append(this._sectionHolder);
-
-    this._sections.length = 0;
-
-    this._sections = [];
-
-    this.loadSections();
-
-    this._sectionWrappers.length = 0;
-
-    this._sectionWrappers = [];
-  };
-
-  private getParent = (element: JQuery<HTMLElement>): JQuery<HTMLElement> => {
-    return element.parentsUntil(`[data-section-descriptor]`).parent();
-  };
-
   private indentationLevel = (element: JQuery<HTMLElement>, acc: number): number => {
-    const parent = this.getParent(element);
+    const parent = element.parentsUntil(`[data-section-descriptor]`).parent();
     if (parent.length > 0) {
       if (parent.attr('data-section-descriptor') != null) {
         return this.indentationLevel(parent, acc + 1);
@@ -68,12 +31,6 @@ export class TOCAnimations {
     }
 
     return acc;
-  };
-
-  private addClickHandler = (e: JQuery<HTMLElement>, target: JQuery<HTMLElement>) => {
-    $(e).on('click', () => {
-      window.scrollTo({ behavior: 'smooth', top: $(target).offset().top });
-    });
   };
 
   private setupInnerElements = (
@@ -106,15 +63,75 @@ export class TOCAnimations {
     };
   };
 
-  public tocAnimation = () => {
+  onResizeHandler = {
+    handler: () => {
+      const self = GlobalPageAnimations.tocAnimations;
+      $(window).on('resize', () => {
+        self.disposePageAnimations();
+        this.animateComponent();
+      });
+    },
+    dispose: () => {},
+  };
+
+  disposePageAnimations = () => {
+    this.gsapComponentAnimations.disposePageAnimations();
+  };
+
+  initializeBaseState = () => {
+    this.pageElements.el.sectionHolder.remove();
+
+    const sectionHolder = $('<div></div>').addClass('section-holder');
+
+    this.pageElements.el.sectionsToc.append(sectionHolder);
+
+    this.pageElements = new PageElements(['.sections-toc', '.section-holder'] as const);
+
+    this._tocButton.pageElements = new PageElements([
+      '.sections-toc',
+      '.section-holder',
+      '.toc-button',
+      '.code-embed-7',
+    ] as const);
+
+    this._sections = [];
+
+    for (const e of Array.from($(`[data-section-descriptor]`))) {
+      this._sections.push([e, this.indentationLevel($(e), 0)]);
+    }
+
+    this._sectionWrappers = [];
+  };
+
+  initElements = () => {
+    this.gsapComponentAnimations = new GsapComponentAnimations(new GsapAnimations());
+
+    this.pageElements = new PageElements(['.sections-toc', '.section-holder'] as const);
+
+    for (const e of Array.from($(`[data-section-descriptor]`))) {
+      this._sections.push([e, this.indentationLevel($(e), 0)]);
+    }
+
+    this._tocButton = new TOCButton(this.gsapComponentAnimations, this.pageElements);
+
+    if (this._sections.length === 0) this._tocButton.hideSidebar();
+  };
+
+  pageElements: PageElements<readonly ['.sections-toc', '.section-holder']>;
+
+  gsapComponentAnimations: GsapComponentAnimations;
+
+  animateComponent = () => {
     $(() => {
-      this.reset();
+      this.initElements();
 
-      this.initToggleButton();
+      this.initializeBaseState();
 
-      const { _sections, addClickHandler } = this;
+      this._tocButton._toggled ? this._tocButton.hideSidebarAsync() : this._tocButton.hideSidebar();
 
-      const tocSectionHolder = this._sectionHolder;
+      const { _sections, onMouseClickHandler } = this;
+
+      const tocSectionHolder = this.pageElements.el.sectionHolder;
 
       const sectionWrappers = this._sectionWrappers;
 
@@ -124,94 +141,138 @@ export class TOCAnimations {
           $(element)
         );
 
+        // Check if window is within section
+        if (
+          window.scrollY > $(element).offset().top &&
+          window.scrollY <= $(element).offset().top + $(element).height()
+        ) {
+          sectionWrapper[0].className = 'toc-section-wrapper current';
+        }
+
         gsap.set(textWrapper, { marginLeft: `${parentNum * 1}em` });
 
         sectionWrappers.push(sectionWrapper[0]);
 
-        addClickHandler(sectionWrapper, $(element));
+        onMouseClickHandler.handler(this, sectionWrapper, $(element));
 
-        gsap.to(sectionWrapper, {
+        const tween = gsap.to(sectionWrapper, {
           scrollTrigger: {
             trigger: element,
             start: 'top 50%',
-            end: 'bottom 51%',
+            end: 'bottom 50%',
             scrub: true,
+            onToggle() {
+              $(sectionWrappers)
+                .filter((i, e) => {
+                  return parentNum !== _sections[i][1] || e !== sectionWrapper[0];
+                })
+                .each((_, e) => {
+                  e.className = 'toc-section-wrapper';
+                });
+            },
+            onRefresh() {
+              $(sectionWrappers)
+                .filter((i, e) => {
+                  return parentNum !== _sections[i][1] || e !== sectionWrapper[0];
+                })
+                .each((_, e) => {
+                  e.className = 'toc-section-wrapper';
+                });
+            },
           },
-          className: `current`,
-          onStart: () => {
-            $(sectionWrappers)
-              .filter((i, e) => {
-                return parentNum <= _sections[i][1] && e !== sectionWrapper[0];
-              })
-              .each((_, e) => {
-                gsap.set($(e), { className: 'toc-section-wrapper' });
-              });
-          },
+          className: 'toc-section-wrapper current',
         });
+        this.gsapComponentAnimations.newItem(tween);
       });
 
-      this._sections.length === 0 ? this._tocButton.hideButton() : this._tocButton.showButton();
+      const { tocButton } = this._tocButton.pageElements.el;
+
+      this._sections.length === 0
+        ? tocButton.css('display', 'none')
+        : tocButton.css('display', 'flex');
     });
+  };
+
+  onMouseClickHandler = {
+    handler(self: TOCAnimations, from: JQuery<HTMLElement>, to: JQuery<HTMLElement>) {
+      $(from).on('click', () => {
+        self.gsapComponentAnimations.newItem(
+          gsap.to(window, { duration: 1, scrollTo: { y: $(to).offset().top } })
+        );
+      });
+    },
+    dispose(self: TOCAnimations) {
+      self.disposePageAnimations();
+    },
   };
 }
 
-/**
- * This class is specific to the sidebar button
- */
-class TOCButton {
-  private _tocButton: JQuery<HTMLElement>;
-
-  private _tocSvg: JQuery<HTMLElement>;
-
-  private _sectionTocRef: JQuery<HTMLElement>;
-
-  private _sectionHolderRef: JQuery<HTMLElement>;
-
+class TOCButton implements IGsapComponentAnimations, IMouseEventAnimations {
   public _toggled: boolean;
-
-  constructor(sectionToc: JQuery<HTMLElement>, sectionHolder: JQuery<HTMLElement>) {
-    this._tocButton = $('.toc-button');
-    this._tocSvg = $('.code-embed-7');
-    this._sectionTocRef = sectionToc;
-    this._sectionHolderRef = sectionHolder;
-    this._toggled = false;
-    this.onClick();
+  /**
+   *
+   */
+  constructor(
+    gsapAnimations: GsapAnimations,
+    pageElements: PageElements<readonly ['.sections-toc', '.section-holder']>
+    //sectionToc: JQuery<HTMLElement>,
+    //sectionHolder: JQuery<HTMLElement>
+  ) {
+    this.gsapComponentAnimations = new GsapComponentAnimations(gsapAnimations);
+    this.pageElements = pageElements.extend(['.toc-button', '.code-embed-7'] as const);
+    this.initElements();
+    this.animateComponent();
   }
 
-  public onClick = () => {
-    this._tocButton.on('click', () => {
-      this.toggleSidebar();
-    });
+  initElements = () => {
+    this._toggled = false;
   };
 
-  public hideButton = () => {
-    this._tocButton.css('display', 'none');
+  pageElements: PageElements<
+    readonly ['.sections-toc', '.section-holder', '.toc-button', '.code-embed-7']
+  >;
+
+  gsapComponentAnimations: GsapComponentAnimations;
+
+  animateComponent = () => {
+    this.onMouseClickHandler.handler(this);
   };
 
-  public showButton = () => {
-    this._tocButton.css('display', 'flex');
-  };
-
-  public setSectionHolder = (sectionHolder: JQuery<HTMLElement>) => {
-    this._sectionHolderRef = sectionHolder;
+  onMouseClickHandler = {
+    handler(self: TOCButton) {
+      self.pageElements.el.tocButton.on('click', () => {
+        self.toggleSidebar();
+      });
+    },
+    dispose() {},
   };
 
   public hideSidebar = () => {
-    gsap.set(this._sectionTocRef, { height: 0, padding: 0 });
-    gsap.set(this._sectionHolderRef, { display: 'none', overflow: 'hidden' });
-    gsap.set(this._tocButton, { backgroundColor: 'rgba(0, 0, 0, 0.57)' });
-    gsap.set(this._tocSvg, { rotation: 180 });
-    gsap.set(this._sectionHolderRef, { height: 0 });
+    const tweens = [
+      gsap.set(this.pageElements.el.sectionsToc, { height: 0, padding: 0 }),
+      gsap.set(this.pageElements.el.sectionHolder, { display: 'none', overflow: 'hidden' }),
+      gsap.set(this.pageElements.el.tocButton, { backgroundColor: 'rgba(0, 0, 0, 0.57)' }),
+      gsap.set(this.pageElements.el.codeEmbed7, { rotation: 180 }),
+      gsap.set(this.pageElements.el.sectionHolder, { height: 0 }),
+    ];
+    this.gsapComponentAnimations.gsapPageAnimations.newItems(tweens);
   };
 
   public hideSidebarAsync = () => {
     const tl = gsap.timeline();
-    gsap.to(this._sectionTocRef, { height: 0, padding: 0 });
-    gsap.to(this._tocButton, { backgroundColor: 'rgba(0, 0, 0, 0.57)' });
-    gsap.to(this._tocSvg, { rotation: 180 });
-    tl.set(this._sectionHolderRef, { overflow: 'hidden' });
-    tl.to(this._sectionHolderRef, { height: 0 });
-    tl.set(this._sectionHolderRef, { display: 'none' });
+
+    const tweens = [
+      gsap.to(this.pageElements.el.sectionsToc, { height: 0, padding: 0 }),
+      gsap.to(this.pageElements.el.tocButton, {
+        backgroundColor: 'rgba(0, 0, 0, 0.57)',
+      }),
+      gsap.to(this.pageElements.el.codeEmbed7, { rotation: 180 }),
+      tl.set(this.pageElements.el.sectionsToc, { overflow: 'hidden' }),
+      tl.to(this.pageElements.el.sectionHolder, { height: 0 }),
+      tl.set(this.pageElements.el.sectionHolder, { display: 'none' }),
+    ];
+
+    this.gsapComponentAnimations.gsapPageAnimations.newItems([tl, ...tweens]);
   };
 
   private toggleSidebar = () => {
@@ -221,14 +282,17 @@ class TOCButton {
     const backgroundColor: string = this._toggled ? 'rgba(0, 0, 0, 0.57)' : 'rgba(0, 0, 0, 0.87)';
     const rotation: number = this._toggled ? 180 : 0;
 
-    gsap.to(this._sectionTocRef, { height });
-    gsap.to(this._tocButton, { backgroundColor });
-    gsap.to(this._tocSvg, { rotation });
+    const tween = gsap.to(this.pageElements.el.sectionsToc, { height });
+    const secondTween = gsap.to(this.pageElements.el.tocButton, { backgroundColor });
+    const thirdTween = gsap.to(this.pageElements.el.codeEmbed7, { rotation });
+
     const tl = gsap.timeline();
-    tl.to(this._sectionHolderRef, { display });
-    tl.to(this._sectionHolderRef, { height });
-    tl.to(this._sectionTocRef, { padding }, this._toggled ? '0' : '>-0.4');
+    tl.to(this.pageElements.el.sectionHolder, { display });
+    tl.to(this.pageElements.el.sectionHolder, { height });
+    tl.to(this.pageElements.el.sectionsToc, { padding }, this._toggled ? '0' : '>-0.4');
 
     this._toggled = !this._toggled;
+
+    this.gsapComponentAnimations.gsapPageAnimations.newItems([tl, tween, secondTween, thirdTween]);
   };
 }

@@ -1,172 +1,63 @@
 import barba from '@barba/core';
+import { Flip, gsap, ScrollToPlugin, ScrollTrigger } from 'gsap/all';
 
-import { Animations, DisposeAnimations } from './animations/animations';
+import { Animations } from './animations/animations';
 import { Utils } from './utils/utils';
 
-export const barbaInit = () => {
-  let startTime: number;
-  let isFirstLoad: boolean = true;
+export class barbaInit {
+  private isFirstLoad: boolean = true;
 
-  barba.init({
-    transitions: [
-      {
-        sync: true,
-        name: 'default',
-        async once(data) {
-          if (data.next.namespace === 'home') {
-            startTime = new Date().getTime();
-            await Utils.InitWebsite(startTime, isFirstLoad);
-          }
-          Utils.manualLoadRedirector(isFirstLoad);
-          //Utils.initStats();
-        },
-        async leave(data) {
-          data.next.container.style.display = 'none';
-          Animations.disableNavLinks();
-          await Animations.handleTransitionAnimation(true);
-          Animations.underlineNav(data.current.namespace, false);
-          //gsap.globalTimeline.clear();
-        },
-        async enter(_data) {
-          Utils.linkHandler();
-        },
-        async after(data) {
-          Animations.animateToc();
+  private animations: Animations;
 
-          switch (data.next.namespace.toString()) {
-            case 'sermons-content':
-              data.next.container.style.display = 'flex';
-              break;
-            default:
-              data.next.container.style.display = 'block';
-          }
-          Animations.enableNavLinks();
-          Animations.showProgress();
-          await Animations.handleTransitionAnimation(false);
-          await Animations.underlineNav(data.next.namespace, true);
-          Animations.cursorHover();
-          isFirstLoad = false;
+  /**
+   *
+   */
+  constructor() {
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, Flip);
+    this.animations = new Animations();
+  }
+
+  public init = () => {
+    let { animations, isFirstLoad } = this;
+    barba.init({
+      transitions: [
+        {
+          sync: true,
+          name: 'default',
+          async once(data) {
+            await animations.once(data, isFirstLoad);
+            Utils.manualLoadRedirector(isFirstLoad);
+            isFirstLoad = false;
+          },
+          async before(data) {
+            await animations.before({ data });
+          },
+          async leave(data) {
+            await animations.leave({ data });
+          },
+          async enter(data) {
+            await animations.enter({ data });
+          },
+          async after(data) {
+            await animations.after({ data });
+          },
+          async beforeEnter(data) {
+            await animations.beforeEnter(data);
+          },
+          async beforeLeave(data) {
+            await animations.beforeLeave(data);
+          },
+          async afterEnter(data) {
+            await animations.afterEnter(data);
+          },
+          async afterLeave(data) {
+            await animations.afterLeave(data);
+          },
         },
-      },
-      {
-        sync: true,
-        name: 'specific',
-        from: { namespace: ['bio'] },
-        to: { namespace: 'home' },
-        async after(data) {
-          data.next.container.style.display = 'block';
-          Animations.animateToc();
-          Animations.footerAnimateWhite();
-          Animations.showProgress();
-          await Animations.handleTransitionAnimation(false);
-          await Animations.underlineNav(data.next.namespace, true);
-        },
-        async leave(data) {
-          data.next.container.style.display = 'none';
-          await Animations.handleTransitionAnimation(true);
-          Animations.underlineNav(data.current.namespace, false);
-        },
-      },
-    ],
-    views: [
-      {
-        namespace: 'home',
-        async afterEnter() {
-          $(async () => {
-            await Animations.initHomePage(startTime, isFirstLoad);
-            Animations.initNavLinks();
-          });
-        },
-        beforeLeave() {
-          DisposeAnimations.disposeHomepageGlobe();
-          DisposeAnimations.disposeHomepageAnimations();
-        },
-      },
-      {
-        namespace: 'bio',
-        async afterLeave() {
-          DisposeAnimations.disposeBioPage();
-          Animations.cursorBlue();
-        },
-        async afterEnter() {
-          await Animations.animateBio();
-          Animations.cursorWhite();
-          Animations.footerAnimateBlue();
-        },
-      },
-      {
-        namespace: 'sermons',
-        async afterLeave() {
-          Animations.cursorBlue();
-        },
-        async afterEnter() {
-          Animations.initSermonPage();
-          Animations.cursorBlue();
-          Animations.footerAnimateBlue();
-        },
-      },
-      {
-        namespace: 'ministry',
-        async afterLeave() {
-          Animations.cursorBlue();
-          Animations.disposeAnimations.disposeMinistrypageGlobe();
-        },
-        async afterEnter() {
-          Animations.initMinistryPage();
-        },
-      },
-      {
-        namespace: 'churches',
-        async afterEnter() {
-          Animations.initChurchesPage();
-        },
-      },
-      {
-        namespace: 'schedule',
-        async beforeEnter() {
-          Animations.footerAnimateWhite();
-        },
-        async afterEnter() {
-          Animations.initSchedulePage();
-        },
-      },
-      {
-        namespace: 'churches-content',
-        async beforeEnter() {
-          Animations.footerAnimateWhite();
-        },
-        async afterEnter() {
-          Animations.initChurchContentPage();
-        },
-        async beforeLeave() {
-          Animations.disposeAnimations.disposeChurchLeaderLine();
-        },
-      },
-      {
-        namespace: 'sermons-content',
-        async beforeEnter() {
-          Animations.footerAnimateWhite();
-        },
-        async afterEnter() {
-          Animations.initSermonsContentPage();
-        },
-        async beforeLeave() {},
-      },
-      {
-        namespace: 'ministry-content',
-        async beforeEnter() {
-          Animations.footerAnimateWhite();
-        },
-        async afterEnter() {
-          Animations.initMinistryContentPage();
-        },
-        async beforeLeave() {
-          Animations.disposeAnimations.disposeMinistryContentPage();
-        },
-      },
-    ],
-  });
-  barba.hooks.after(async (data) => {
-    Utils.scriptReloader(data);
-  });
-};
+      ],
+    });
+    barba.hooks.after(async (data) => {
+      Utils.scriptReloader(data);
+    });
+  };
+}

@@ -1,7 +1,17 @@
-import type { ISchemaPage } from '@barba/core/dist/core/src/src/defs';
-import { gsap } from 'gsap/all';
+import type { ISchemaPage, ITransitionData } from '@barba/core/dist/core/src/src/defs';
+import { instanceofICssAnimations } from 'src/interfaces/ICssAnimations';
+import { instanceofIDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
+import { instanceofIGsapPageAnimations } from 'src/interfaces/IGsapPageAnimations';
+import { instanceofIMouseEventAnimations } from 'src/interfaces/IMouseEventAnimations';
+import {
+  GlobalPageAnimations,
+  type IComplexTransitions,
+  type IGenericTransitions,
+  type IPageAnimations,
+} from 'src/interfaces/IPageAnimations';
+import { instanceofIResizePageAnimations } from 'src/interfaces/IResizePageAnimations';
 
-import { FooterAnimations } from './Components/footerAnimations';
+//import { FooterAnimations } from './Components/footerAnimations';
 import { BioAnimations } from './Pages/bio-animations';
 import { ChurchContentAnimations } from './Pages/churchcontent-animations';
 import { ChurchAnimations } from './Pages/churchpage-animations';
@@ -11,228 +21,120 @@ import { MinistryPageAnimations } from './Pages/ministrypage-animations';
 import { ScheduleAnimations } from './Pages/schedule-animations';
 import { SermonPageAnimations } from './Pages/sermon-animations';
 import { SermonContentAnimations } from './Pages/sermoncontent-animations';
-import { CursorAnimations } from './UI/cursor-animations';
-import { NavBarAnimations } from './UI/navbar-animations';
-import { TOCAnimations } from './UI/toc';
 import type { Player } from './UI/Widgets/player';
 
-export class DisposeAnimations {
-  private static _homePageAnimator: typeof HomePageAnimations;
+export class Animations implements IGenericTransitions, IComplexTransitions {
+  private static _animators: IPageAnimations[] = [
+    new HomePageAnimations(),
+    new BioAnimations(),
+    new MinistryPageAnimations(),
+    new SermonPageAnimations(),
+    new ChurchAnimations(),
+    new ChurchContentAnimations(),
+    new SermonContentAnimations(),
+    new MinistryContentAnimations(),
+    new ScheduleAnimations(),
+  ];
 
-  private _ministryPageAnimator: MinistryPageAnimations;
-
-  private _sermonContentAnimator: SermonContentAnimations;
-
-  private _ministryContentAnimator: MinistryContentAnimations;
-
-  private _churchContentPageAnimations: ChurchContentAnimations;
-
-  private static _bioAnimator: typeof BioAnimations;
-
-  constructor(
-    homePageAnimator: typeof HomePageAnimations,
-    ministryPageAnimator: MinistryPageAnimations,
-    sermonContentAnimator: SermonContentAnimations,
-    churchPageAnimator: ChurchContentAnimations,
-    ministryContentAnimator: MinistryContentAnimations,
-    bioAnimator: typeof BioAnimations
-  ) {
-    DisposeAnimations._homePageAnimator = homePageAnimator;
-    DisposeAnimations._bioAnimator = bioAnimator;
-    this._ministryPageAnimator = ministryPageAnimator;
-    this._sermonContentAnimator = sermonContentAnimator;
-    this._churchContentPageAnimations = churchPageAnimator;
-    this._ministryContentAnimator = ministryContentAnimator;
-  }
-
-  public static disposeHomepageGlobe = () => {
-    this._homePageAnimator.disposeGlobe();
-  };
-
-  public static disposeHomepageAnimations = () => {
-    this._homePageAnimator.gsapGlobeContainerDestroy();
-  };
-
-  public disposeMinistrypageGlobe = () => {
-    this._ministryPageAnimator.disposeGlobe();
-  };
-
-  public disposeChurchLeaderLine = () => {
-    this._churchContentPageAnimations.disposeChurchContentPage();
-  };
-
-  public disposeMinistryContentPage = () => {
-    this._ministryContentAnimator.disposePage();
-  };
-
-  public static disposeBioPage = () => {
-    this._bioAnimator.unloadCss();
-  };
-}
-
-export class Animations {
-  private static _cursorAnimator = CursorAnimations;
-
-  private static _navBarAnimator = new NavBarAnimations();
-
-  private static _bioAnimator = BioAnimations;
-
-  private static _footerAnimator = FooterAnimations;
-
-  private static _tocAnimator = new TOCAnimations();
-
-  private static _homePageAnimator = HomePageAnimations;
-
-  private static _ministryPageAnimator = new MinistryPageAnimations();
-
-  private static _sermonPageAnimator = new SermonPageAnimations();
-
-  private static _churchesPageAnimator = new ChurchAnimations();
-
-  private static _churcheContentAnimator = new ChurchContentAnimations();
-
-  private static _sermonContentAnimator = new SermonContentAnimations();
-
-  private static _ministryContentAnimator = new MinistryContentAnimations();
-
-  private static _scheduleAnimator = new ScheduleAnimations();
+  public globalPageAnimations = GlobalPageAnimations;
 
   public static player: Player;
 
-  public static disposeAnimations = new DisposeAnimations(
-    this._homePageAnimator,
-    this._ministryPageAnimator,
-    this._sermonContentAnimator,
-    this._churcheContentAnimator,
-    this._ministryContentAnimator,
-    this._bioAnimator
-  );
-
-  public static initMinistryPage = () => {
-    this._ministryPageAnimator.animateMinistryPage(this._navBarAnimator);
+  private handlers: Record<
+    keyof IGenericTransitions,
+    (data: ITransitionData, animator: IPageAnimations) => Promise<void>
+  > = {
+    leave: async (data, animator) =>
+      await this.globalPageAnimations.genericAnimations.leave({
+        data,
+        cssTransClass: instanceofICssAnimations(animator) ? animator : null,
+        mouseEventTransClass: instanceofIMouseEventAnimations(animator) ? animator : null,
+        resizeTransClass: instanceofIResizePageAnimations(animator) ? animator : null,
+        gsapTransClass: instanceofIGsapPageAnimations(animator) ? animator : null,
+        disposableTransClass: instanceofIDisposableAnimations(animator) ? animator : null,
+      }),
+    enter: async (data, animator) =>
+      await this.globalPageAnimations.genericAnimations.enter({
+        data,
+        cssTransClass: instanceofICssAnimations(animator) ? animator : null,
+      }),
+    after: async (data) =>
+      await this.globalPageAnimations.genericAnimations.after({
+        data,
+      }),
+    before: async (data) =>
+      await this.globalPageAnimations.genericAnimations.before({
+        data,
+      }),
   };
 
-  public static initSermonPage = () => {
-    this._sermonPageAnimator.animateSermonPage(this._navBarAnimator);
+  enter = async (obj: { data: ITransitionData }) => {
+    await this.handleTransitionAnimation({ generic: 'enter' }, obj.data.next.namespace, obj.data);
   };
 
-  public static initChurchContentPage = () => {
-    this._churcheContentAnimator.animateChurchContent(this._navBarAnimator);
+  before = async (obj: { data: ITransitionData }) => {
+    await this.handleTransitionAnimation({ generic: 'before' }, obj.data.next.namespace, obj.data);
   };
 
-  public static initMinistryContentPage = () => {
-    this._ministryContentAnimator.animateMinistryContent(this._navBarAnimator);
+  leave = async (obj: { data: ITransitionData }) => {
+    await this.handleTransitionAnimation(
+      { generic: 'leave' },
+      obj.data.current.namespace,
+      obj.data
+    );
   };
 
-  public static initSermonsContentPage = () => {
-    this._sermonContentAnimator.animateSermonContent(this._navBarAnimator);
+  after = async (obj: { data: ITransitionData }) => {
+    await this.handleTransitionAnimation({ generic: 'after' }, obj.data.next.namespace, obj.data);
   };
 
-  public static initChurchesPage = () => {
-    this._churchesPageAnimator.animateChurchPage(this._navBarAnimator);
+  once = async (data: ITransitionData, isFirstLoad: boolean) => {
+    await this.handleTransitionAnimation(
+      { complex: 'once' },
+      data.next.namespace,
+      data,
+      isFirstLoad
+    );
   };
 
-  public static initSchedulePage = () => {
-    this._scheduleAnimator.animateSchedulePage(this._navBarAnimator);
+  afterEnter = async (data: ITransitionData) => {
+    await this.handleTransitionAnimation({ complex: 'afterEnter' }, data.next.namespace, data);
   };
 
-  public static showProgress = () => {
-    this.displayShow('.progress', true, 'block');
-    this.setOpaque('.progress');
+  afterLeave = async (data: ITransitionData) => {
+    await this.handleTransitionAnimation({ complex: 'afterLeave' }, data.current.namespace, data);
   };
 
-  public static initHomePage = async (initTime: number, isFirstLoad: boolean) => {
-    await this._homePageAnimator.animateHomePage(initTime, isFirstLoad, this._navBarAnimator);
+  beforeEnter = async (data: ITransitionData) => {
+    await this.handleTransitionAnimation({ complex: 'beforeEnter' }, data.next.namespace, data);
   };
 
-  public static cursorWhite = (): void => {
-    this._cursorAnimator.cursorWhite();
+  beforeLeave = async (data: ITransitionData) => {
+    await this.handleTransitionAnimation({ complex: 'beforeLeave' }, data.current.namespace, data);
   };
 
-  public static cursorBlue = (): void => {
-    this._cursorAnimator.cursorBlue();
-  };
+  private async handleTransitionAnimation<
+    T extends keyof IComplexTransitions,
+    U extends keyof IGenericTransitions,
+  >(
+    fnObj: {
+      complex?: T;
+      generic?: U;
+    },
+    namespace: ISchemaPage['namespace'],
+    data: ITransitionData,
+    ...any: any[]
+  ): Promise<void> {
+    const animator = Animations._animators.find((animator) => animator.namespace === namespace);
 
-  public static cursorHover = (): void => {
-    this._cursorAnimator.cursorHover();
-  };
+    if (fnObj.generic && this.handlers[fnObj.generic]) {
+      await this.handlers[fnObj.generic](data, animator);
+    }
 
-  public static underlineNav = async (
-    identifier: ISchemaPage['namespace'],
-    underline: boolean
-  ): Promise<void> => {
-    await this._navBarAnimator.underlineNav(identifier, underline);
-  };
-
-  public static setOpaque = (identifier: gsap.TweenTarget): void => {
-    gsap.set(identifier, { opacity: '1' });
-  };
-
-  public static initNavLinks = (): void => {
-    this._navBarAnimator.initNavLinks();
-  };
-
-  public static disableNavLinks = (): void => {
-    this._navBarAnimator.disableNavLinks();
-  };
-
-  public static enableNavLinks = (): void => {
-    this._navBarAnimator.enableNavLinks();
-  };
-
-  public static displayShow(
-    identifier: gsap.TweenTarget,
-    view: true,
-    display: gsap.TweenValue
-  ): void;
-  public static displayShow(identifier: gsap.TweenTarget, view: false): void;
-  public static displayShow(
-    identifier: gsap.TweenTarget,
-    view: boolean,
-    display?: gsap.TweenValue
-  ) {
-    gsap.set(identifier, { display: view ? display! : 'none' });
+    if (fnObj.complex && animator[fnObj.complex]) {
+      await animator[fnObj.complex](data, ...any);
+    }
   }
-
-  public static handleTransitionAnimation = async (inView: boolean): Promise<void> => {
-    const loadTl = gsap.timeline();
-    const transitionDivs = [
-      '.first-transition',
-      '.second-transition',
-      '.third-transition',
-      '.fourth-transition',
-      '.fifth-transition',
-    ];
-
-    if (inView) {
-      Animations.displayShow('.transition', true, 'flex');
-      for (const div of transitionDivs) {
-        gsap.set(div, { marginTop: '100vh' });
-      }
-    }
-
-    for (const div of transitionDivs) {
-      await loadTl.to(div, { marginTop: inView ? '0vh' : '100vh', duration: 0.25 });
-    }
-
-    if (!inView) this.displayShow('.transition', false);
-  };
-
-  public static animateBio = async () => {
-    await this._bioAnimator.animateBio();
-  };
-
-  public static footerAnimateBlue = () => {
-    this._footerAnimator.animateFooterBlue();
-  };
-
-  public static footerAnimateWhite = () => {
-    this._footerAnimator.animateFooterWhite();
-  };
-
-  public static animateToc = () => {
-    this._tocAnimator.tocAnimation();
-  };
 
   public static initPlayer = (player: Player) => {
     if (!Animations.player) {

@@ -10,7 +10,8 @@ const observer = new MutationObserver((mutationsList, observer) => {
   for (const mutation of mutationsList) {
     if (mutation.type === 'childList') {
       if ($(containerSelector).length) {
-        barbaInit();
+        const barba = new barbaInit();
+        barba.init();
         observer.disconnect();
         break;
       }

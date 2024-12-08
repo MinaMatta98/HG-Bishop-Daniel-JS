@@ -1,5 +1,6 @@
 import gsap from 'gsap/all';
 import { Animations } from 'src/animations/animations';
+import { GlobalPageAnimations } from 'src/interfaces/IPageAnimations';
 
 import { Player } from './player';
 
@@ -11,6 +12,8 @@ export class PortablePlayer {
   private _playlistWrapper: JQuery<HTMLElement>;
 
   private _animationTL: gsap.core.Timeline;
+
+  private supportAnimations = GlobalPageAnimations;
 
   constructor() {
     $(() => {
@@ -43,7 +46,7 @@ export class PortablePlayer {
         { width: '50vw', height: '50vh', duration: 1 },
         '=0'
       );
-      Animations.cursorWhite();
+      this.supportAnimations.cursorAnimations.cursorWhite();
     });
   };
 
@@ -53,7 +56,7 @@ export class PortablePlayer {
       this._animationTL.to(this._playlistWrapper, { width: 0, height: 0, duration: 1 }, '0');
       await this._animationTL.to(this._playlistWrapper, { opacity: 0, duration: 0.5 }, '0');
       this._playlistWrapper.css('display', 'none');
-      Animations.cursorBlue();
+      this.supportAnimations.cursorAnimations.cursorBlue();
     });
   };
 }

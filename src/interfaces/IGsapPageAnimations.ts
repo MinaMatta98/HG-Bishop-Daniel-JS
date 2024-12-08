@@ -1,30 +1,34 @@
-import gsap from 'gsap/all';
+import gsap, { ScrollTrigger } from 'gsap/all';
 
 import type { IDisposableAnimations } from './IDisposableAnimations';
+import type { IElementsAnimations } from './IElementsAnimations';
+import type { PageElements } from './IPageAnimations';
 
 interface IGsapAnimations extends IDisposableAnimations {
-  gsapTargets?: Map<string, JQuery<HTMLElement>>;
-  tweens: gsap.core.Animation[];
+  gsapTargets?: PageElements<readonly string[]>;
+  tweens: Partial<gsap.core.Animation | ScrollTrigger>[];
 }
 
 export class GsapAnimations implements IGsapAnimations {
-  public disposableTargets?: Map<string, JQuery<HTMLElement>>;
-  public gsapTargets?: Map<string, JQuery<HTMLElement>>;
-  public tweens: gsap.core.Animation[] = [];
+  public disposableTargets?: PageElements<readonly string[]>;
+
+  public gsapTargets?: PageElements<readonly string[]>;
+
+  public tweens: Partial<gsap.core.Animation | ScrollTrigger>[] = [];
 
   constructor(
-    gsapTargets?: Map<string, JQuery<HTMLElement>>,
-    disposableTargets?: Map<string, JQuery<HTMLElement>>
+    gsapTargets?: PageElements<readonly string[]>,
+    disposableTargets?: PageElements<readonly string[]>
   ) {
     this.disposableTargets = disposableTargets;
     this.gsapTargets = gsapTargets;
   }
 
-  public newItem(tween: gsap.core.Animation) {
+  public newItem(tween: Partial<gsap.core.Animation> | ScrollTrigger) {
     this.tweens.push(tween);
   }
 
-  public newItems(tweens: gsap.core.Animation[]) {
+  public newItems(tweens: Partial<gsap.core.Animation>[]) {
     for (const tween of tweens) {
       this.tweens.push(tween);
     }
@@ -36,10 +40,10 @@ export class GsapAnimations implements IGsapAnimations {
 
     if (tw[0]) {
       if (tw[0] instanceof gsap.core.Timeline) {
-        tw[0].clear();
+        tw[0].clear()!;
       }
 
-      tw[0].kill();
+      tw[0].kill()!;
     }
 
     tw.pop();
@@ -47,7 +51,7 @@ export class GsapAnimations implements IGsapAnimations {
 
   public disposePageAnimations() {
     for (const tween of this.tweens) {
-      tween.kill();
+      if (tween) tween.kill();
     }
     this.tweens.length = 0;
     this.tweens = [];
@@ -61,8 +65,8 @@ export class GsapComponentAnimations extends GsapAnimations {
    */
   constructor(
     gsapPageAnimations: GsapAnimations,
-    gsapTargets?: Map<string, JQuery<HTMLElement>>,
-    disposableTargets?: Map<string, JQuery<HTMLElement>>
+    gsapTargets?: PageElements<readonly string[]>,
+    disposableTargets?: PageElements<readonly string[]>
   ) {
     super(gsapTargets, disposableTargets);
     this.gsapPageAnimations = gsapPageAnimations;
@@ -79,8 +83,11 @@ export interface IGsapPageAnimations {
 /**
  * Supporting component animations class. This is used so that IGsapPageAnimations can be shared amongst page components.
  */
-export interface IGsapComponentAnimations {
-  pageElements: Map<string, JQuery<HTMLElement>>;
+export interface IGsapComponentAnimations extends IElementsAnimations {
   gsapComponentAnimations: GsapComponentAnimations;
   animateComponent: () => void;
+}
+
+export function instanceofIGsapPageAnimations(obj: any): obj is IGsapPageAnimations {
+  return obj && typeof obj.gsapAnimations === 'object';
 }

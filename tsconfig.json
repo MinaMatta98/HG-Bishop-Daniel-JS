@@ -2,7 +2,7 @@
 	"extends": "@finsweet/tsconfig",
 	"compilerOptions": {
 		"target": "ES2020",
-		"useDefineForClassFields": true,
+		//"useDefineForClassFields": true,
 		"module": "ES2020",
 		"rootDir": ".",
 		"baseUrl": ".",
@@ -34,7 +34,6 @@
 		"noEmit": false,
 		/* Linting */
 		"strict": false,
-		"noUnusedLocals": false,
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": false,
 		"noImplicitAny": false

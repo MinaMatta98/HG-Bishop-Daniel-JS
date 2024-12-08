@@ -152,10 +152,6 @@ input[type="password"],
 	background: #1098ff;
 }
 
-/*.leaflet-interactive {*/
-/*  	filter: drop-shadow(0.35rem 0.35rem 0.4rem rgba(0, 0, 0, 0.5));*/
-/*}*/
-
 .leaflet-marker-icon {
 	height: 0px !important;
 	width: 0px !important;
@@ -172,7 +168,3 @@ input[type="password"],
 	background: var(--cursor-inner) !important;
 
 }
-/**/
-/*.timeline__content::before {*/
-/*	border-top-color: var(--cursor-inner) !important;*/
-/*}*/

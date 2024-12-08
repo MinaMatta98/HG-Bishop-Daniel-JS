@@ -50,6 +50,7 @@ export class NavBarAnimations {
     if (NavBarAnimations.currentTL) NavBarAnimations.currentTL.kill();
 
     const scrollButton = $('.outer-parent');
+
     gsap.set(scrollButton, { opacity: 0 });
 
     scrollButton.on('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
