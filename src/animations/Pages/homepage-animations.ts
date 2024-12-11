@@ -6,6 +6,7 @@ import '../../public/animations.css';
 import type { ITransitionData } from '@barba/core/dist/core/src/src/defs';
 import { gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
+import { barbaInit } from 'src/barba';
 import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
 import type {
   IGsapComponentAnimations,
@@ -20,7 +21,6 @@ import { GlobalPageAnimations } from 'src/interfaces/IPageAnimations';
 import type { IResizePageAnimations } from 'src/interfaces/IResizePageAnimations';
 import Swiper from 'swiper/bundle';
 
-import { Utils } from '../../utils/utils';
 import { GlobeAnimation } from '../Components/globe';
 
 class NewsAnimations implements IGsapComponentAnimations {
@@ -175,7 +175,7 @@ export class HomePageAnimations
       const currentTime = new Date().getTime();
 
       await (currentTime - initTime < 2000
-        ? Utils.sleep(2000 - (currentTime - initTime))
+        ? barbaInit.sleep(2000 - (currentTime - initTime))
         : Promise.resolve());
 
       const tween = await gsap.to(pageload, {
@@ -236,7 +236,6 @@ export class HomePageAnimations
       );
     },
     dispose: (self: HomePageAnimations) => {
-      console.log('dispose');
       self.pageElements.el.stickyImageContainer.off('mouseenter');
     },
   };

@@ -26,11 +26,15 @@ export class MinistryPageAnimations
 
   onMouseEnterHandler = {
     handler(self: MinistryPageAnimations) {
-      const { itemSection, sectionGlow } = self.pageElements.el;
+      const { itemSection, sectionGlow, webgl } = self.pageElements.el;
 
       const tween = gsap.set(sectionGlow, { display: 'none' });
 
       self.gsapAnimations.newItem(tween);
+
+      webgl.on('mouseenter', () => {
+        self.supportAnimations.cursorAnimations.cursorWhite();
+      });
 
       itemSection.on('mouseenter', () => {
         self.supportAnimations.cursorAnimations.cursorWhite();
@@ -38,6 +42,7 @@ export class MinistryPageAnimations
       });
     },
     dispose(self: MinistryPageAnimations) {
+      self.pageElements.el.webgl.off('mouseenter');
       self.pageElements.el.itemSection.off('mouseenter');
     },
   };
@@ -59,7 +64,6 @@ export class MinistryPageAnimations
       document.addEventListener('mousemove', onMouseMove);
     },
     dispose(_self: MinistryPageAnimations) {
-      console.log('dispose');
       $(document).off('mousemove');
     },
   };
