@@ -1,4 +1,5 @@
 import type { ISchemaPage, ITransitionData } from '@barba/core/dist/core/src/src/defs';
+import { ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
 import { FooterAnimations } from 'src/animations/Components/footerAnimations';
 import { LogoAnimations } from 'src/animations/Components/logo-animations';
@@ -80,16 +81,19 @@ export class GenericAnimations implements IGenericAnimations {
       obj.mouseEventTransClass.onMouseMoveHandler?.dispose(obj.mouseEventTransClass);
       obj.mouseEventTransClass.onMouseClickHandler?.dispose(obj.mouseEventTransClass);
       obj.mouseEventTransClass.onMouseEnterHandler?.dispose(obj.mouseEventTransClass);
-      obj.mouseEventTransClass.onScrollEventHandler?.dispose(obj.mouseEventTransClass);
+      if (obj.mouseEventTransClass.onScrollEventHandler) {
+        ScrollTrigger.killAll();
+        obj.mouseEventTransClass.onScrollEventHandler?.dispose(obj.mouseEventTransClass);
+      }
     }
 
-    if (obj.resizeTransClass) obj.resizeTransClass.onResizeHandler?.dispose(obj.resizeTransClass);
+    obj.resizeTransClass?.onResizeHandler?.dispose(obj.resizeTransClass);
 
-    if (obj.gsapTransClass) obj.gsapTransClass.gsapAnimations.disposePageAnimations();
+    obj.gsapTransClass?.gsapAnimations.disposePageAnimations();
 
-    if (obj.disposableTransClass) obj.disposableTransClass.disposePageAnimations();
+    obj.disposableTransClass?.disposePageAnimations();
 
-    if (obj.cssTransClass) obj.cssTransClass.unloadCss();
+    obj.cssTransClass?.unloadCss();
   }
 
   after = async (obj: { data: ITransitionData }) => {
