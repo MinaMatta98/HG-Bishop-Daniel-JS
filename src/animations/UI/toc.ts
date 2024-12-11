@@ -73,7 +73,6 @@ export class TOCAnimations
       });
     },
     dispose: () => {
-      const self = GlobalPageAnimations.tocAnimations;
       $(window).off('resize');
     },
   };
