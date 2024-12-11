@@ -13,7 +13,6 @@ import { LeafletMapComponent } from '../Components/map';
 export class ChurchAnimations
   implements IPageAnimations, IGsapPageAnimations, IDisposableAnimations
 {
-
   disposePageAnimations = () => {
     this._map.disposePageAnimations();
     this.gsapAnimations.disposePageAnimations();
@@ -72,3 +71,4 @@ export class ChurchAnimations
     );
   };
 }
+
