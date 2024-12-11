@@ -1,8 +1,11 @@
 import barba from '@barba/core';
+import type { ITransitionData } from '@barba/core/dist/core/src/src/defs';
+import { restartWebflow } from '@finsweet/ts-utils';
 import { Flip, gsap, ScrollToPlugin, ScrollTrigger } from 'gsap/all';
 
 import { Animations } from './animations/animations';
-import { Utils } from './utils/utils';
+import { DOMAIN } from './index';
+import { Stats } from './utils/sentry';
 
 export class barbaInit {
   private isFirstLoad: boolean = true;
@@ -18,7 +21,8 @@ export class barbaInit {
   }
 
   public init = () => {
-    let { animations, isFirstLoad } = this;
+    const { animations, isFirstLoad, manualLoadRedirector } = this;
+
     barba.init({
       transitions: [
         {
@@ -26,8 +30,7 @@ export class barbaInit {
           name: 'default',
           async once(data) {
             await animations.once(data, isFirstLoad);
-            Utils.manualLoadRedirector(isFirstLoad);
-            isFirstLoad = false;
+            manualLoadRedirector();
           },
           async before(data) {
             await animations.before({ data });
@@ -57,7 +60,32 @@ export class barbaInit {
       ],
     });
     barba.hooks.after(async (data) => {
-      Utils.scriptReloader(data);
+      await this.scriptReloader(data);
     });
+  };
+
+  public static sleep = async (ms: number): Promise<void> => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
+  public scriptReloader = async (data: ITransitionData): Promise<void> => {
+    const js = data.next.container.querySelectorAll('script');
+    js ? js.forEach((item) => eval(item.innerHTML)) : null;
+    await restartWebflow();
+    //window.dispatchEvent(new Event('resize'));
+  };
+
+  public initStats = () => {
+    Stats.init();
+  };
+
+  public manualLoadRedirector = (): void => {
+    // Timeout interval ensures no hanging on chrome browser engine
+    if (this.isFirstLoad && window.location.href !== DOMAIN) {
+      setTimeout(() => {
+        console.warn('Redirecting due to illegal access');
+        window.location.replace(DOMAIN);
+      }, 10);
+    }
   };
 }
