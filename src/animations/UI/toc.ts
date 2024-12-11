@@ -66,16 +66,20 @@ export class TOCAnimations
   onResizeHandler = {
     handler: () => {
       const self = GlobalPageAnimations.tocAnimations;
+
       $(window).on('resize', () => {
         self.disposePageAnimations();
         this.animateComponent();
       });
     },
-    dispose: () => {},
+    dispose: () => {
+      const self = GlobalPageAnimations.tocAnimations;
+      $(window).off('resize');
+    },
   };
 
   disposePageAnimations = () => {
-    this.gsapComponentAnimations.disposePageAnimations();
+    this.gsapComponentAnimations.gsapPageAnimations.disposePageAnimations();
   };
 
   initializeBaseState = () => {
@@ -143,7 +147,7 @@ export class TOCAnimations
 
         // Check if window is within section
         if (
-          window.scrollY > $(element).offset().top &&
+          window.scrollY >= $(element).offset().top &&
           window.scrollY <= $(element).offset().top + $(element).height()
         ) {
           sectionWrapper[0].className = 'toc-section-wrapper current';
