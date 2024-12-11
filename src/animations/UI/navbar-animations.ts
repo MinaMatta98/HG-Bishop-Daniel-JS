@@ -10,8 +10,11 @@ export class NavBarAnimations {
   protected static currentTL: GSAPTween;
 
   constructor() {
-    $(() => (this._links = $('.link-block')));
-    this._disabledClass = 'disabled';
+    $(() => {
+      this._links = $('.link-block');
+      this._disabledClass = 'disabled';
+      this.onResizeHandler();
+    });
   }
 
   underlineNav = async (identifier: ISchemaPage['namespace'], underline: boolean) => {
@@ -37,6 +40,12 @@ export class NavBarAnimations {
   disableNavLinks = () => {
     $(this._links).each((_, e) => {
       $(e).addClass(this._disabledClass);
+    });
+  };
+
+  onResizeHandler = () => {
+    $(window).on('resize', () => {
+      $('.navbar.container').width('100%');
     });
   };
 
