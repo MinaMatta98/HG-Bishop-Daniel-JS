@@ -73,7 +73,6 @@ export class LeafletMapComponent
       this._leaderLineTarget = leaderLineTarget;
       this.animateComponent();
       this.animateLeaderLines();
-      console.log(this);
     });
   }
 
