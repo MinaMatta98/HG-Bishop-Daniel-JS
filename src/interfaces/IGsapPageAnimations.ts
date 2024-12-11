@@ -14,7 +14,7 @@ export class GsapAnimations implements IGsapAnimations {
 
   public gsapTargets?: PageElements<readonly string[]>;
 
-  public tweens: Partial<gsap.core.Animation | ScrollTrigger>[] = [];
+  public tweens: Partial<gsap.core.Animation>[] = [];
 
   constructor(
     gsapTargets?: PageElements<readonly string[]>,
@@ -24,7 +24,7 @@ export class GsapAnimations implements IGsapAnimations {
     this.gsapTargets = gsapTargets;
   }
 
-  public newItem(tween: Partial<gsap.core.Animation> | ScrollTrigger) {
+  public newItem(tween: Partial<gsap.core.Animation>) {
     this.tweens.push(tween);
   }
 
@@ -34,7 +34,7 @@ export class GsapAnimations implements IGsapAnimations {
     }
   }
 
-  public clearAnimation(tween: gsap.core.Animation) {
+  public clearAnimation(tween: Partial<gsap.core.Animation>) {
     const index = this.tweens.findIndex((t) => t === tween);
     const tw = this.tweens.splice(index, 1);
 
@@ -51,7 +51,9 @@ export class GsapAnimations implements IGsapAnimations {
 
   public disposePageAnimations() {
     for (const tween of this.tweens) {
-      if (tween) tween.kill();
+      if (tween) {
+        tween.kill();
+      }
     }
     this.tweens.length = 0;
     this.tweens = [];
