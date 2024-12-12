@@ -9,6 +9,7 @@ import { CursorAnimations } from 'src/animations/UI/cursor-animations';
 import { NavBarAnimations } from 'src/animations/UI/navbar-animations';
 import { TOCAnimations } from 'src/animations/UI/toc';
 
+import type { ICMSPageAnimations } from './ICMSPageAnimations';
 import type { ICssAnimations } from './ICssAnimations';
 import type { IDisposableAnimations } from './IDisposableAnimations';
 import type { IElementsAnimations } from './IElementsAnimations';
@@ -42,10 +43,22 @@ export class GenericAnimations implements IGenericAnimations {
     };
   };
 
-  enter = async <C extends ICssAnimations>(obj: { data: ITransitionData; cssTransClass?: C }) => {
+  enter = async <C extends ICssAnimations, M extends ICMSPageAnimations<any>>(obj: {
+    data: ITransitionData;
+    cssTransClass?: C;
+    cmsTransClass?: M;
+  }) => {
     this.handleLinks();
+
     this.globalPageAnimations.tocAnimations.onResizeHandler.handler();
-    if (obj.cssTransClass) obj.cssTransClass.loadCss();
+
+    obj.cssTransClass?.loadCss();
+
+    if (obj.cmsTransClass) {
+      obj.cmsTransClass?.genericCMSAnimations.removeCss();
+      obj.cmsTransClass?.genericCMSAnimations.replaceSpans();
+      obj.cmsTransClass?.genericCMSAnimations.replaceLinks();
+    }
   };
 
   before = async (obj: { data: ITransitionData }) => {
@@ -54,6 +67,8 @@ export class GenericAnimations implements IGenericAnimations {
     this.globalPageAnimations.navBarAnimations.disableNavLinks();
 
     this.globalPageAnimations.logoAnimations.disposePageAnimations();
+
+    $(window).scrollTop(0);
 
     await this.globalPageAnimations.transitionAnimations.handleTransitionAnimation(true);
   };
@@ -186,7 +201,7 @@ export type ElementObjectProperties<T extends readonly string[]> = {
 export class PageElements<T extends readonly string[]> {
   public el: ElementObjectProperties<T>;
 
-  private keys: T;
+  public keys: T;
 
   constructor(keys: T) {
     this.el = {} as ElementObjectProperties<T>;

@@ -22,10 +22,12 @@ export class PortablePlayer {
       this._animationTL = gsap.timeline();
       this._widgetContainer = $('.widget-wrapper');
       this._playlistWrapper = $('.playlist-wrapper');
-      this.toggleFullPlayerButton();
-      this.toggleMiniPlayerButton();
-      this.initWidgetDisplay();
-      this._player.updateElapsedTime();
+      if (this._player.getCurrentKey()) {
+        this.toggleFullPlayerButton();
+        this.toggleMiniPlayerButton();
+        this.initWidgetDisplay();
+        this._player.updateElapsedTime();
+      }
     });
   }
 

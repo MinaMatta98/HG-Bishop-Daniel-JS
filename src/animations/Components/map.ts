@@ -25,9 +25,9 @@ interface Style {
 
 interface ZoomControlOptions {
   zoomControl: boolean;
-  zoom: number;
-  minZoom: number;
-  maxZoom: number;
+  zoom: () => number;
+  minZoom: () => number;
+  maxZoom: () => number;
   dragging: boolean;
   scrollWheelZoom: boolean;
 }
@@ -44,7 +44,7 @@ export class LeafletMapComponent
   private static _shadow = 'drop-shadow(2px 7px 15px rgba(0, 0, 0, 0.4))';
   private _shadowAnimation: gsap.core.Tween;
   private _leaderLines?: LeaderLine[];
-  private _mapPin?: JQuery<HTMLElement>;
+  private _mapPins?: { pin: JQuery<HTMLElement>; lat: number; long: number }[];
   private _leaderLineTarget?: JQuery<HTMLElement>;
   private _fill: (feature: any) => string;
   private _className?: (feature: any) => string;
@@ -58,34 +58,39 @@ export class LeafletMapComponent
     zoomControlOptions: ZoomControlOptions,
     gsapAnimations: GsapAnimations,
     className?: (feature: any) => string,
-    mapPin?: JQuery<HTMLElement>,
+    mapPin?: [{ pin: JQuery<HTMLElement>; lat: number; long: number }],
     leaderLineTarget?: JQuery<HTMLElement>
   ) {
-    $(() => {
-      this._mapElement = mapElement;
-      this._fill = fill;
-      this._className = className;
-      this._color = color;
-      this._zoomControlOptions = zoomControlOptions;
-      this.gsapComponentAnimations = new GsapComponentAnimations(gsapAnimations);
-      this._leaderLines = [];
-      this._mapPin = mapPin;
-      this._leaderLineTarget = leaderLineTarget;
-      this.animateComponent();
-      this.animateLeaderLines();
-    });
+    this._mapElement = mapElement;
+    this._fill = fill;
+    this._className = className;
+    this._color = color;
+    this._zoomControlOptions = zoomControlOptions;
+    this.gsapComponentAnimations = new GsapComponentAnimations(gsapAnimations);
+    this._leaderLines = [];
+    this._mapPins = mapPin;
+    this._leaderLineTarget = leaderLineTarget;
+    this.animateComponent();
+    this.animateLeaderLines();
   }
 
   gsapComponentAnimations: GsapComponentAnimations;
 
   animateComponent = () => {
+    const { _zoomControlOptions } = this;
+
+    const { zoomControl, dragging, scrollWheelZoom, zoom, maxZoom, minZoom } = _zoomControlOptions;
+
     this._map = leaflet
-      .map(
-        this._mapElement[0],
-        this._zoomControlOptions
-        //zoomControl: false, maxZoom: 5.2, minZoom: 5.2
-      )
-      .setView([-28.2744, 133.7751], 5.2);
+      .map(this._mapElement[0], {
+        dragging,
+        scrollWheelZoom,
+        zoomControl,
+        maxZoom: maxZoom(),
+        minZoom: minZoom(),
+        zoom: zoom(),
+      })
+      .setView([-28.2744, 133.7751]);
 
     const { onMouseEnterHandler, onMouseLeaveHandler } = this;
 
@@ -116,12 +121,14 @@ export class LeafletMapComponent
       layer.bindPopup(layer.feature.properties.STATE_NAME);
     });
 
-    if (this._mapPin) {
-      const marker = new leaflet.DivIcon({
-        html: this._mapPin[0],
-      });
+    if (this._mapPins) {
+      for (const pinObject of this._mapPins) {
+        const marker = new leaflet.DivIcon({
+          html: pinObject.pin[0],
+        });
 
-      leaflet.marker([-33.762282, 150.8274209], { icon: marker }).addTo(this._map);
+        leaflet.marker([pinObject.lat, pinObject.long], { icon: marker }).addTo(this._map);
+      }
     }
   };
 
@@ -147,7 +154,7 @@ export class LeafletMapComponent
   private animateLeaderLines = (): void => {
     if (this._leaderLineTarget)
       for (const lineEnd of this._leaderLineTarget) {
-        const line = new LeaderLine(this._mapPin[0], lineEnd, {
+        const line = new LeaderLine(this._mapPins[0].pin[0], lineEnd, {
           color: '#ffffff',
           size: 2,
           dash: { animation: true, len: 10 },
@@ -165,9 +172,10 @@ export class LeafletMapComponent
       $(window).on('resize', () => {
         try {
           for (const line of self._leaderLines) if (line) line.position();
-          self._map.setMinZoom(self._zoomControlOptions.minZoom);
-          self._map.setMaxZoom(self._zoomControlOptions.maxZoom);
-          self._map.setZoom(self._zoomControlOptions.zoom);
+          self._map.invalidateSize();
+          self._map.setMinZoom(self._zoomControlOptions.minZoom());
+          self._map.setMaxZoom(self._zoomControlOptions.maxZoom());
+          self._map.setZoom(self._zoomControlOptions.zoom());
         } catch (e) {
           console.warn(e);
         }

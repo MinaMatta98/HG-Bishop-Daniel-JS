@@ -491,7 +491,6 @@ export class Player {
   protected initializeButtons = (): void => {
     [this._playMain.parent().parent(), this._playMini.parent().parent()].forEach((item) =>
       item.on('click', () => {
-        console.log(this.getCurrentPlayer().playing());
         this.getCurrentPlayer().playing() ? this.pauseState(true) : this.playState(true);
       })
     );

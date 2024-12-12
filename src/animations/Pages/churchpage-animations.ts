@@ -4,15 +4,31 @@ import $ from 'jquery';
 import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
 import type { IGsapPageAnimations } from 'src/interfaces/IGsapPageAnimations';
 import { GsapAnimations } from 'src/interfaces/IGsapPageAnimations';
+import type { IMouseEventAnimations } from 'src/interfaces/IMouseEventAnimations';
 import type { IPageAnimations } from 'src/interfaces/IPageAnimations';
 import { PageElements } from 'src/interfaces/IPageAnimations';
 import { GlobalPageAnimations } from 'src/interfaces/IPageAnimations';
+import type { IResizePageAnimations } from 'src/interfaces/IResizePageAnimations';
 
 import { LeafletMapComponent } from '../Components/map';
 
 export class ChurchAnimations
-  implements IPageAnimations, IGsapPageAnimations, IDisposableAnimations
+  implements
+    IPageAnimations,
+    IGsapPageAnimations,
+    IDisposableAnimations,
+    IMouseEventAnimations,
+    IResizePageAnimations
 {
+  onResizeHandler = {
+    handler: (self: ChurchAnimations) => {
+      if (self._map) self._map.onResizeHandler.handler(self._map);
+    },
+    dispose: () => {
+      $(window).off('resize');
+    },
+  };
+
   disposePageAnimations = () => {
     this._map.disposePageAnimations();
     this.gsapAnimations.disposePageAnimations();
@@ -20,7 +36,7 @@ export class ChurchAnimations
 
   gsapAnimations: GsapAnimations;
 
-  pageElements: PageElements<['#map']>;
+  pageElements: PageElements<['#map', '.item']>;
 
   supportAnimations = GlobalPageAnimations;
 
@@ -44,6 +60,20 @@ export class ChurchAnimations
     this.disposePageAnimations();
   };
 
+  onMouseEnterHandler = {
+    handler: (self: ChurchAnimations) => {
+      self.pageElements.el.item.each((_, e) => {
+        $(e).on('mouseenter', () => self.supportAnimations.cursorAnimations.cursorWhite());
+        $(e).on('mouseleave', () => self.supportAnimations.cursorAnimations.cursorBlue());
+      });
+    },
+    dispose: (self: ChurchAnimations) => {
+      self.pageElements.el.item.each((_, e) => {
+        $(e).off('mouseenter');
+      });
+    },
+  };
+
   initElements = () => {
     this.namespace = 'churches';
 
@@ -51,23 +81,27 @@ export class ChurchAnimations
 
     this.gsapAnimations = new GsapAnimations();
 
-    this.pageElements = new PageElements(['#map'] as const);
+    this.pageElements = new PageElements(['#map', '.item'] as const);
 
-    this.supportAnimations;
+    this.onMouseEnterHandler.handler(this);
+
+    const zoom = () => Math.max(Math.min((this.pageElements.el.map.width() / 1360.0) * 5.0, 5.0), 3.7);
 
     this._map = new LeafletMapComponent(
       this.pageElements.el.map,
       () => '#ffffff',
       '#1098ff',
       {
-        zoom: 5.2,
+        zoom,
         zoomControl: false,
-        maxZoom: 5.2,
-        minZoom: 5.2,
+        maxZoom: zoom,
+        minZoom: zoom,
         dragging: false,
         scrollWheelZoom: false,
       },
       this.gsapAnimations
     );
+
+    this.onResizeHandler.handler(this);
   };
 }

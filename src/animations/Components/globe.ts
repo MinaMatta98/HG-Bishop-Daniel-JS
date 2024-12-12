@@ -62,29 +62,31 @@ export class GlobeAnimation
   };
 
   private initGlobe = (): GlobeInstance => {
-    return Globe({
-      rendererConfig: {
-        powerPreference: 'low-power',
-        antialias: false,
-        precision: 'lowp',
-      },
-    })
-      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-      .globeMaterial(
-        new MeshPhysicalMaterial({
-          color: 0xebeef5,
-          reflectivity: 1,
-          roughness: 0,
-          iridescence: 2,
-          clearcoat: 0.1,
-          emissive: 0xebeef5,
-          emissiveIntensity: 0.5,
-        })
-      )
-      .width(this.pageElements.el.webGL.width() * this._RATIO)
-      .height(this.pageElements.el.webGL.height() * this._RATIO)
-      .backgroundColor('#ffffff00')
-      .pointsMerge(true);
+    return (
+      Globe({
+        rendererConfig: {
+          powerPreference: 'low-power',
+          antialias: false,
+          precision: 'lowp',
+        },
+      })
+        .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+        .globeMaterial(
+          new MeshPhysicalMaterial({
+            color: 0xebeef5,
+            reflectivity: 1,
+            roughness: 0,
+            iridescence: 2,
+            clearcoat: 0.1,
+            emissive: 0xebeef5,
+            emissiveIntensity: 0.5,
+          })
+        )
+        .width(this.pageElements.el.webGL.width() * this._RATIO)
+        //.height(this.pageElements.el.webGL.height() * this._RATIO)
+        .backgroundColor('#ffffff00')
+        .pointsMerge(true)
+    );
   };
 
   public disposePageAnimations = () => {
@@ -331,12 +333,18 @@ export class GlobeAnimation
   onResizeHandler = {
     handler(self: GlobeAnimation, c: GlobeInstance) {
       $(window).on('resize', () => {
-        self._size.innerWidth = self.pageElements.el.webGL.width();
-        self._size.innerHeight = self.pageElements.el.webGL.height();
+        self._size.innerWidth = self.pageElements.el.ministryWrapper.width();
+        self._size.innerHeight = self.pageElements.el.ministryWrapper.height();
+        const setSize = Math.min(
+          self._size.innerWidth,
+          self._size.innerHeight,
+          $(window).innerWidth(),
+          $(window).innerHeight()
+        );
         const renderer = c.renderer();
-        c.width(self._size.innerWidth * self._RATIO);
-        c.height(self._size.innerHeight * self._RATIO);
-        renderer.setSize(self._size.innerWidth * self._RATIO, self._size.innerHeight * self._RATIO);
+        renderer.setSize(setSize * self._RATIO, setSize * self._RATIO);
+        c.width(setSize * self._RATIO);
+        c.height(setSize * self._RATIO);
       });
     },
     dispose() {

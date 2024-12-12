@@ -8,12 +8,13 @@ import type { ITransitionData } from '@barba/core/dist/core/src/src/defs';
 import { Flip, gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
 import type { ICarouselAnimations } from 'src/interfaces/ICarouselAnimations';
+import type { ICMSPageAnimations } from 'src/interfaces/ICMSPageAnimations';
+import { GenericCMSPageAnimations } from 'src/interfaces/ICMSPageAnimations';
 import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
 import type { IGsapPageAnimations } from 'src/interfaces/IGsapPageAnimations';
 import { GsapAnimations } from 'src/interfaces/IGsapPageAnimations';
 import type { IMouseEventAnimations } from 'src/interfaces/IMouseEventAnimations';
-import type { IPageAnimations } from 'src/interfaces/IPageAnimations';
-import { GlobalPageAnimations } from 'src/interfaces/IPageAnimations';
+import { type ElementObjectProperties, GlobalPageAnimations } from 'src/interfaces/IPageAnimations';
 import { PageElements } from 'src/interfaces/IPageAnimations';
 import type { IResizePageAnimations } from 'src/interfaces/IResizePageAnimations';
 
@@ -21,12 +22,29 @@ import { LeafletMapComponent } from '../Components/map';
 
 export class ChurchContentAnimations
   implements
-    IPageAnimations,
     IResizePageAnimations,
     IDisposableAnimations,
     IGsapPageAnimations,
-    IMouseEventAnimations
+    IMouseEventAnimations,
+    ICMSPageAnimations<
+      readonly [
+        '.churches-content',
+        '.churches-content-subheading',
+        '.church-content-cta',
+        '.churches-content-images',
+        '.map-pin',
+        '.find-us',
+        '.loc-invitation',
+        '.loc-content',
+        '.church-content-hero-section',
+        '.map',
+        '.timeline',
+        '.timeline__content',
+      ]
+    >
 {
+  genericCMSAnimations: GenericCMSPageAnimations = new GenericCMSPageAnimations();
+
   private _targetState: string;
 
   private _priestCarousel: PriestCarousel;
@@ -34,6 +52,10 @@ export class ChurchContentAnimations
   private _map: LeafletMapComponent;
 
   private _mapTL: gsap.core.Timeline;
+
+  private _lat: number;
+
+  private _long: number;
 
   gsapAnimations: GsapAnimations;
 
@@ -93,12 +115,22 @@ export class ChurchContentAnimations
     this.pageElements.el.churchesContentImages.css('opacity', 0);
   };
 
+  replaceCMSAnimations?: <T extends typeof this.pageElements>(keys: keyof T['el'][]) => void[];
+
+  mapPinCoordinates<K extends keyof ElementObjectProperties<typeof this.pageElements.keys>>(
+    key: K
+  ) {
+    const pin = this.pageElements.el[key];
+
+    this._lat = parseInt(pin.attr('Latitude'));
+
+    this._long = parseInt(pin.attr('Longitude'));
+  }
+
   initElements = () => {
     this.supportAnimations = GlobalPageAnimations;
 
     this.gsapAnimations = new GsapAnimations();
-
-    this._targetState = 'New South Wales';
 
     this.pageElements = new PageElements([
       '.churches-content',
@@ -115,6 +147,10 @@ export class ChurchContentAnimations
       '.timeline__content',
     ] as const);
 
+    this.mapPinCoordinates('mapPin');
+
+    this._targetState = 'New South Wales';
+
     this._priestCarousel = new PriestCarousel(this.gsapAnimations, this.supportAnimations);
 
     this._mapTL = gsap.timeline();
@@ -123,7 +159,9 @@ export class ChurchContentAnimations
 
     this.initializeBaseState();
 
-    const zoom = Math.min(($('.loc-grid').width() / 1366.1) * 4.2, 4.2);
+    const zoom = () => Math.min(($('.loc-grid').width() / 1366.1) * 4.2, 4.2);
+
+    console.log(this._lat, this._long);
 
     this._map = new LeafletMapComponent(
       this.pageElements.el.map,
@@ -140,9 +178,7 @@ export class ChurchContentAnimations
       },
       this.gsapAnimations,
       (feature: any) => (feature.properties.STATE_NAME === this._targetState ? 'active-layer' : ''),
-
-      this.pageElements.el.mapPin,
-
+      [{ pin: this.pageElements.el.mapPin, lat: this._lat, long: this._long }],
       this.pageElements.el.locInvitation
     );
   };
@@ -333,14 +369,14 @@ class PriestCarousel implements ICarouselAnimations {
   private _supportingAnimations: typeof GlobalPageAnimations;
 
   pageElemets: PageElements<
-    ['.priest-container', '.priests-carousel', '.controls', '.pause', '.play']
+    ['.priest-container-cms', '.priests-carousel', '.controls', '.pause', '.play']
   >;
 
   gsapAnimations: GsapAnimations;
 
   initElements = () => {
     this.pageElemets = new PageElements([
-      '.priest-container',
+      '.priest-container-cms',
       '.priests-carousel',
       '.controls',
       '.pause',
@@ -366,9 +402,9 @@ class PriestCarousel implements ICarouselAnimations {
   }
 
   animateCarousel = () => {
-    const { priestContainer, priestsCarousel, play, pause } = this.pageElemets.el;
+    const { priestContainerCms, priestsCarousel, play, pause } = this.pageElemets.el;
 
-    priestContainer.each((i, e) => {
+    priestContainerCms.each((i, e) => {
       this.animatePriestContainer(i, $(e));
       this.animatePins(i, $(e));
     });
@@ -396,20 +432,20 @@ class PriestCarousel implements ICarouselAnimations {
   };
 
   nextSlide = (i: number, el: JQuery<HTMLElement>) => {
-    const { priestContainer, priestsCarousel } = this.pageElemets.el;
-    const width = priestContainer.width();
+    const { priestContainerCms, priestsCarousel } = this.pageElemets.el;
+    const width = priestContainerCms.width();
     const playDuration = 5;
 
     const tween = this._animationTL.to(
       priestsCarousel,
       {
-        translateX: i !== priestContainer.length - 1 ? -width * (i + 1) : 0,
+        translateX: i !== priestContainerCms.length - 1 ? -width * (i + 1) : 0,
         duration: 1,
         onStart: () => {
           this.animateUnfocusedSlide($(el));
-          i !== priestContainer.length - 1
-            ? this.animateFocusedSlide($(priestContainer.get(i + 1)))
-            : this.animateFocusedSlide($(priestContainer.get(0)));
+          i !== priestContainerCms.length - 1
+            ? this.animateFocusedSlide($(priestContainerCms.get(i + 1)))
+            : this.animateFocusedSlide($(priestContainerCms.get(0)));
         },
       },
       playDuration * (i + 1)
@@ -433,23 +469,23 @@ class PriestCarousel implements ICarouselAnimations {
 
   onMouseEnterHandler = {
     handler(self: PriestCarousel) {
-      self.pageElemets.el.priestContainer.on('mouseover', () =>
+      self.pageElemets.el.priestContainerCms.on('mouseover', () =>
         self._supportingAnimations.cursorAnimations.cursorWhite()
       );
     },
     dispose(self: PriestCarousel) {
-      self.pageElemets.el.priestContainer.off('mouseleave');
+      self.pageElemets.el.priestContainerCms.off('mouseleave');
     },
   };
 
   onMouseLeaveHandler = {
     handler(self: PriestCarousel) {
-      self.pageElemets.el.priestContainer.on('mouseleave', () =>
+      self.pageElemets.el.priestContainerCms.on('mouseleave', () =>
         self._supportingAnimations.cursorAnimations.cursorBlue()
       );
     },
     dispose(self: PriestCarousel) {
-      self.pageElemets.el.priestContainer.off('mouseleave');
+      self.pageElemets.el.priestContainerCms.off('mouseleave');
     },
   };
 
@@ -540,9 +576,9 @@ class PriestCarousel implements ICarouselAnimations {
   };
 
   animateButtons = () => {
-    const { priestContainer, controls } = this.pageElemets.el;
+    const { priestContainerCms, controls } = this.pageElemets.el;
 
-    priestContainer.each((i, _) => {
+    priestContainerCms.each((i, _) => {
       const pin = document.createElement('div');
       const pinFiller = document.createElement('div');
       $(pinFiller).addClass('slide-pin-filler');

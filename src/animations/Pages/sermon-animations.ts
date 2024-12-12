@@ -42,6 +42,7 @@ export class SermonPageAnimations
       onMouseEnterHandler.handler(this);
       onMouseLeaveHandler.handler(this);
       this.animateHeading();
+      this.animateItemSection();
     });
   };
 
@@ -118,6 +119,7 @@ export class SermonPageAnimations
       '.piling',
       '.sermon-heading',
       '.sermon-title-block',
+      '.filler',
     ]
   >;
 
@@ -136,6 +138,7 @@ export class SermonPageAnimations
       '.piling',
       '.sermon-heading',
       '.sermon-title-block',
+      '.filler',
     ] as const);
     this.gsapAnimations = new GsapAnimations();
     this._playerWidget = new PortablePlayer();
@@ -153,6 +156,16 @@ export class SermonPageAnimations
     dispose(self: SermonPageAnimations) {
       self.pageElements.el.itemSection.off('mouseenter');
     },
+  };
+
+  animateItemSection = () => {
+    this.pageElements.el.filler.each((index, item) => {
+      console.log(index, item);
+
+      //if (index !== 0 && index !== 2) {
+      //  $(item).css('display', 'none');
+      //}
+    });
   };
 
   onMouseLeaveHandler = {
@@ -190,7 +203,7 @@ export class SermonPageAnimations
   onScrollEventHandler = {
     handler(self: SermonPageAnimations) {
       const scroll = (index: number) => {
-        if (self._scrollTL !== undefined) self._scrollTL.kill();
+        if (self._scrollTL) self._scrollTL.kill();
         self._scrollTL = gsap.to(window, {
           scrollTo: { y: $(self.pageElements.el.piling[index]).position().top },
           duration: 1,
@@ -219,6 +232,6 @@ export class SermonPageAnimations
         self.gsapAnimations.newItem(scrollTween);
       });
     },
-    dispose(_self: SermonPageAnimations) {},
+    dispose() {},
   };
 }
