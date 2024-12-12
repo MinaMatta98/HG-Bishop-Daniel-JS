@@ -25,7 +25,9 @@ typings/
 .env
 
 # Production files
-dist
+dist/*.png
+
+dist/*.mp4
 
 # Lock files
 pnpm-lock.yaml
