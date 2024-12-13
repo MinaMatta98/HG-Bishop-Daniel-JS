@@ -1,12 +1,13 @@
 import 'leaflet/dist/leaflet.css';
 
 import $ from 'jquery';
+import type { ICMSPageAnimations } from 'src/interfaces/ICMSPageAnimations';
+import { GenericCMSPageAnimations } from 'src/interfaces/ICMSPageAnimations';
 import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
 import type { IGsapPageAnimations } from 'src/interfaces/IGsapPageAnimations';
 import { GsapAnimations } from 'src/interfaces/IGsapPageAnimations';
 import type { IMouseEventAnimations } from 'src/interfaces/IMouseEventAnimations';
-import type { IPageAnimations } from 'src/interfaces/IPageAnimations';
-import { PageElements } from 'src/interfaces/IPageAnimations';
+import { type ElementObjectProperties, PageElements } from 'src/interfaces/IPageAnimations';
 import { GlobalPageAnimations } from 'src/interfaces/IPageAnimations';
 import type { IResizePageAnimations } from 'src/interfaces/IResizePageAnimations';
 
@@ -14,12 +15,38 @@ import { LeafletMapComponent } from '../Components/map';
 
 export class ChurchAnimations
   implements
-    IPageAnimations,
     IGsapPageAnimations,
     IDisposableAnimations,
     IMouseEventAnimations,
-    IResizePageAnimations
+    IResizePageAnimations,
+    ICMSPageAnimations<readonly ['#map', '.item', '.map-pin']>
 {
+  genericCMSAnimations: GenericCMSPageAnimations;
+
+  replaceCMSAnimations = <T extends typeof this.pageElements.el>(keys: keyof T[]) => void {};
+  mapPinCoordinates<K extends keyof ElementObjectProperties<typeof this.pageElements.keys>>(
+    key: K
+  ): { pin: JQuery<HTMLElement>; lat: number; long: number }[] {
+    const pins = this.pageElements.el[key];
+
+    return pins
+      .map((_, pin) => {
+        try {
+          const mapPin = $(pin);
+          return {
+            pin: mapPin,
+            lat: parseInt(mapPin.attr('Latitude')),
+            long: parseInt(mapPin.attr('Longitude')),
+          };
+        } catch (e) {
+          console.error(e);
+        }
+      })
+      .toArray();
+  }
+
+  initializeBaseState?: () => void;
+
   onResizeHandler = {
     handler: (self: ChurchAnimations) => {
       if (self._map) self._map.onResizeHandler.handler(self._map);
@@ -36,7 +63,7 @@ export class ChurchAnimations
 
   gsapAnimations: GsapAnimations;
 
-  pageElements: PageElements<['#map', '.item']>;
+  pageElements: PageElements<readonly ['#map', '.item', '.map-pin']>;
 
   supportAnimations = GlobalPageAnimations;
 
@@ -77,15 +104,18 @@ export class ChurchAnimations
   initElements = () => {
     this.namespace = 'churches';
 
+    this.genericCMSAnimations = new GenericCMSPageAnimations();
+
     this.supportAnimations = GlobalPageAnimations;
 
     this.gsapAnimations = new GsapAnimations();
 
-    this.pageElements = new PageElements(['#map', '.item'] as const);
+    this.pageElements = new PageElements(['#map', '.item', '.map-pin'] as const);
 
     this.onMouseEnterHandler.handler(this);
 
-    const zoom = () => Math.max(Math.min((this.pageElements.el.map.width() / 1360.0) * 5.0, 5.0), 3.7);
+    const zoom = () =>
+      Math.max(Math.min((this.pageElements.el.map.width() / 1360.0) * 5.0, 5.0), 3.7);
 
     this._map = new LeafletMapComponent(
       this.pageElements.el.map,
@@ -99,7 +129,8 @@ export class ChurchAnimations
         dragging: false,
         scrollWheelZoom: false,
       },
-      this.gsapAnimations
+      this.gsapAnimations,
+      this.mapPinCoordinates('mapPin')
     );
 
     this.onResizeHandler.handler(this);

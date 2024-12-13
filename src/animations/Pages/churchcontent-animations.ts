@@ -177,8 +177,8 @@ export class ChurchContentAnimations
         scrollWheelZoom: false,
       },
       this.gsapAnimations,
-      (feature: any) => (feature.properties.STATE_NAME === this._targetState ? 'active-layer' : ''),
       [{ pin: this.pageElements.el.mapPin, lat: this._lat, long: this._long }],
+      (feature: any) => (feature.properties.STATE_NAME === this._targetState ? 'active-layer' : ''),
       this.pageElements.el.locInvitation
     );
   };

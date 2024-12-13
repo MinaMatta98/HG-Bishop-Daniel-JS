@@ -57,8 +57,8 @@ export class LeafletMapComponent
     color: string,
     zoomControlOptions: ZoomControlOptions,
     gsapAnimations: GsapAnimations,
+    mapPin?: { pin: JQuery<HTMLElement>; lat: number; long: number }[],
     className?: (feature: any) => string,
-    mapPin?: [{ pin: JQuery<HTMLElement>; lat: number; long: number }],
     leaderLineTarget?: JQuery<HTMLElement>
   ) {
     this._mapElement = mapElement;
