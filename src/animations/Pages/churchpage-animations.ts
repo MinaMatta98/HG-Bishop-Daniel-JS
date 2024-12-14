@@ -23,7 +23,6 @@ export class ChurchAnimations
 {
   genericCMSAnimations: GenericCMSPageAnimations;
 
-  replaceCMSAnimations = <T extends typeof this.pageElements.el>(keys: keyof T[]) => void {};
   mapPinCoordinates<K extends keyof ElementObjectProperties<typeof this.pageElements.keys>>(
     key: K
   ): { pin: JQuery<HTMLElement>; lat: number; long: number }[] {
@@ -37,6 +36,7 @@ export class ChurchAnimations
             pin: mapPin,
             lat: parseInt(mapPin.attr('Latitude')),
             long: parseInt(mapPin.attr('Longitude')),
+            div: mapPin.parent('div'),
           };
         } catch (e) {
           console.error(e);
