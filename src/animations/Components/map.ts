@@ -44,12 +44,18 @@ export class LeafletMapComponent
   private static _shadow = 'drop-shadow(2px 7px 15px rgba(0, 0, 0, 0.4))';
   private _shadowAnimation: gsap.core.Tween;
   private _leaderLines?: LeaderLine[];
-  private _mapPins?: { pin: JQuery<HTMLElement>; lat: number; long: number }[];
+  private _mapPins?: {
+    pin: JQuery<HTMLElement>;
+    lat: number;
+    long: number;
+    div?: JQuery<HTMLElement>;
+  }[];
   private _leaderLineTarget?: JQuery<HTMLElement>;
   private _fill: (feature: any) => string;
   private _className?: (feature: any) => string;
   private _color: string;
   private _zoomControlOptions: ZoomControlOptions;
+  private _markers: { marker: leaflet.Marker; div: JQuery<HTMLElement> }[] = [];
 
   constructor(
     mapElement: JQuery<HTMLElement>,
@@ -57,7 +63,7 @@ export class LeafletMapComponent
     color: string,
     zoomControlOptions: ZoomControlOptions,
     gsapAnimations: GsapAnimations,
-    mapPin?: { pin: JQuery<HTMLElement>; lat: number; long: number }[],
+    mapPin?: { pin: JQuery<HTMLElement>; lat: number; long: number; div?: JQuery<HTMLElement> }[],
     className?: (feature: any) => string,
     leaderLineTarget?: JQuery<HTMLElement>
   ) {
@@ -127,9 +133,20 @@ export class LeafletMapComponent
           html: pinObject.pin[0],
         });
 
-        leaflet.marker([pinObject.lat, pinObject.long], { icon: marker }).addTo(this._map);
+        const newMarker = leaflet
+          .marker([pinObject.lat, pinObject.long], { icon: marker })
+          .addTo(this._map);
+
+        if (pinObject.div) {
+          this._markers.push({
+            marker: newMarker,
+            div: pinObject.div,
+          });
+        }
       }
     }
+
+    this.onMouseEnterHandler.handler(this);
   };
 
   supportAnimations = GlobalPageAnimations;
@@ -148,7 +165,7 @@ export class LeafletMapComponent
     }
     this.onResizeHandler.dispose();
     this.onMouseEnterHandler.dispose(this);
-    this.onMouseLeaveHandler.dispose();
+    this.onMouseLeaveHandler.dispose(this);
   };
 
   private animateLeaderLines = (): void => {
@@ -206,47 +223,70 @@ export class LeafletMapComponent
   };
 
   onMouseEnterHandler = {
-    handler(self: LeafletMapComponent, e: any, _feature: any) {
-      const layer = e.target;
+    handler(self: LeafletMapComponent, e?: any, _feature?: any) {
+      if (e) {
+        const layer = e.target;
 
-      layer.setStyle({
-        weight: 5,
-        fillColor: self._color,
-        dashArray: '0',
-        fillOpacity: 0.7,
-      });
+        layer.setStyle({
+          weight: 5,
+          fillColor: self._color,
+          dashArray: '0',
+          fillOpacity: 0.7,
+        });
 
-      layer.bringToFront();
+        layer.bringToFront();
 
-      self._shadowAnimation = gsap.to(layer._path, { filter: LeafletMapComponent._shadow });
+        self._shadowAnimation = gsap.to(layer._path, { filter: LeafletMapComponent._shadow });
 
-      self.gsapComponentAnimations.newItem(self._shadowAnimation);
+        self.gsapComponentAnimations.newItem(self._shadowAnimation);
+      } else {
+        for (const [i, { marker, div }] of self._markers.entries()) {
+          marker.on('mousover', () => {
+            div.filter((_, elem) => elem !== self._mapPins[i].pin[0]).css({ display: 'flex' });
+          });
+        }
+      }
     },
     dispose(self: LeafletMapComponent) {
       self.gsapComponentAnimations.clearAnimation(self._shadowAnimation);
+      for (const { marker } of self._markers) {
+        marker.off('mousover');
+      }
     },
   };
 
   onMouseLeaveHandler = {
     handler(self: LeafletMapComponent, e: any, feature: any) {
-      const layer = e.target;
+      if (e) {
+        const layer = e.target;
 
-      layer.setStyle({
-        fillColor: self._fill(feature),
-        weight: 2,
-        opacity: 1,
-        color: self._color,
-        dashArray: '0',
-        fillOpacity: 0.7,
-      });
+        layer.setStyle({
+          fillColor: self._fill(feature),
+          weight: 2,
+          opacity: 1,
+          color: self._color,
+          dashArray: '0',
+          fillOpacity: 0.7,
+        });
 
-      self.onMouseEnterHandler.dispose(self);
+        self.onMouseEnterHandler.dispose(self);
 
-      layer._path.style.filter = 'none';
+        layer._path.style.filter = 'none';
 
-      layer.bringToFront();
+        layer.bringToFront();
+      } else {
+        for (const [i, { marker, div }] of self._markers.entries()) {
+          marker.on('mouseleave', () => {
+            div.filter((_, elem) => elem !== self._mapPins[i].pin[0]).css({ display: 'none' });
+          });
+        }
+      }
     },
-    dispose() {},
+    dispose(self: LeafletMapComponent) {
+      for (const { marker } of self._markers) {
+        marker.off('mouseleave');
+      }
+    },
   };
 
   public animateMap = (): void => {
