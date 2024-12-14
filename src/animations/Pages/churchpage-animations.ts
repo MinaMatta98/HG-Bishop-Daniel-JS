@@ -28,6 +28,8 @@ export class ChurchAnimations
   ): { pin: JQuery<HTMLElement>; lat: number; long: number }[] {
     const pins = this.pageElements.el[key];
 
+    console.log(pins);
+
     return pins
       .map((_, pin) => {
         try {
