@@ -92,7 +92,7 @@ export class GlobeAnimation
       )
       .width(this.setSize() * this._RATIO)
       .height(this.setSize() * this._RATIO)
-      .backgroundColor('#ffffff00')
+      .backgroundColor('#1098ff00')
       .pointsMerge(true);
   };
 
