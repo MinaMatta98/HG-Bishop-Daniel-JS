@@ -14,7 +14,7 @@ export class GsapAnimations implements IGsapAnimations {
 
   public gsapTargets?: PageElements<readonly string[]>;
 
-  public tweens: Partial<gsap.core.Animation>[] = [];
+  public tweens: Partial<gsap.core.Animation | ScrollTrigger>[] = [];
 
   constructor(
     gsapTargets?: PageElements<readonly string[]>,
@@ -24,7 +24,7 @@ export class GsapAnimations implements IGsapAnimations {
     this.gsapTargets = gsapTargets;
   }
 
-  public newItem(tween: Partial<gsap.core.Animation>) {
+  public newItem(tween: Partial<gsap.core.Animation | ScrollTrigger>) {
     this.tweens.push(tween);
   }
 
