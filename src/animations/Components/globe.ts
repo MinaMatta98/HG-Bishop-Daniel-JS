@@ -86,7 +86,7 @@ export class GlobeAnimation
           })
         )
         .width(this.setSize() * this._RATIO)
-        //.height(this.pageElements.el.webGL.height() * this._RATIO)
+        .height(this.setSize() * this._RATIO)
         .backgroundColor('#ffffff00')
         .pointsMerge(true)
     );
@@ -311,7 +311,6 @@ export class GlobeAnimation
     $(async () => {
       if (this._GLOBE === null) {
         this.initElements();
-
         this._GLOBE = this.initGlobe();
       }
 
