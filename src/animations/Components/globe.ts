@@ -65,31 +65,29 @@ export class GlobeAnimation
   };
 
   private initGlobe = (): GlobeInstance => {
-    return (
-      Globe({
-        rendererConfig: {
-          powerPreference: 'low-power',
-          antialias: false,
-          precision: 'lowp',
-        },
-      })
-        .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-        .globeMaterial(
-          new MeshPhysicalMaterial({
-            color: 0xebeef5,
-            reflectivity: 1,
-            roughness: 0,
-            iridescence: 2,
-            clearcoat: 0.1,
-            emissive: 0xebeef5,
-            emissiveIntensity: 0.5,
-          })
-        )
-        .width(this.setSize() * this._RATIO)
-        .height(this.setSize() * this._RATIO)
-        .backgroundColor('#ffffff00')
-        .pointsMerge(true)
-    );
+    return Globe({
+      rendererConfig: {
+        powerPreference: 'low-power',
+        antialias: false,
+        precision: 'lowp',
+      },
+    })
+      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+      .globeMaterial(
+        new MeshPhysicalMaterial({
+          color: 0xebeef5,
+          reflectivity: 1,
+          roughness: 0,
+          iridescence: 2,
+          clearcoat: 0.1,
+          emissive: 0xebeef5,
+          emissiveIntensity: 0.5,
+        })
+      )
+      .width(this.setSize() * this._RATIO)
+      .height(this.setSize() * this._RATIO)
+      .backgroundColor('#ffffff00')
+      .pointsMerge(true);
   };
 
   public disposePageAnimations = () => {
@@ -193,7 +191,9 @@ export class GlobeAnimation
   };
 
   private addAtmosphere = () => {
-    this._GLOBE = this._GLOBE.atmosphereColor('white').atmosphereAltitude(0.4);
+    const width = this.setSize() * this._RATIO;
+    this._GLOBE = this._GLOBE.atmosphereColor('white');
+    width < 445 ? this._GLOBE.atmosphereAltitude(0.1) : this._GLOBE.atmosphereAltitude(0.1);
   };
 
   private addHexPolygonData = () => {
