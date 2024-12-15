@@ -1,9 +1,10 @@
 import Globe, { type GlobeInstance } from 'globe.gl';
-import gsap from 'gsap/all';
+import gsap, { ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
 import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
 import type { GsapAnimations, IGsapComponentAnimations } from 'src/interfaces/IGsapPageAnimations';
 import { GsapComponentAnimations } from 'src/interfaces/IGsapPageAnimations';
+import type { IMouseEventAnimations } from 'src/interfaces/IMouseEventAnimations';
 import { GlobalPageAnimations } from 'src/interfaces/IPageAnimations';
 import { PageElements } from 'src/interfaces/IPageAnimations';
 import type { IResizePageAnimations } from 'src/interfaces/IResizePageAnimations';
@@ -14,8 +15,13 @@ import countries from '../../public/custom.geo.json';
 //import { CursorAnimations } from '../UI/cursor-animations';
 
 export class GlobeAnimation
-  implements IGsapComponentAnimations, IDisposableAnimations, IResizePageAnimations
+  implements
+    IGsapComponentAnimations,
+    IDisposableAnimations,
+    IResizePageAnimations,
+    IMouseEventAnimations
 {
+  private EL = ['#webGL', '.globe-svg', '.ministry-wrapper'] as const;
   private _RATIO = 0.95;
   private _ARC_REL_LEN = 0.4;
   private _FLIGHT_TIME = 1000;
@@ -58,10 +64,10 @@ export class GlobeAnimation
 
   gsapComponentAnimations: GsapComponentAnimations;
 
-  pageElements: PageElements<readonly ['#webGL', '.globe-svg', '.ministry-wrapper']>;
+  pageElements: PageElements<typeof this.EL>;
 
   initElements = () => {
-    this.pageElements = new PageElements(['#webGL', '.globe-svg', '.ministry-wrapper'] as const);
+    this.pageElements = new PageElements(this.EL);
   };
 
   private initGlobe = (): GlobeInstance => {
@@ -314,6 +320,7 @@ export class GlobeAnimation
         this._GLOBE = this.initGlobe();
       }
 
+      this._GLOBE.pauseAnimation();
       this.addArcsData();
       this.addAtmosphere();
       this.addHexPolygonData();
@@ -325,6 +332,30 @@ export class GlobeAnimation
       this.initControls();
       this.onResizeHandler.handler(this, c);
     });
+  };
+
+  onScrollEventHandler = {
+    handler: (self: this) => {
+      const tween = ScrollTrigger.create({
+        trigger: self.pageElements.el.webGL,
+        start: 'top 70%',
+        end: 'bottom 0%',
+        onEnter: () => {
+          this._GLOBE.resumeAnimation();
+        },
+        onLeave: () => {
+          this._GLOBE.pauseAnimation();
+        },
+        onLeaveBack: () => {
+          this._GLOBE.resumeAnimation();
+        },
+        onEnterBack: () => {
+          this._GLOBE.resumeAnimation();
+        },
+      });
+      this.gsapComponentAnimations.newItem(tween);
+    },
+    dispose: () => {},
   };
 
   onResizeHandler = {
