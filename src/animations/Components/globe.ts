@@ -100,8 +100,9 @@ export class GlobeAnimation
     if (this._GLOBE) this._GLOBE._destructor();
     this._GLOBE = null;
     if (this._timeout) clearTimeout(this._timeout);
-    this.gsapComponentAnimations.disposePageAnimations();
+    this.gsapComponentAnimations.gsapPageAnimations.disposePageAnimations();
     this.onResizeHandler.dispose();
+    this.onScrollEventHandler.dispose();
   };
 
   private emitArc = ({
@@ -320,7 +321,6 @@ export class GlobeAnimation
         this._GLOBE = this.initGlobe();
       }
 
-      this._GLOBE.pauseAnimation();
       this.addArcsData();
       this.addAtmosphere();
       this.addHexPolygonData();
@@ -331,31 +331,39 @@ export class GlobeAnimation
       const c = this._GLOBE(this.pageElements.el.webGL[0]);
       this.initControls();
       this.onResizeHandler.handler(this, c);
+      this.onScrollEventHandler.handler(this);
+
+      this._GLOBE.pauseAnimation();
     });
   };
 
   onScrollEventHandler = {
     handler: (self: this) => {
-      const tween = ScrollTrigger.create({
-        trigger: self.pageElements.el.webGL,
-        start: 'top 70%',
-        end: 'bottom 0%',
-        onEnter: () => {
-          this._GLOBE.resumeAnimation();
-        },
-        onLeave: () => {
-          this._GLOBE.pauseAnimation();
-        },
-        onLeaveBack: () => {
-          this._GLOBE.resumeAnimation();
-        },
-        onEnterBack: () => {
-          this._GLOBE.resumeAnimation();
-        },
+      $(() => {
+        const tween = ScrollTrigger.create({
+          trigger: self.pageElements.el.webGL,
+          start: 'top 80%',
+          end: 'bottom 0%',
+          scrub: 1,
+          onEnter: () => {
+            this._GLOBE.resumeAnimation();
+          },
+          onLeave: () => {
+            this._GLOBE.pauseAnimation();
+          },
+          onLeaveBack: () => {
+            this._GLOBE.pauseAnimation();
+          },
+          onEnterBack: () => {
+            this._GLOBE.resumeAnimation();
+          },
+        });
+        this.gsapComponentAnimations.newItem(tween);
       });
-      this.gsapComponentAnimations.newItem(tween);
     },
-    dispose: () => {},
+    dispose: () => {
+      ScrollTrigger.killAll();
+    },
   };
 
   onResizeHandler = {
