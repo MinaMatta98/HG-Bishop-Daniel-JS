@@ -174,5 +174,5 @@ input[type="password"],
 }
 
 video {
-	margin: 0;
+	margin: auto 0 !important;
 }
