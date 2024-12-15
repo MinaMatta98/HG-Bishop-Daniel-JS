@@ -20,28 +20,30 @@ import type { IResizePageAnimations } from 'src/interfaces/IResizePageAnimations
 
 import { LeafletMapComponent } from '../Components/map';
 
+const elem = [
+  '.churches-content',
+  '.churches-content-subheading',
+  '.church-content-cta',
+  '.churches-content-images',
+  '.map-pin',
+  '.find-us',
+  '.loc-invitation',
+  '.loc-content',
+  '.church-content-hero-section',
+  '.map',
+  '.timeline',
+  '.timeline__content',
+] as const;
+
+type K = typeof elem;
+
 export class ChurchContentAnimations
   implements
     IResizePageAnimations,
     IDisposableAnimations,
     IGsapPageAnimations,
     IMouseEventAnimations,
-    ICMSPageAnimations<
-      readonly [
-        '.churches-content',
-        '.churches-content-subheading',
-        '.church-content-cta',
-        '.churches-content-images',
-        '.map-pin',
-        '.find-us',
-        '.loc-invitation',
-        '.loc-content',
-        '.church-content-hero-section',
-        '.map',
-        '.timeline',
-        '.timeline__content',
-      ]
-    >
+    ICMSPageAnimations<K>
 {
   genericCMSAnimations: GenericCMSPageAnimations = new GenericCMSPageAnimations();
 
@@ -75,22 +77,7 @@ export class ChurchContentAnimations
     },
   };
 
-  pageElements: PageElements<
-    readonly [
-      '.churches-content',
-      '.churches-content-subheading',
-      '.church-content-cta',
-      '.churches-content-images',
-      '.map-pin',
-      '.find-us',
-      '.loc-invitation',
-      '.loc-content',
-      '.church-content-hero-section',
-      '.map',
-      '.timeline',
-      '.timeline__content',
-    ]
-  >;
+  pageElements: PageElements<K>;
 
   supportAnimations: typeof GlobalPageAnimations;
 
@@ -132,20 +119,7 @@ export class ChurchContentAnimations
 
     this.gsapAnimations = new GsapAnimations();
 
-    this.pageElements = new PageElements([
-      '.churches-content',
-      '.churches-content-subheading',
-      '.church-content-cta',
-      '.churches-content-images',
-      '.map-pin',
-      '.find-us',
-      '.loc-invitation',
-      '.loc-content',
-      '.church-content-hero-section',
-      '.map',
-      '.timeline',
-      '.timeline__content',
-    ] as const);
+    this.pageElements = new PageElements(elem);
 
     this.mapPinCoordinates('mapPin');
 
@@ -160,8 +134,6 @@ export class ChurchContentAnimations
     this.initializeBaseState();
 
     const zoom = () => Math.min(($('.loc-grid').width() / 1366.1) * 4.2, 4.2);
-
-    console.log(this._lat, this._long);
 
     this._map = new LeafletMapComponent(
       this.pageElements.el.map,

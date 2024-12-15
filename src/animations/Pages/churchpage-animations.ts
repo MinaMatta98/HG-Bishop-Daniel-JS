@@ -3,6 +3,7 @@ import 'leaflet/dist/leaflet.css';
 import $ from 'jquery';
 import type { ICMSPageAnimations } from 'src/interfaces/ICMSPageAnimations';
 import { GenericCMSPageAnimations } from 'src/interfaces/ICMSPageAnimations';
+import { GenericCollectionAnimations } from 'src/interfaces/ICollectionAnimations';
 import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
 import type { IGsapPageAnimations } from 'src/interfaces/IGsapPageAnimations';
 import { GsapAnimations } from 'src/interfaces/IGsapPageAnimations';
@@ -13,22 +14,29 @@ import type { IResizePageAnimations } from 'src/interfaces/IResizePageAnimations
 
 import { LeafletMapComponent } from '../Components/map';
 
+const elem = ['#map', '.map-pin'] as const;
+
+const itemElem = ['.item', '.filler', '.item-grid', ...elem] as const;
+
+type T = typeof elem;
+
+type K = typeof itemElem;
+
 export class ChurchAnimations
+  extends GenericCollectionAnimations<T>
   implements
     IGsapPageAnimations,
     IDisposableAnimations,
     IMouseEventAnimations,
     IResizePageAnimations,
-    ICMSPageAnimations<readonly ['#map', '.item', '.map-pin']>
+    ICMSPageAnimations<K>
 {
-  genericCMSAnimations: GenericCMSPageAnimations;
+  genericCMSAnimations = new GenericCMSPageAnimations();
 
   mapPinCoordinates<K extends keyof ElementObjectProperties<typeof this.pageElements.keys>>(
     key: K
   ): { pin: JQuery<HTMLElement>; lat: number; long: number }[] {
     const pins = this.pageElements.el[key];
-
-    console.log('pins', pins);
 
     return pins
       .map((_, pin) => {
@@ -65,7 +73,7 @@ export class ChurchAnimations
 
   gsapAnimations: GsapAnimations;
 
-  pageElements: PageElements<readonly ['#map', '.item', '.map-pin']>;
+  pageElements: PageElements<K>;
 
   supportAnimations = GlobalPageAnimations;
 
@@ -112,7 +120,7 @@ export class ChurchAnimations
 
     this.gsapAnimations = new GsapAnimations();
 
-    this.pageElements = new PageElements(['#map', '.item', '.map-pin'] as const);
+    this.pageElements = new PageElements(itemElem);
 
     this.onMouseEnterHandler.handler(this);
 
