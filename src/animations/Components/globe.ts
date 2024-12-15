@@ -200,7 +200,7 @@ export class GlobeAnimation
   private addAtmosphere = () => {
     const width = this.setSize() * this._RATIO;
     this._GLOBE = this._GLOBE.atmosphereColor('white');
-    width < 445 ? this._GLOBE.atmosphereAltitude(2) : this._GLOBE.atmosphereAltitude(0.4);
+    width < 445 ? this._GLOBE.atmosphereAltitude(0.01) : this._GLOBE.atmosphereAltitude(0.4);
   };
 
   private addHexPolygonData = () => {
