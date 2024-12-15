@@ -137,6 +137,41 @@ export class GenericAnimations implements IGenericAnimations {
     await this.globalPageAnimations.navBarAnimations.underlineNav(obj.data.next.namespace, true);
 
     this.globalPageAnimations.cursorAnimations.cursorHover();
+    this.checkElementsOverflowing();
+  };
+
+  checkElementsOverflowing = () => {
+    // Select all elements
+    const elements = document.querySelectorAll<HTMLElement>('*');
+    const oversizeElements: {
+      element: HTMLElement;
+      width: number;
+      xStart: number;
+      xEnd: number;
+    }[] = [];
+
+    elements.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      const { width } = rect;
+      const xStart = rect.left;
+      const xEnd = rect.right;
+
+      // Check if the element's width is larger than 100vw or if it sticks out
+      if (width > window.innerWidth || xStart < 0 || xEnd > window.innerWidth) {
+        oversizeElements.push({
+          element: el,
+          width,
+          xStart,
+          xEnd,
+        });
+      }
+    });
+
+    if (oversizeElements.length) {
+      console.log('Oversized or overflowing elements:', oversizeElements);
+    } else {
+      console.log('No elements stick out or exceed 100vw.');
+    }
   };
 }
 
