@@ -10,6 +10,7 @@ import { NavBarAnimations } from 'src/animations/UI/navbar-animations';
 import { TOCAnimations } from 'src/animations/UI/toc';
 
 import type { ICMSPageAnimations } from './ICMSPageAnimations';
+import type { ICollectionAnimations } from './ICollectionAnimations';
 import type { ICssAnimations } from './ICssAnimations';
 import type { IDisposableAnimations } from './IDisposableAnimations';
 import type { IElementsAnimations } from './IElementsAnimations';
@@ -111,8 +112,13 @@ export class GenericAnimations implements IGenericAnimations {
     obj.cssTransClass?.unloadCss();
   }
 
-  after = async (obj: { data: ITransitionData }) => {
+  after = async <CL extends ICollectionAnimations<any>>(obj: {
+    data: ITransitionData;
+    collectionTransClass?: CL;
+  }) => {
     this.globalPageAnimations.tocAnimations.animateComponent();
+
+    await obj.collectionTransClass?.animateFillers();
 
     switch (obj.data.next.namespace.toString()) {
       case 'sermons-content':

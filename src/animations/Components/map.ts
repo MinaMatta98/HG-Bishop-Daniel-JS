@@ -55,7 +55,7 @@ export class LeafletMapComponent
   private _className?: (feature: any) => string;
   private _color: string;
   private _zoomControlOptions: ZoomControlOptions;
-  private _markers: { marker: leaflet.Marker; div: JQuery<HTMLElement> }[] = [];
+  private _markers: { marker: JQuery<HTMLElement>; div: JQuery<HTMLElement> }[] = [];
 
   constructor(
     mapElement: JQuery<HTMLElement>,
@@ -78,6 +78,7 @@ export class LeafletMapComponent
     console.log(this._mapPins);
     this._leaderLineTarget = leaderLineTarget;
     this.animateComponent();
+    this.initializeBaseState();
     this.animateLeaderLines();
   }
 
@@ -129,25 +130,32 @@ export class LeafletMapComponent
     });
 
     if (this._mapPins) {
-      for (const pinObject of this._mapPins) {
+      for (const { div, lat, long, pin } of this._mapPins) {
         const marker = new leaflet.DivIcon({
-          html: pinObject.pin[0],
+          html: div ? div[0] : pin[0],
         });
 
-        const newMarker = leaflet
-          .marker([pinObject.lat, pinObject.long], { icon: marker })
-          .addTo(this._map);
+        const newMarker = leaflet.marker([lat, long], { icon: marker }).addTo(this._map);
 
-        if (pinObject.div) {
+        if (div) {
           this._markers.push({
-            marker: newMarker,
-            div: pinObject.div,
+            marker: $(newMarker.getElement()).find('.map-pin'),
+            div,
           });
         }
       }
     }
 
     this.onMouseEnterHandler.handler(this);
+    this.onMouseLeaveHandler.handler(this);
+  };
+
+  initializeBaseState = () => {
+    for (const { div, pin } of this._mapPins) {
+      if (div) {
+        this.hide(div, pin);
+      }
+    }
   };
 
   supportAnimations = GlobalPageAnimations;
@@ -241,9 +249,16 @@ export class LeafletMapComponent
 
         self.gsapComponentAnimations.newItem(self._shadowAnimation);
       } else {
-        for (const [i, { marker, div }] of self._markers.entries()) {
-          marker.on('mousover', () => {
-            div.filter((_, elem) => elem !== self._mapPins[i].pin[0]).css({ display: 'flex' });
+        for (const { div } of self._markers) {
+          const pin = div.find('.map-pin');
+          $(div).on('mouseenter', () => {
+            div.css({ height: '30em', width: '25em', padding: '1em', overflow: 'visible' });
+            div
+              .children()
+              .filter((_, elem) => elem !== pin[0])
+              .each((_, e) => {
+                $(e).css({ display: 'block' });
+              });
           });
         }
       }
@@ -251,13 +266,23 @@ export class LeafletMapComponent
     dispose(self: LeafletMapComponent) {
       self.gsapComponentAnimations.clearAnimation(self._shadowAnimation);
       for (const { marker } of self._markers) {
-        marker.off('mousover');
+        $(marker).off('mousover');
       }
     },
   };
 
+  private hide = (div: JQuery<HTMLElement>, pin: JQuery<HTMLElement>) => {
+    div.css({ height: 0, width: 0, padding: 0, overflow: 'visible' });
+    div
+      .children()
+      .filter((_, elem) => elem !== pin[0])
+      .each((_, e) => {
+        $(e).css({ display: 'none' });
+      });
+  };
+
   onMouseLeaveHandler = {
-    handler(self: LeafletMapComponent, e: any, feature: any) {
+    handler(self: LeafletMapComponent, e?: any, feature?: any) {
       if (e) {
         const layer = e.target;
 
@@ -276,16 +301,17 @@ export class LeafletMapComponent
 
         layer.bringToFront();
       } else {
-        for (const [i, { marker, div }] of self._markers.entries()) {
-          marker.on('mouseleave', () => {
-            div.filter((_, elem) => elem !== self._mapPins[i].pin[0]).css({ display: 'none' });
+        for (const { div } of self._markers) {
+          const pin = div.find('.map-pin');
+          $(div).on('mouseleave', () => {
+            self.hide(div, pin);
           });
         }
       }
     },
     dispose(self: LeafletMapComponent) {
       for (const { marker } of self._markers) {
-        marker.off('mouseleave');
+        $(marker).off('mouseleave');
       }
     },
   };

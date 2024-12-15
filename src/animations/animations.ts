@@ -1,5 +1,6 @@
 import type { ISchemaPage, ITransitionData } from '@barba/core/dist/core/src/src/defs';
 import { instanceofICMSPageAnimations } from 'src/interfaces/ICMSPageAnimations';
+import { instanceofICollectionAnimations } from 'src/interfaces/ICollectionAnimations';
 import { instanceofICssAnimations } from 'src/interfaces/ICssAnimations';
 import { instanceofIDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
 import { instanceofIGsapPageAnimations } from 'src/interfaces/IGsapPageAnimations';
@@ -59,10 +60,12 @@ export class Animations implements IGenericTransitions, IComplexTransitions {
         cssTransClass: instanceofICssAnimations(animator) ? animator : null,
         cmsTransClass: instanceofICMSPageAnimations(animator) ? animator : null,
       }),
-    after: async (data) =>
-      await this.globalPageAnimations.genericAnimations.after({
+    after: async (data, animator) => {
+      return await this.globalPageAnimations.genericAnimations.after({
         data,
-      }),
+        collectionTransClass: instanceofICollectionAnimations(animator) ? animator : null,
+      });
+    },
     before: async (data) =>
       await this.globalPageAnimations.genericAnimations.before({
         data,
@@ -129,7 +132,6 @@ export class Animations implements IGenericTransitions, IComplexTransitions {
     const animator = Animations._animators.find((animator) => animator.namespace === namespace);
 
     if (fnObj.generic && this.handlers[fnObj.generic]) {
-      console.log(instanceofICMSPageAnimations(animator));
       await this.handlers[fnObj.generic](data, animator);
     }
 

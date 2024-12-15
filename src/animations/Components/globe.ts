@@ -25,10 +25,18 @@ export class GlobeAnimation
   private _currentPolygon: object;
   private prevCoords = { lat: 0, lng: 0 };
   private _GLOBE: GlobeInstance;
-  private _size: { innerHeight: number; innerWidth: number };
   private _timeout: number;
   private _tl: GSAPTimeline;
   private _lightBG: boolean;
+
+  private setSize = (): number => {
+    return Math.min(
+      this.pageElements.el.webGL.width(),
+      this.pageElements.el.webGL.height(),
+      $(window).innerWidth(),
+      $(window).innerHeight()
+    );
+  };
   /**
    *
    */
@@ -41,11 +49,6 @@ export class GlobeAnimation
       this.supportingAnimations = GlobalPageAnimations;
 
       this._GLOBE = this.initGlobe();
-
-      this._size = {
-        innerHeight: this.pageElements.el.webGL.width(),
-        innerWidth: this.pageElements.el.webGL.height(),
-      };
 
       this._lightBG = lightBg;
     });
@@ -82,7 +85,7 @@ export class GlobeAnimation
             emissiveIntensity: 0.5,
           })
         )
-        .width(this.pageElements.el.webGL.width() * this._RATIO)
+        .width(this.setSize() * this._RATIO)
         //.height(this.pageElements.el.webGL.height() * this._RATIO)
         .backgroundColor('#ffffff00')
         .pointsMerge(true)
@@ -309,11 +312,6 @@ export class GlobeAnimation
       if (this._GLOBE === null) {
         this.initElements();
 
-        this._size = {
-          innerHeight: this.pageElements.el.webGL.width(),
-          innerWidth: this.pageElements.el.webGL.height(),
-        };
-
         this._GLOBE = this.initGlobe();
       }
 
@@ -333,15 +331,8 @@ export class GlobeAnimation
   onResizeHandler = {
     handler(self: GlobeAnimation, c: GlobeInstance) {
       $(window).on('resize', () => {
-        self._size.innerWidth = self.pageElements.el.ministryWrapper.width();
-        self._size.innerHeight = self.pageElements.el.ministryWrapper.height();
-        const setSize = Math.min(
-          self._size.innerWidth,
-          self._size.innerHeight,
-          $(window).innerWidth(),
-          $(window).innerHeight()
-        );
         const renderer = c.renderer();
+        const setSize = self.setSize();
         renderer.setSize(setSize * self._RATIO, setSize * self._RATIO);
         c.width(setSize * self._RATIO);
         c.height(setSize * self._RATIO);

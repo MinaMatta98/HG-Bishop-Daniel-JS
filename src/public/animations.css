@@ -167,3 +167,8 @@ input[type="password"],
 	color: white !important;
 	background: var(--cursor-inner) !important;
 }
+
+.map-item-desc {
+	color: white !important;
+	justify-content: center !important;
+}
