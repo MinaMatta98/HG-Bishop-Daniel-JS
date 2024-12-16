@@ -22,6 +22,7 @@ import { MinistryPageAnimations } from './Pages/ministrypage-animations';
 import { ScheduleAnimations } from './Pages/schedule-animations';
 import { SermonPageAnimations } from './Pages/sermon-animations';
 import { SermonContentAnimations } from './Pages/sermoncontent-animations';
+import { UpdatePageAnimations } from './Pages/updates-animations';
 import type { Player } from './UI/Widgets/player';
 
 export class Animations implements IGenericTransitions, IComplexTransitions {
@@ -35,6 +36,7 @@ export class Animations implements IGenericTransitions, IComplexTransitions {
     new SermonContentAnimations(),
     new MinistryContentAnimations(),
     new ScheduleAnimations(),
+    new UpdatePageAnimations(),
   ];
 
   public globalPageAnimations = GlobalPageAnimations;
