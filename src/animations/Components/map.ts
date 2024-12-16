@@ -67,6 +67,7 @@ export class LeafletMapComponent
     className?: (feature: any) => string,
     leaderLineTarget?: JQuery<HTMLElement>
   ) {
+    console.log('called ctor');
     this._mapElement = mapElement;
     this._fill = fill;
     this._className = className;
@@ -83,6 +84,11 @@ export class LeafletMapComponent
   }
 
   gsapComponentAnimations: GsapComponentAnimations;
+
+  public off() {
+    this._map.remove();
+    this.disposePageAnimations();
+  }
 
   animateComponent = () => {
     const { _zoomControlOptions } = this;
@@ -151,11 +157,12 @@ export class LeafletMapComponent
   };
 
   initializeBaseState = () => {
-    for (const { div, pin } of this._mapPins) {
-      if (div) {
-        this.hide(div, pin);
+    if (this._mapPins)
+      for (const { div, pin } of this._mapPins) {
+        if (div) {
+          this.hide(div, pin);
+        }
       }
-    }
   };
 
   supportAnimations = GlobalPageAnimations;
