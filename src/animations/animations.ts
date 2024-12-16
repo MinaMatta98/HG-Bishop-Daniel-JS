@@ -133,12 +133,16 @@ export class Animations implements IGenericTransitions, IComplexTransitions {
   ): Promise<void> {
     const animator = Animations._animators.find((animator) => animator.namespace === namespace);
 
-    if (fnObj.generic && this.handlers[fnObj.generic]) {
-      await this.handlers[fnObj.generic](data, animator);
-    }
+    try {
+      if (fnObj.generic && this.handlers[fnObj.generic]) {
+        await this.handlers[fnObj.generic](data, animator);
+      }
 
-    if (fnObj.complex && animator[fnObj.complex]) {
-      await animator[fnObj.complex](data, ...any);
+      if (fnObj.complex && animator[fnObj.complex]) {
+        await animator[fnObj.complex](data, ...any);
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 
