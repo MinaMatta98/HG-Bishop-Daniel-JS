@@ -19,7 +19,7 @@ export class UpdatePageAnimations
 
   gsapAnimations: GsapAnimations;
 
-  private _el = ['.section-glow', '.item-section', '.webgl'] as const;
+  private _el = ['.item-section'] as const;
 
   //onMouseEnterHandler = {
   //  handler(self: UpdatePageAnimations) {
@@ -100,7 +100,7 @@ export class UpdatePageAnimations
   afterEnter = async (_data: ITransitionData) => {
     $(async () => {
       this.initElements();
-      this.supportAnimations.navBarAnimations.animateScrollButton(this.pageElements.el.webgl!);
+      this.supportAnimations.navBarAnimations.animateScrollButton(this.pageElements.el.itemSection);
       this.supportAnimations.logoAnimations.animateLogo();
       await this.initializeBaseState();
       //this.onMouseEnterHandler.handler(this);
