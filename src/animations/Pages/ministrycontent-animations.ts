@@ -11,6 +11,7 @@ import type { IMouseEventAnimations } from 'src/interfaces/IMouseEventAnimations
 import type { IPageAnimations } from 'src/interfaces/IPageAnimations';
 import { PageElements } from 'src/interfaces/IPageAnimations';
 import { GlobalPageAnimations } from 'src/interfaces/IPageAnimations';
+
 import { LeafletMapComponent } from '../Components/map';
 
 export class MinistryContentAnimations
@@ -215,6 +216,9 @@ export class MinistryContentAnimations
 
     this.supportAnimations.logoAnimations.animateLogo();
 
+    const zoom = () =>
+      Math.max(Math.min((this.pageElements.el.map.width() / 1360.0) * 5.0, 5.0), 3.7);
+
     this._map = new LeafletMapComponent(
       this.pageElements.el.map,
       (feature: any) =>
@@ -222,15 +226,15 @@ export class MinistryContentAnimations
       '#ffffff',
       {
         zoomControl: false,
-        zoom: 3.8,
-        minZoom: 3.8,
-        maxZoom: 3.8,
+        zoom,
+        minZoom: zoom,
+        maxZoom: zoom,
         dragging: false,
         scrollWheelZoom: false,
       },
       this.gsapAnimations,
+      [{ pin: this.pageElements.el.mapPin, lat: -33.8688, long: 151.2093 }],
       (feature: any) => (feature.properties.STATE_NAME === this._targetState ? 'active-layer' : ''),
-      this.pageElements.el.mapPin,
       this.pageElements.el.locInvitation
     );
 

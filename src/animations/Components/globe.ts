@@ -97,8 +97,10 @@ export class GlobeAnimation
   };
 
   public disposePageAnimations = (clearAnimations = true) => {
-    if (this._GLOBE) this._GLOBE._destructor();
-    this._GLOBE = null;
+    if (this._GLOBE) {
+      this._GLOBE._destructor();
+      this._GLOBE = null;
+    }
     if (this._timeout) clearTimeout(this._timeout);
     if (clearAnimations) this.gsapComponentAnimations.gsapPageAnimations.disposePageAnimations();
     this.onResizeHandler.dispose();
@@ -107,7 +109,7 @@ export class GlobeAnimation
 
   public destructor = () => {
     this._GLOBE._destructor();
-    this._GLOBE = null;
+    if (this._GLOBE) this._GLOBE = null;
     if (this._timeout) clearTimeout(this._timeout);
     this.gsapComponentAnimations.gsapPageAnimations.disposePageAnimations();
     this.onScrollEventHandler.dispose();
