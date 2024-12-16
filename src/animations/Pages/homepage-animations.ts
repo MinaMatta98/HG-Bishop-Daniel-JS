@@ -22,6 +22,7 @@ import type { IResizePageAnimations } from 'src/interfaces/IResizePageAnimations
 import Swiper from 'swiper/bundle';
 
 import { GlobeAnimation } from '../Components/globe';
+import { LeafletMapComponent } from '../Components/map';
 
 class NewsAnimations implements IGsapComponentAnimations {
   pageElements: PageElements<
@@ -107,7 +108,7 @@ export class HomePageAnimations
     IMouseEventAnimations,
     IDisposableAnimations
 {
-  private _globeAnimation: GlobeAnimation;
+  private _globeAnimation: GlobeAnimation | LeafletMapComponent;
 
   private _globeTL: GSAPTween;
 
@@ -122,6 +123,7 @@ export class HomePageAnimations
   pageElements: PageElements<
     readonly [
       '.pageload',
+      '#webGL',
       '.globe-container',
       '.sticky-image-container',
       '.opening-hero',
@@ -212,16 +214,28 @@ export class HomePageAnimations
   };
 
   private initGlobe = () => {
-    this._globeAnimation.animateComponent();
+    if (this._globeAnimation instanceof GlobeAnimation) this._globeAnimation.animateComponent();
+
     this.gsapGlobeContainerExpand();
-    this._globeAnimation.animateGlobeBlock();
+
+    if (this._globeAnimation instanceof GlobeAnimation) this._globeAnimation.animateGlobeBlock();
   };
 
   onResizeHandler = {
     handler: () => {
       $(window).on('resize', () => {
         this.gsapGlobeContainerExpand();
-        this._globeAnimation.animateGlobeBlock();
+        const width = $(window).width();
+
+        if (
+          (width >= 480 && this._globeAnimation instanceof LeafletMapComponent) ||
+          (width < 480 && this._globeAnimation instanceof GlobeAnimation)
+        ) {
+          this.dynamicPageAssignment();
+        }
+
+        if (this._globeAnimation instanceof GlobeAnimation)
+          this._globeAnimation.animateGlobeBlock();
       });
     },
     dispose: () => {
@@ -251,12 +265,10 @@ export class HomePageAnimations
     },
   };
 
-  initElements = () => {
+  partialInit = () => {
     this.supportAnimations = GlobalPageAnimations;
 
     this.gsapAnimations = new GsapAnimations();
-
-    this._globeAnimation = new GlobeAnimation(true, this.gsapAnimations);
 
     this._scheduleAnimator = new ScheduleAnimations(this.gsapAnimations);
 
@@ -266,6 +278,7 @@ export class HomePageAnimations
 
     this.pageElements = new PageElements([
       '.pageload',
+      '#webGL',
       '.globe-container',
       '.sticky-image-container',
       '.opening-hero',
@@ -277,9 +290,48 @@ export class HomePageAnimations
     ] as const);
   };
 
+  initElements = () => {
+    this.partialInit();
+
+    this.dynamicPageAssignment();
+  };
+
+  private dynamicPageAssignment = () => {
+    const zoom = () =>
+      Math.max(Math.min((this.pageElements.el.webGL.width() / 1360.0) * 5.0, 5.0), 3.7);
+
+    this.pageElements.el.webGL.empty();
+
+    if (this._globeAnimation?.['off']) {
+      this._globeAnimation['off']();
+    }
+
+    if (this._globeAnimation?.['destructor']) this._globeAnimation['destructor']();
+
+    if ($(window).width() >= 480) {
+      this._globeAnimation = new GlobeAnimation(true, this.gsapAnimations);
+      this.initGlobe();
+    } else {
+      this._globeAnimation = new LeafletMapComponent(
+        this.pageElements.el.webGL,
+        () => '#ffffff50',
+        '#ffffff',
+        {
+          zoom,
+          zoomControl: false,
+          maxZoom: zoom,
+          minZoom: zoom,
+          dragging: false,
+          scrollWheelZoom: false,
+        },
+        this.gsapAnimations
+      );
+    }
+  };
+
   once = async (_data: ITransitionData, isFirstLoad: boolean) => {
     $(async () => {
-      this.initElements();
+      this.partialInit();
 
       if (isFirstLoad) {
         const pageLoadTween = gsap.set(this.pageElements.el.pageload, { display: 'flex' });
@@ -304,9 +356,6 @@ export class HomePageAnimations
 
       this.supportAnimations.tocAnimations.animateComponent();
     });
-    //});
-    //});
-    //});
   };
 
   afterEnter = async (_data: ITransitionData, initTime: number) => {
@@ -316,8 +365,6 @@ export class HomePageAnimations
       this.supportAnimations.logoAnimations.logoAnimation();
 
       this.supportAnimations.navBarAnimations.initNavLinks();
-
-      this.initGlobe();
 
       this.onMouseEnterHandler.handler(this);
 

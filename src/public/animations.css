@@ -152,6 +152,10 @@ input[type="password"],
 	background: #1098ff;
 }
 
+#webGL.leaflet-container {
+	background: #1098ff;
+}
+
 .leaflet-marker-icon {
 	height: 0px !important;
 	width: 0px !important;
