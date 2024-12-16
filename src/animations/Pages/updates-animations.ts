@@ -87,7 +87,6 @@ export class UpdatePageAnimations
   private _globeAnimation: GlobeAnimation;
 
   initElements = () => {
-    this.namespace = 'ministry';
     this.gsapAnimations = new GsapAnimations();
     this.pageElements = new PageElements(this._el);
     this._globeAnimation = new GlobeAnimation(false, this.gsapAnimations);
