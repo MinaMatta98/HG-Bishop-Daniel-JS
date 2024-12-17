@@ -136,6 +136,8 @@ export class GenericAnimations implements IGenericAnimations {
 
     await this.globalPageAnimations.navBarAnimations.underlineNav(obj.data.next.namespace, true);
 
+    this.globalPageAnimations.navBarAnimations.onResizeHandler();
+
     this.globalPageAnimations.cursorAnimations.cursorHover();
   };
 }
