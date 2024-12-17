@@ -302,9 +302,7 @@ export class HomePageAnimations
 
     this.pageElements.el.webGL.empty();
 
-    if (this._globeAnimation?.['off']) {
-      this._globeAnimation['off']();
-    }
+    if (this._globeAnimation?.['off']) this._globeAnimation['off']();
 
     if (this._globeAnimation?.['destructor']) this._globeAnimation['destructor']();
 

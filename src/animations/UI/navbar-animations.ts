@@ -45,7 +45,12 @@ export class NavBarAnimations {
 
   onResizeHandler = () => {
     $(window).on('resize', () => {
-      $('.navbar.container').width('100%');
+      const obj = {
+        width: '100%',
+        display: $(window).width() > 991 ? 'flex' : undefined,
+      };
+
+      $('.navbar > .container').css(obj);
     });
   };
 

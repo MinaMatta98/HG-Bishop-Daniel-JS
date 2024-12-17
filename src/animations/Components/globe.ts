@@ -34,6 +34,7 @@ export class GlobeAnimation
   private _timeout: number;
   private _tl: GSAPTimeline;
   private _lightBG: boolean;
+  private _scrollTween: ScrollTrigger;
 
   private setSize = (): number => {
     return Math.min(
@@ -97,21 +98,21 @@ export class GlobeAnimation
   };
 
   public disposePageAnimations = (clearAnimations = true) => {
+    this.destructor();
+    if (clearAnimations) this.gsapComponentAnimations.gsapPageAnimations.disposePageAnimations();
+    this.onResizeHandler.dispose();
+  };
+
+  public destructor = () => {
+    if (this._timeout) clearTimeout(this._timeout);
+
     if (this._GLOBE) {
       this._GLOBE._destructor();
       this._GLOBE = null;
     }
-    if (this._timeout) clearTimeout(this._timeout);
-    if (clearAnimations) this.gsapComponentAnimations.gsapPageAnimations.disposePageAnimations();
-    this.onResizeHandler.dispose();
-    this.onScrollEventHandler.dispose();
-  };
 
-  public destructor = () => {
-    this._GLOBE._destructor();
-    if (this._GLOBE) this._GLOBE = null;
-    if (this._timeout) clearTimeout(this._timeout);
-    this.gsapComponentAnimations.gsapPageAnimations.disposePageAnimations();
+    if (this._timeout) this.gsapComponentAnimations.gsapPageAnimations.disposePageAnimations();
+
     this.onScrollEventHandler.dispose();
   };
 
@@ -147,7 +148,9 @@ export class GlobeAnimation
     // add and remove target rings
     setTimeout(() => {
       const targetRing = { lat: endLat, lng: endLng };
+
       this._GLOBE.ringsData([...this._GLOBE.ringsData(), targetRing]);
+
       setTimeout(
         () => this._GLOBE.ringsData(this._GLOBE.ringsData().filter((r) => r !== targetRing)),
         this._FLIGHT_TIME * this._ARC_REL_LEN
@@ -351,7 +354,7 @@ export class GlobeAnimation
   onScrollEventHandler = {
     handler: (self: this) => {
       $(() => {
-        const tween = ScrollTrigger.create({
+        this._scrollTween = ScrollTrigger.create({
           trigger: self.pageElements.el.webGL,
           start: 'top 80%',
           end: 'bottom 0%',
@@ -369,11 +372,14 @@ export class GlobeAnimation
             this._GLOBE.resumeAnimation();
           },
         });
-        this.gsapComponentAnimations.newItem(tween);
+        this.gsapComponentAnimations.newItem(this._scrollTween);
       });
     },
+    // This is automatically disposed on leave(), but must be implemented to disable scroll effects on resize if globe is disposed. Check IGenericAnimations
     dispose: () => {
-      ScrollTrigger.killAll();
+      if (this._scrollTween) {
+        this._scrollTween.kill();
+      }
     },
   };
 

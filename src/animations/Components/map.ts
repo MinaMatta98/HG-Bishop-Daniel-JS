@@ -67,7 +67,6 @@ export class LeafletMapComponent
     className?: (feature: any) => string,
     leaderLineTarget?: JQuery<HTMLElement>
   ) {
-    console.log('called ctor');
     this._mapElement = mapElement;
     this._fill = fill;
     this._className = className;
@@ -76,7 +75,6 @@ export class LeafletMapComponent
     this.gsapComponentAnimations = new GsapComponentAnimations(gsapAnimations);
     this._leaderLines = [];
     this._mapPins = mapPins;
-    console.log(this._mapPins);
     this._leaderLineTarget = leaderLineTarget;
     this.animateComponent();
     this.initializeBaseState();
@@ -86,8 +84,8 @@ export class LeafletMapComponent
   gsapComponentAnimations: GsapComponentAnimations;
 
   public off() {
-    this._map.remove();
     this.disposePageAnimations();
+    this._map.remove();
   }
 
   animateComponent = () => {
@@ -185,7 +183,7 @@ export class LeafletMapComponent
   };
 
   private animateLeaderLines = (): void => {
-    if (this._leaderLineTarget)
+    if (this._leaderLineTarget && this._mapPins)
       for (const lineEnd of this._leaderLineTarget) {
         const line = new LeaderLine(this._mapPins[0].pin[0], lineEnd, {
           color: '#ffffff',
@@ -204,7 +202,7 @@ export class LeafletMapComponent
     handler(self: LeafletMapComponent) {
       $(window).on('resize', () => {
         try {
-          for (const line of self._leaderLines) if (line) line.position();
+          if (self._leaderLines) for (const line of self._leaderLines) line?.position?.();
           self._map.invalidateSize();
           self._map.setMinZoom(self._zoomControlOptions.minZoom());
           self._map.setMaxZoom(self._zoomControlOptions.maxZoom());

@@ -19,7 +19,7 @@ export class MinistryPageAnimations
 {
   disposePageAnimations = () => {
     this.gsapAnimations.disposePageAnimations();
-    this._globeAnimation.disposePageAnimations();
+    this._globeAnimation.gsapComponentAnimations.disposePageAnimations();
   };
 
   gsapAnimations: GsapAnimations;
@@ -129,6 +129,5 @@ export class MinistryPageAnimations
   afterLeave = async () => {
     this.supportAnimations.cursorAnimations.cursorBlue();
     this.supportAnimations.footerAnimations.animateFooterWhite();
-    this.disposePageAnimations();
   };
 }

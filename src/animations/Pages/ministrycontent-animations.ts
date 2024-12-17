@@ -80,6 +80,7 @@ export class MinistryContentAnimations
 
   disposePageAnimations = () => {
     this.gsapAnimations.disposePageAnimations();
+    this._map.disposePageAnimations();
   };
 
   onMouseLeaveHandler = {
@@ -249,9 +250,5 @@ export class MinistryContentAnimations
     this.supportAnimations.navBarAnimations.animateScrollButton(
       this.pageElements.el.ministryContentHero
     );
-  };
-
-  afterLeave = async (_data: ITransitionData) => {
-    this.disposePageAnimations();
   };
 }
