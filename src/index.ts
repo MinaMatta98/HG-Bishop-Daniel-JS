@@ -4,7 +4,7 @@ import { barbaInit } from './barba';
 
 const containerSelector = '.main-wrapper';
 
-export const DOMAIN = 'https://hg-bishop-daniels-website.webflow.io/';
+export const DOMAIN = window.location.origin;
 
 const observer = new MutationObserver((mutationsList, observer) => {
   for (const mutation of mutationsList) {

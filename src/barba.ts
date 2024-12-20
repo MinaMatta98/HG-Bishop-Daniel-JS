@@ -81,7 +81,7 @@ export class barbaInit {
 
   public manualLoadRedirector = (): void => {
     // Timeout interval ensures no hanging on chrome browser engine
-    if (this.isFirstLoad && window.location.href !== DOMAIN) {
+    if (this.isFirstLoad && window.location.href !== DOMAIN + '/') {
       setTimeout(() => {
         console.warn('Redirecting due to illegal access');
         window.location.replace(DOMAIN);
