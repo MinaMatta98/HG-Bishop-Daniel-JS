@@ -438,7 +438,8 @@ class ScheduleAnimations implements IGsapComponentAnimations {
           end: 'bottom 50%',
           scrub: true,
           onEnter: () => {
-            const childTween = gsap.set(children[index], { display: 'block' });
+            console.log('onEnter');
+            const childTween = gsap.set(children[index], { display: 'flex' });
             const childTweenSec = gsap.from(children[index], {
               opacity: 0,
               duration: 1,
@@ -449,10 +450,16 @@ class ScheduleAnimations implements IGsapComponentAnimations {
             this.gsapComponentAnimations.newItems([childTween, childTweenSec, , childTweenLast]);
           },
           onLeave: () => {
+            console.log('onLeave');
             this.gsapComponentAnimations.newItem(gsap.set(children[index], { display: 'none' }));
           },
           onEnterBack: () => {
-            const childTween = gsap.set(children[index], { display: 'block' });
+            console.log('onEnterBack');
+            const childTween = gsap.set(children[index], {
+              display: 'flex',
+              flexDirection: index == 1 ? 'vertical' : null,
+              alignItems: index == 1 ? 'center' : null,
+            });
             const childTweenSec = gsap.from(children[index], {
               opacity: 0,
               duration: 1,
@@ -461,6 +468,9 @@ class ScheduleAnimations implements IGsapComponentAnimations {
             const neighbours = children.slice(0, index).extend(children.slice(index + 1));
             const childTweenLast = gsap.set(neighbours, { display: 'none' });
             this.gsapComponentAnimations.newItems([childTween, childTweenSec, childTweenLast]);
+          },
+          onLeaveBack: () => {
+            console.log('onLeaveBack');
           },
         },
         marginBottom: '20em',
