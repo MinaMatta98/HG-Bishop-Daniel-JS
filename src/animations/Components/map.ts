@@ -30,7 +30,7 @@ interface ZoomControlOptions {
   maxZoom: () => number;
   dragging: boolean;
   scrollWheelZoom: boolean;
-  tap?: false;
+  [key: string]: any;
 }
 
 export class LeafletMapComponent
@@ -73,7 +73,12 @@ export class LeafletMapComponent
     this._fill = fill;
     this._className = className;
     this._color = color;
-    zoomControlOptions.tap = false;
+    zoomControlOptions = {
+      ...zoomControlOptions,
+      touchZoom: false,
+      boxZoom: false,
+      doubleClickZoom: false,
+    };
     this._zoomControlOptions = zoomControlOptions;
     this.gsapComponentAnimations = new GsapComponentAnimations(gsapAnimations);
     this._leaderLines = [];
