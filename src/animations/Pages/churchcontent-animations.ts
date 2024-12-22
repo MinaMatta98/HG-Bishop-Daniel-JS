@@ -20,31 +20,29 @@ import type { IResizePageAnimations } from 'src/interfaces/IResizePageAnimations
 
 import { LeafletMapComponent } from '../Components/map';
 
-const elem = [
-  '.churches-content',
-  '.churches-content-subheading',
-  '.church-content-cta',
-  '.churches-content-images',
-  '.map-pin',
-  '.find-us',
-  '.loc-invitation',
-  '.loc-content',
-  '.church-content-hero-section',
-  '.map',
-  '.timeline',
-  '.timeline__content',
-] as const;
-
-type K = typeof elem;
-
 export class ChurchContentAnimations
   implements
     IResizePageAnimations,
     IDisposableAnimations,
     IGsapPageAnimations,
     IMouseEventAnimations,
-    ICMSPageAnimations<K>
+    ICMSPageAnimations
 {
+  EL = [
+    '.churches-content',
+    '.churches-content-subheading',
+    '.church-content-cta',
+    '.churches-content-images',
+    '.map-pin',
+    '.find-us',
+    '.loc-invitation',
+    '.loc-content',
+    '.church-content-hero-section',
+    '.map',
+    '.timeline',
+    '.timeline__content',
+  ] as const;
+
   genericCMSAnimations: GenericCMSPageAnimations = new GenericCMSPageAnimations();
 
   private _targetState: string;
@@ -77,7 +75,7 @@ export class ChurchContentAnimations
     },
   };
 
-  pageElements: PageElements<K>;
+  pageElements: PageElements<typeof this.EL>;
 
   supportAnimations: typeof GlobalPageAnimations;
 
@@ -119,7 +117,7 @@ export class ChurchContentAnimations
 
     this.gsapAnimations = new GsapAnimations();
 
-    this.pageElements = new PageElements(elem);
+    this.pageElements = new PageElements(this.EL);
 
     this.mapPinCoordinates('mapPin');
 
@@ -334,20 +332,20 @@ export class ChurchContentAnimations
 }
 
 class PriestCarousel implements ICarouselAnimations {
+  EL = ['.priest-container-cms', '.priests-carousel', '.controls', '.pause', '.play'] as const;
+
   private _animationTL: gsap.core.Timeline;
 
   private _controlsTL: gsap.core.Timeline;
 
   private _supportingAnimations: typeof GlobalPageAnimations;
 
-  pageElemets: PageElements<
-    ['.priest-container-cms', '.priests-carousel', '.controls', '.pause', '.play']
-  >;
+  pageElements: PageElements<typeof this.EL>;
 
   gsapAnimations: GsapAnimations;
 
   initElements = () => {
-    this.pageElemets = new PageElements([
+    this.pageElements = new PageElements([
       '.priest-container-cms',
       '.priests-carousel',
       '.controls',
@@ -364,7 +362,7 @@ class PriestCarousel implements ICarouselAnimations {
       this.gsapAnimations = gsapAnimations;
       this._supportingAnimations = supportAnimations;
       this.gsapAnimations.newItems([this._animationTL, this._controlsTL]);
-      this.pageElemets.el.controls.children().remove();
+      this.pageElements.el.controls.children().remove();
       this.onMouseEnterHandler.handler(this);
       this.onMouseLeaveHandler.handler(this);
       this.onMouseClickHandler.handler(this);
@@ -374,7 +372,7 @@ class PriestCarousel implements ICarouselAnimations {
   }
 
   animateCarousel = () => {
-    const { priestContainerCms, priestsCarousel, play, pause } = this.pageElemets.el;
+    const { priestContainerCms, priestsCarousel, play, pause } = this.pageElements.el;
 
     priestContainerCms.each((i, e) => {
       this.animatePriestContainer(i, $(e));
@@ -404,7 +402,7 @@ class PriestCarousel implements ICarouselAnimations {
   };
 
   nextSlide = (i: number, el: JQuery<HTMLElement>) => {
-    const { priestContainerCms, priestsCarousel } = this.pageElemets.el;
+    const { priestContainerCms, priestsCarousel } = this.pageElements.el;
     const width = priestContainerCms.width();
     const playDuration = 5;
 
@@ -441,23 +439,23 @@ class PriestCarousel implements ICarouselAnimations {
 
   onMouseEnterHandler = {
     handler(self: PriestCarousel) {
-      self.pageElemets.el.priestContainerCms.on('mouseover', () =>
+      self.pageElements.el.priestContainerCms.on('mouseover', () =>
         self._supportingAnimations.cursorAnimations.cursorWhite()
       );
     },
     dispose(self: PriestCarousel) {
-      self.pageElemets.el.priestContainerCms.off('mouseleave');
+      self.pageElements.el.priestContainerCms.off('mouseleave');
     },
   };
 
   onMouseLeaveHandler = {
     handler(self: PriestCarousel) {
-      self.pageElemets.el.priestContainerCms.on('mouseleave', () =>
+      self.pageElements.el.priestContainerCms.on('mouseleave', () =>
         self._supportingAnimations.cursorAnimations.cursorBlue()
       );
     },
     dispose(self: PriestCarousel) {
-      self.pageElemets.el.priestContainerCms.off('mouseleave');
+      self.pageElements.el.priestContainerCms.off('mouseleave');
     },
   };
 
@@ -513,7 +511,7 @@ class PriestCarousel implements ICarouselAnimations {
   animatePins = (i: number, el: JQuery<HTMLElement>) => {
     const playDuration = 5;
 
-    const { controls } = this.pageElemets.el;
+    const { controls } = this.pageElements.el;
 
     this._controlsTL.addLabel(`slide-${i}`);
 
@@ -548,7 +546,7 @@ class PriestCarousel implements ICarouselAnimations {
   };
 
   animateButtons = () => {
-    const { priestContainerCms, controls } = this.pageElemets.el;
+    const { priestContainerCms, controls } = this.pageElements.el;
 
     priestContainerCms.each((i, _) => {
       const pin = document.createElement('div');
@@ -563,7 +561,7 @@ class PriestCarousel implements ICarouselAnimations {
 
   onMouseClickHandler = {
     handler(self: PriestCarousel) {
-      const { pause, play } = self.pageElemets.el;
+      const { pause, play } = self.pageElements.el;
 
       pause.on('click', () => {
         if (self._animationTL) self._animationTL.pause();
@@ -580,7 +578,7 @@ class PriestCarousel implements ICarouselAnimations {
       });
     },
     dispose(self: PriestCarousel) {
-      const { pause, play } = self.pageElemets.el;
+      const { pause, play } = self.pageElements.el;
       pause.off('click');
       play.off('click');
     },

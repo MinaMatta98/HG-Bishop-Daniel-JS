@@ -44,7 +44,7 @@ export class GenericAnimations implements IGenericAnimations {
     };
   };
 
-  enter = async <C extends ICssAnimations, M extends ICMSPageAnimations<any>>(obj: {
+  enter = async <C extends ICssAnimations, M extends ICMSPageAnimations>(obj: {
     data: ITransitionData;
     cssTransClass?: C;
     cmsTransClass?: M;
@@ -112,7 +112,7 @@ export class GenericAnimations implements IGenericAnimations {
     obj.cssTransClass?.unloadCss();
   }
 
-  after = async <CL extends ICollectionAnimations<any>>(obj: {
+  after = async <CL extends ICollectionAnimations>(obj: {
     data: ITransitionData;
     collectionTransClass?: CL;
   }) => {

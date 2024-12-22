@@ -1,9 +1,11 @@
+import type { IElementsAnimations } from './IElementsAnimations';
+
 type HandlerWithDispose<T extends (...args: any[]) => void> = {
   handler: T;
   dispose: (args?: any) => void;
 };
 
-export interface IMouseEventAnimations {
+export interface IMouseEventAnimations extends IElementsAnimations {
   onMouseEnterHandler?: HandlerWithDispose<(...args: any) => void>;
   onMouseLeaveHandler?: HandlerWithDispose<(...args: any) => void>;
   onMouseClickHandler?: HandlerWithDispose<(...args: any) => void>;

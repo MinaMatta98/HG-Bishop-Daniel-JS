@@ -15,6 +15,8 @@ export class TOCAnimations
     IDisposableAnimations,
     IResizePageAnimations
 {
+  public EL = ['.sections-toc', '.section-holder'] as const;
+
   public _tocButton: TOCButton;
 
   /** Page sections with attr*/
@@ -211,6 +213,8 @@ export class TOCAnimations
 }
 
 class TOCButton implements IGsapComponentAnimations, IMouseEventAnimations {
+  EL: ['.toc-button', '.code-embed-7'] = ['.toc-button', '.code-embed-7'] as const;
+
   public _toggled: boolean;
   /**
    *
@@ -218,11 +222,9 @@ class TOCButton implements IGsapComponentAnimations, IMouseEventAnimations {
   constructor(
     gsapAnimations: GsapAnimations,
     pageElements: PageElements<readonly ['.sections-toc', '.section-holder']>
-    //sectionToc: JQuery<HTMLElement>,
-    //sectionHolder: JQuery<HTMLElement>
   ) {
     this.gsapComponentAnimations = new GsapComponentAnimations(gsapAnimations);
-    this.pageElements = pageElements.extend(['.toc-button', '.code-embed-7'] as const);
+    this.pageElements = pageElements.extend(this.EL);
     this.initElements();
     this.animateComponent();
   }
@@ -231,9 +233,7 @@ class TOCButton implements IGsapComponentAnimations, IMouseEventAnimations {
     this._toggled = false;
   };
 
-  pageElements: PageElements<
-    readonly ['.sections-toc', '.section-holder', '.toc-button', '.code-embed-7']
-  >;
+  pageElements: PageElements<readonly ['.sections-toc', '.section-holder', ...typeof this.EL]>;
 
   gsapComponentAnimations: GsapComponentAnimations;
 

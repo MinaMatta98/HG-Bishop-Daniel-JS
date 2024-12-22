@@ -1,11 +1,13 @@
 import $ from 'jquery';
 
-import type { ElementObjectProperties, IPageAnimations, PageElements } from './IPageAnimations';
+import type { IElementsAnimations } from './IElementsAnimations';
+import type { ElementObjectProperties, IPageAnimations } from './IPageAnimations';
 
-export interface ICMSPageAnimations<T extends readonly string[]> extends IPageAnimations {
+export interface ICMSPageAnimations extends IPageAnimations, IElementsAnimations {
   genericCMSAnimations: GenericCMSPageAnimations;
-  replaceCMSAnimations?: <K extends keyof ElementObjectProperties<T>>(keys: keyof K[]) => void[];
-  pageElements: PageElements<T>;
+  replaceCMSAnimations?: <K extends keyof ElementObjectProperties<typeof this.EL>>(
+    keys: keyof K[]
+  ) => void[];
 }
 
 export class GenericCMSPageAnimations {
@@ -54,6 +56,6 @@ export class GenericCMSPageAnimations {
     });
   };
 }
-export function instanceofICMSPageAnimations(obj: any): obj is ICMSPageAnimations<any> {
+export function instanceofICMSPageAnimations(obj: any): obj is ICMSPageAnimations {
   return typeof obj.genericCMSAnimations === 'object';
 }

@@ -21,7 +21,7 @@ export class GlobeAnimation
     IResizePageAnimations,
     IMouseEventAnimations
 {
-  private EL = ['#webGL', '.globe-svg', '.ministry-wrapper'] as const;
+  EL = ['#webGL', '.globe-svg', '.ministry-wrapper'] as const;
   private _RATIO = 0.95;
   private _ARC_REL_LEN = 0.4;
   private _FLIGHT_TIME = 1000;

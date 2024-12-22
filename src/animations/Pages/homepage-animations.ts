@@ -4,6 +4,7 @@ import 'swiper/css/effect-cards';
 import '../../public/animations.css';
 
 import type { ITransitionData } from '@barba/core/dist/core/src/src/defs';
+import { getGPUTier, type TierResult } from 'detect-gpu';
 import { gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
 import { barbaInit } from 'src/barba';
@@ -25,9 +26,15 @@ import { GlobeAnimation } from '../Components/globe';
 import { LeafletMapComponent } from '../Components/map';
 
 class NewsAnimations implements IGsapComponentAnimations {
-  pageElements: PageElements<
-    readonly ['.news-colleciton-item', '.special', '.sticky-top', '.news-btn', '.agenda-item > div']
-  >;
+  EL = [
+    '.news-colleciton-item',
+    '.special',
+    '.sticky-top',
+    '.news-btn',
+    '.agenda-item > div',
+  ] as const;
+
+  pageElements: PageElements<typeof this.EL>;
 
   private _articleCount: number;
 
@@ -36,13 +43,7 @@ class NewsAnimations implements IGsapComponentAnimations {
   }
 
   initElements = () => {
-    this.pageElements = new PageElements([
-      '.news-colleciton-item',
-      '.special',
-      '.sticky-top',
-      '.news-btn',
-      '.agenda-item > div',
-    ] as const);
+    this.pageElements = new PageElements(this.EL);
     this._articleCount = this.pageElements.el.newsCollecitonItem.length;
   };
 
@@ -108,6 +109,19 @@ export class HomePageAnimations
     IMouseEventAnimations,
     IDisposableAnimations
 {
+  EL = [
+    '.pageload',
+    '#webGL',
+    '.globe-container',
+    '.sticky-image-container',
+    '.opening-hero',
+    '.swiper.is-photos',
+    '.swiper.is-content',
+    '.arrow.is-right',
+    '.arrow.is-left',
+    '.cursor',
+  ] as const;
+
   private _globeAnimation: GlobeAnimation | LeafletMapComponent;
 
   private _globeTL: GSAPTween;
@@ -120,20 +134,9 @@ export class HomePageAnimations
 
   gsapAnimations: GsapAnimations;
 
-  pageElements: PageElements<
-    readonly [
-      '.pageload',
-      '#webGL',
-      '.globe-container',
-      '.sticky-image-container',
-      '.opening-hero',
-      '.swiper.is-photos',
-      '.swiper.is-content',
-      '.arrow.is-right',
-      '.arrow.is-left',
-      '.cursor',
-    ]
-  >;
+  private _gpuTier: TierResult;
+
+  pageElements: PageElements<typeof this.EL>;
 
   supportAnimations = GlobalPageAnimations;
 
@@ -142,6 +145,11 @@ export class HomePageAnimations
   disposePageAnimations = () => {
     this._globeAnimation.disposePageAnimations();
     this.gsapAnimations.disposePageAnimations();
+  };
+
+  detectGPUSupported = async (): Promise<boolean> => {
+    const gpuTier = await getGPUTier();
+    return gpuTier.tier > 2;
   };
 
   private swiperAnimation = (): void => {
@@ -265,7 +273,7 @@ export class HomePageAnimations
     },
   };
 
-  partialInit = () => {
+  partialInit = async () => {
     this.supportAnimations = GlobalPageAnimations;
 
     this.gsapAnimations = new GsapAnimations();
@@ -275,6 +283,8 @@ export class HomePageAnimations
     this._newsAnimator = new NewsAnimations(this.gsapAnimations);
 
     this._openingHeroAnimator = new OpeningHeroAnimations(this.gsapAnimations);
+
+    this._gpuTier = await getGPUTier();
 
     this.pageElements = new PageElements([
       '.pageload',
@@ -290,8 +300,8 @@ export class HomePageAnimations
     ] as const);
   };
 
-  initElements = () => {
-    this.partialInit();
+  initElements = async () => {
+    await this.partialInit();
 
     this.dynamicPageAssignment();
   };
@@ -305,8 +315,9 @@ export class HomePageAnimations
     if (this._globeAnimation?.['off']) this._globeAnimation['off']();
 
     if (this._globeAnimation?.['destructor']) this._globeAnimation['destructor']();
+    console.log(this._gpuTier.tier);
 
-    if ($(window).width() >= 480) {
+    if ($(window).width() >= 480 && this._gpuTier.tier >= 2) {
       this._globeAnimation = new GlobeAnimation(true, this.gsapAnimations);
       this.initGlobe();
     } else {
@@ -329,7 +340,7 @@ export class HomePageAnimations
 
   once = async (_data: ITransitionData, isFirstLoad: boolean) => {
     $(async () => {
-      this.partialInit();
+      await this.partialInit();
 
       if (isFirstLoad) {
         const pageLoadTween = gsap.set(this.pageElements.el.pageload, { display: 'flex' });
@@ -358,7 +369,7 @@ export class HomePageAnimations
 
   afterEnter = async (_data: ITransitionData, initTime: number) => {
     $(async () => {
-      this.initElements();
+      await this.initElements();
 
       this.supportAnimations.logoAnimations.logoAnimation();
 
@@ -392,7 +403,9 @@ export class HomePageAnimations
 }
 
 class ScheduleAnimations implements IGsapComponentAnimations {
-  pageElements: PageElements<readonly ['.slide-block', '.sticky-image-container']>;
+  EL = ['.slide-block', '.sticky-image-container'] as const;
+
+  pageElements: PageElements<typeof this.EL>;
 
   gsapComponentAnimations: GsapComponentAnimations;
 
@@ -481,9 +494,9 @@ class ScheduleAnimations implements IGsapComponentAnimations {
 }
 
 class OpeningHeroAnimations implements IGsapComponentAnimations {
-  pageElements: PageElements<
-    readonly ['.opening-hero', '.progress', '.ths07-logo', '.video-image', '.hero-heading']
-  >;
+  EL = ['.opening-hero', '.progress', '.ths07-logo', '.video-image', '.hero-heading'] as const;
+
+  pageElements: PageElements<typeof this.EL>;
 
   gsapComponentAnimations: GsapComponentAnimations;
 
@@ -493,13 +506,7 @@ class OpeningHeroAnimations implements IGsapComponentAnimations {
   }
 
   initElements = () => {
-    this.pageElements = new PageElements([
-      '.opening-hero',
-      '.progress',
-      '.ths07-logo',
-      '.video-image',
-      '.hero-heading',
-    ] as const);
+    this.pageElements = new PageElements(this.EL);
   };
 
   animateProgressFade = () => {

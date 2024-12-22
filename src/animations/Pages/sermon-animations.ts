@@ -17,6 +17,17 @@ import { PortablePlayer } from '../UI/Widgets/portable-player';
 export class SermonPageAnimations
   implements IPageAnimations, IMouseEventAnimations, IGsapPageAnimations
 {
+  EL = [
+    '.section-glow',
+    '.item-section',
+    '.sermon-container',
+    '.sermon-scene',
+    '.piling',
+    '.sermon-heading',
+    '.sermon-title-block',
+    '.filler',
+  ] as const;
+
   private _scrollTL: gsap.core.Tween;
 
   private _playerWidget: PortablePlayer;
@@ -110,18 +121,7 @@ export class SermonPageAnimations
 
   beforeLeave?: (data: ITransitionData) => Promise<void>;
 
-  pageElements: PageElements<
-    [
-      '.section-glow',
-      '.item-section',
-      '.sermon-container',
-      '.sermon-scene',
-      '.piling',
-      '.sermon-heading',
-      '.sermon-title-block',
-      '.filler',
-    ]
-  >;
+  pageElements: PageElements<typeof this.EL>;
 
   initializeBaseState = () => {
     const { sectionGlow } = this.pageElements.el;
@@ -130,16 +130,7 @@ export class SermonPageAnimations
 
   initElements = () => {
     this.namespace = 'sermons';
-    this.pageElements = new PageElements([
-      '.section-glow',
-      '.item-section',
-      '.sermon-container',
-      '.sermon-scene',
-      '.piling',
-      '.sermon-heading',
-      '.sermon-title-block',
-      '.filler',
-    ] as const);
+    this.pageElements = new PageElements(this.EL);
     this.gsapAnimations = new GsapAnimations();
     this._playerWidget = new PortablePlayer();
   };
@@ -161,10 +152,6 @@ export class SermonPageAnimations
   animateItemSection = () => {
     this.pageElements.el.filler.each((index, item) => {
       console.log(index, item);
-
-      //if (index !== 0 && index !== 2) {
-      //  $(item).css('display', 'none');
-      //}
     });
   };
 

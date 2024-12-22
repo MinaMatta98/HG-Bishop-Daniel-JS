@@ -21,9 +21,11 @@ export class BioAnimations
 {
   private _splitType: SplitType;
 
+  EL = ['.bio-heading', '.timeline_item', '.timeline-hero-section'] as const;
+
   gsapAnimations: GsapAnimations;
 
-  pageElements: PageElements<readonly ['.bio-heading', '.timeline_item', '.timeline-hero-section']>;
+  pageElements: PageElements<typeof this.EL>;
 
   supportAnimations = GlobalPageAnimations;
 
@@ -50,11 +52,7 @@ export class BioAnimations
   };
 
   initElements = () => {
-    this.pageElements = new PageElements([
-      '.bio-heading',
-      '.timeline_item',
-      '.timeline-hero-section',
-    ] as const);
+    this.pageElements = new PageElements(this.EL);
 
     this.gsapAnimations = new GsapAnimations();
   };

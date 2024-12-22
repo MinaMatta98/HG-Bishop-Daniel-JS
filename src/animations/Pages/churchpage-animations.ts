@@ -14,23 +14,17 @@ import type { IResizePageAnimations } from 'src/interfaces/IResizePageAnimations
 
 import { LeafletMapComponent } from '../Components/map';
 
-const elem = ['#map', '.map-pin'] as const;
-
-const itemElem = ['.item', '.filler', '.item-grid', ...elem] as const;
-
-type T = typeof elem;
-
-type K = typeof itemElem;
-
 export class ChurchAnimations
-  extends GenericCollectionAnimations<T>
+  extends GenericCollectionAnimations
   implements
     IGsapPageAnimations,
     IDisposableAnimations,
     IMouseEventAnimations,
     IResizePageAnimations,
-    ICMSPageAnimations<K>
+    ICMSPageAnimations
 {
+  EL = ['.item', '.filler', '.item-grid', '#map', '.map-pin'] as const;
+
   genericCMSAnimations = new GenericCMSPageAnimations();
 
   mapPinCoordinates<K extends keyof ElementObjectProperties<typeof this.pageElements.keys>>(
@@ -73,7 +67,7 @@ export class ChurchAnimations
 
   gsapAnimations: GsapAnimations;
 
-  pageElements: PageElements<K>;
+  pageElements: PageElements<typeof this.EL>;
 
   supportAnimations = GlobalPageAnimations;
 
@@ -120,7 +114,7 @@ export class ChurchAnimations
 
     this.gsapAnimations = new GsapAnimations();
 
-    this.pageElements = new PageElements(itemElem);
+    this.pageElements = new PageElements(this.EL);
 
     this.onMouseEnterHandler.handler(this);
 

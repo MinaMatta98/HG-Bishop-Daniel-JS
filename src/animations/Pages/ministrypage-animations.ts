@@ -17,6 +17,8 @@ import { GlobeAnimation } from '../Components/globe';
 export class MinistryPageAnimations
   implements IPageAnimations, IMouseEventAnimations, IGsapPageAnimations, IDisposableAnimations
 {
+  EL = ['.section-glow', '.item-section', '.webgl'] as const;
+
   disposePageAnimations = () => {
     this.gsapAnimations.disposePageAnimations();
     this._globeAnimation.gsapComponentAnimations.disposePageAnimations();
@@ -81,7 +83,7 @@ export class MinistryPageAnimations
     },
   };
 
-  pageElements: PageElements<['.section-glow', '.item-section', '.webgl']>;
+  pageElements: PageElements<typeof this.EL>;
 
   supportAnimations = GlobalPageAnimations;
 
@@ -92,7 +94,7 @@ export class MinistryPageAnimations
   initElements = () => {
     this.namespace = 'ministry';
     this.gsapAnimations = new GsapAnimations();
-    this.pageElements = new PageElements(['.section-glow', '.item-section', '.webgl'] as const);
+    this.pageElements = new PageElements(this.EL);
     this._globeAnimation = new GlobeAnimation(false, this.gsapAnimations);
   };
 

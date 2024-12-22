@@ -1,4 +1,6 @@
-export interface ICssAnimations {
+import type { IElementsAnimations } from './IElementsAnimations';
+
+export interface ICssAnimations extends IElementsAnimations {
   loadCss: () => void;
   unloadCss: () => void;
 }

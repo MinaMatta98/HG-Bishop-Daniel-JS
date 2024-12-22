@@ -30,6 +30,7 @@ interface ZoomControlOptions {
   maxZoom: () => number;
   dragging: boolean;
   scrollWheelZoom: boolean;
+  tap?: false;
 }
 
 export class LeafletMapComponent
@@ -39,6 +40,7 @@ export class LeafletMapComponent
     IMouseEventAnimations,
     IDisposableAnimations
 {
+  EL: readonly string[] = [] as const;
   private _map: leaflet.Map;
   private _mapElement: JQuery<HTMLElement>;
   private static _shadow = 'drop-shadow(2px 7px 15px rgba(0, 0, 0, 0.4))';
@@ -165,7 +167,7 @@ export class LeafletMapComponent
 
   supportAnimations = GlobalPageAnimations;
 
-  pageElements: PageElements<readonly string[]>;
+  pageElements: PageElements<typeof this.EL>;
 
   initElements = () => {};
 

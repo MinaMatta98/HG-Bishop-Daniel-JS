@@ -16,6 +16,8 @@ import { Player } from '../UI/Widgets/player';
 export class SermonContentAnimations
   implements IPageAnimations, IMouseEventAnimations, IGsapPageAnimations, IDisposableAnimations
 {
+  EL = ['.sermon-content-hero-section', '.playlist-wrapper', '.sermons-items'] as const;
+
   private _carousel: SermonsCarousel;
 
   private _player: Player;
@@ -50,9 +52,7 @@ export class SermonContentAnimations
     this.supportAnimations.footerAnimations.animateFooterWhite();
   };
 
-  pageElements: PageElements<
-    ['.sermon-content-hero-section', '.playlist-wrapper', '.sermons-items']
-  >;
+  pageElements: PageElements<typeof this.EL>;
 
   initElements = () => {
     this.namespace = 'sermon-content';
@@ -61,11 +61,7 @@ export class SermonContentAnimations
 
     this._carousel = new SermonsCarousel();
 
-    this.pageElements = new PageElements([
-      '.sermon-content-hero-section',
-      '.playlist-wrapper',
-      '.sermons-items',
-    ] as const);
+    this.pageElements = new PageElements(this.EL);
 
     Animations.player ? (this._player = Animations.player) : (this._player = new Player());
 
@@ -104,6 +100,15 @@ export class SermonContentAnimations
 }
 
 class SermonsCarousel implements ICarouselAnimations, IDisposableAnimations {
+  EL = [
+    '.theme-background',
+    '.t-cov',
+    '.player-controls',
+    '.sermons-banner',
+    '.indicator',
+    '.arrow-circle',
+  ] as const;
+
   disposePageAnimations = () => {
     this.gsapAnimations.disposePageAnimations();
   };
@@ -120,16 +125,7 @@ class SermonsCarousel implements ICarouselAnimations, IDisposableAnimations {
 
   gsapAnimations: GsapAnimations;
 
-  pageElemets: PageElements<
-    [
-      '.theme-background',
-      '.t-cov',
-      '.player-controls',
-      '.sermons-banner',
-      '.indicator',
-      '.arrow-circle',
-    ]
-  >;
+  pageElements: PageElements<typeof this.EL>;
 
   constructor() {
     this.gsapAnimations = new GsapAnimations();
@@ -149,9 +145,9 @@ class SermonsCarousel implements ICarouselAnimations, IDisposableAnimations {
   };
 
   private ChangeBanner = (): void => {
-    this.pageElemets.el.sermonsBanner.text(
+    this.pageElements.el.sermonsBanner.text(
       `Browse Sermons for ${$(
-        $(this.pageElemets.el.themeBackground[this._currentIndex]).children()[0]
+        $(this.pageElements.el.themeBackground[this._currentIndex]).children()[0]
       ).text()}`
     );
   };
@@ -171,7 +167,7 @@ class SermonsCarousel implements ICarouselAnimations, IDisposableAnimations {
   };
 
   animatePins = () => {
-    this.pageElemets.el.indicator.each((index, indicator) => {
+    this.pageElements.el.indicator.each((index, indicator) => {
       // Start Condition
       const filler = $(indicator).find('.inner-filler');
 
@@ -186,7 +182,7 @@ class SermonsCarousel implements ICarouselAnimations, IDisposableAnimations {
           borderRadius: `5px`,
           duration: 0.5,
           onStart: () => {
-            this.pageElemets.el.indicator
+            this.pageElements.el.indicator
               .filter((_, el) => el !== indicator)
               .each((_, el) => {
                 const tween = gsap.to($(el), { width: 5, duration: 0.5 });
@@ -210,11 +206,11 @@ class SermonsCarousel implements ICarouselAnimations, IDisposableAnimations {
           duration: this._duration,
           ease: 'none',
           onStart: () => {
-            this.pageElemets.el.tCov[this._currentIndex].style.display = 'block';
+            this.pageElements.el.tCov[this._currentIndex].style.display = 'block';
 
             this.ChangeBanner();
 
-            this.pageElemets.el.indicator
+            this.pageElements.el.indicator
               .filter((_, el) => el !== indicator)
               .each((_, el) => {
                 $(el).find('.inner-filler').css('width', 0);
@@ -225,7 +221,7 @@ class SermonsCarousel implements ICarouselAnimations, IDisposableAnimations {
 
             this.ChangeBanner();
 
-            this._currentIndex < this.pageElemets.el.tCov.length - 1
+            this._currentIndex < this.pageElements.el.tCov.length - 1
               ? this._currentIndex++
               : (this._currentIndex = 0);
           },
@@ -236,7 +232,7 @@ class SermonsCarousel implements ICarouselAnimations, IDisposableAnimations {
   };
 
   animateFocusedSlide = () => {
-    this.pageElemets.el.tCov.each((index, cover) => {
+    this.pageElements.el.tCov.each((index, cover) => {
       this._animationTL.addLabel(`${index}`, index * this._duration);
       this._animationTL.to(
         cover,
@@ -244,7 +240,7 @@ class SermonsCarousel implements ICarouselAnimations, IDisposableAnimations {
           display: 'block',
           duration: 1,
           onStart: () => {
-            this.pageElemets.el.tCov.each((_, el) => {
+            this.pageElements.el.tCov.each((_, el) => {
               if (el != cover) $(el).css('display', 'none');
             });
           },
@@ -255,18 +251,18 @@ class SermonsCarousel implements ICarouselAnimations, IDisposableAnimations {
   };
 
   animateButtons = () => {
-    $(this.pageElemets.el.arrowCircle[0]).on('click', () => {
-      this._currentIndex < this.pageElemets.el.tCov.length - 1
+    $(this.pageElements.el.arrowCircle[0]).on('click', () => {
+      this._currentIndex < this.pageElements.el.tCov.length - 1
         ? this._currentIndex++
         : (this._currentIndex = 0);
       this.gsapAnimations.disposePageAnimations();
       this.nthSlide(this._currentIndex);
     });
 
-    $(this.pageElemets.el.arrowCircle[1]).on('click', () => {
+    $(this.pageElements.el.arrowCircle[1]).on('click', () => {
       this._currentIndex > 0
         ? this._currentIndex--
-        : (this._currentIndex = this.pageElemets.el.tCov.length - 1);
+        : (this._currentIndex = this.pageElements.el.tCov.length - 1);
       this.gsapAnimations.disposePageAnimations();
       this.nthSlide(this._currentIndex);
     });

@@ -1,10 +1,11 @@
+import type { IElementsAnimations } from './IElementsAnimations';
 import type { IGsapPageAnimations } from './IGsapPageAnimations';
 import type { IMouseEventAnimations } from './IMouseEventAnimations';
-import type { PageElements } from './IPageAnimations';
 
-export interface ICarouselAnimations extends IGsapPageAnimations, IMouseEventAnimations {
-  pageElemets: PageElements<readonly string[]>;
-  initElements: () => void;
+export interface ICarouselAnimations
+  extends IGsapPageAnimations,
+    IMouseEventAnimations,
+    IElementsAnimations {
   animateCarousel: () => void;
   nextSlide?: (i: number, el: JQuery<HTMLElement>) => void;
   prevSlide?: (i: number, el: JQuery<HTMLElement>) => void;

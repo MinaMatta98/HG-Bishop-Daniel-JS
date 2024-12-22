@@ -10,19 +10,7 @@ interface IGsapAnimations extends IDisposableAnimations {
 }
 
 export class GsapAnimations implements IGsapAnimations {
-  public disposableTargets?: PageElements<readonly string[]>;
-
-  public gsapTargets?: PageElements<readonly string[]>;
-
   public tweens: Partial<gsap.core.Animation | ScrollTrigger>[] = [];
-
-  constructor(
-    gsapTargets?: PageElements<readonly string[]>,
-    disposableTargets?: PageElements<readonly string[]>
-  ) {
-    this.disposableTargets = disposableTargets;
-    this.gsapTargets = gsapTargets;
-  }
 
   public newItem(tween: Partial<gsap.core.Animation | ScrollTrigger>) {
     this.tweens.push(tween);
@@ -65,12 +53,8 @@ export class GsapComponentAnimations extends GsapAnimations {
   /**
    *
    */
-  constructor(
-    gsapPageAnimations: GsapAnimations,
-    gsapTargets?: PageElements<readonly string[]>,
-    disposableTargets?: PageElements<readonly string[]>
-  ) {
-    super(gsapTargets, disposableTargets);
+  constructor(gsapPageAnimations: GsapAnimations) {
+    super();
     this.gsapPageAnimations = gsapPageAnimations;
   }
 }

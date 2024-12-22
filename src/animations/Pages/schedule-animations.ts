@@ -4,6 +4,7 @@ import type { IPageAnimations } from 'src/interfaces/IPageAnimations';
 import { GlobalPageAnimations, PageElements } from 'src/interfaces/IPageAnimations';
 
 export class ScheduleAnimations implements IPageAnimations {
+  EL = ['#calendar'] as const;
   supportAnimations = GlobalPageAnimations;
 
   namespace: string = 'schedule';
@@ -22,10 +23,10 @@ export class ScheduleAnimations implements IPageAnimations {
 
   beforeLeave?: (data: ITransitionData) => Promise<void>;
 
-  pageElements: PageElements<readonly ['#calendar']>;
+  pageElements: PageElements<typeof this.EL>;
 
   initElements = () => {
     this.namespace = 'schedule';
-    this.pageElements = new PageElements(['#calendar'] as const);
+    this.pageElements = new PageElements(this.EL);
   };
 }

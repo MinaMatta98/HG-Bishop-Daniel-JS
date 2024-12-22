@@ -1,7 +1,9 @@
 import type { PageElements } from './IPageAnimations';
 
 export interface IElementsAnimations {
-  pageElements: PageElements<readonly string[]>;
+  EL: readonly string[];
+
+  pageElements: PageElements<typeof this.EL>;
 
   initializeBaseState?: () => void;
 

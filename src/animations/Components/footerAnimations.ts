@@ -1,7 +1,7 @@
 import type { IMouseEventAnimations } from 'src/interfaces/IMouseEventAnimations';
 import { GlobalPageAnimations, PageElements } from 'src/interfaces/IPageAnimations';
 
-export class FooterAnimations implements IMouseEventAnimations {
+export class FooterAnimations {
   private static supportingAnimations: typeof GlobalPageAnimations;
 
   private static pageElements: PageElements<

@@ -19,66 +19,9 @@ export class UpdatePageAnimations
 
   gsapAnimations: GsapAnimations;
 
-  private _el = ['.item-section'] as const;
+  EL = ['.item-section'] as const;
 
-  //onMouseEnterHandler = {
-  //  handler(self: UpdatePageAnimations) {
-  //    const { itemSection, sectionGlow, webgl } = self.pageElements.el;
-  //
-  //    const tween = gsap.set(sectionGlow, { display: 'none' });
-  //
-  //    self.gsapAnimations.newItem(tween);
-  //
-  //    webgl.on('mouseenter', () => {
-  //      self.supportAnimations.cursorAnimations.cursorWhite();
-  //    });
-  //
-  //    itemSection.on('mouseenter', () => {
-  //      self.supportAnimations.cursorAnimations.cursorWhite();
-  //      self.gsapAnimations.newItem(gsap.set(sectionGlow, { display: 'block' }));
-  //    });
-  //  },
-  //  dispose(self: UpdatePageAnimations) {
-  //    self.pageElements.el.webgl.off('mouseenter');
-  //    self.pageElements.el.itemSection.off('mouseenter');
-  //  },
-  //};
-
-  //onMouseMoveHandler = {
-  //  handler(self: UpdatePageAnimations) {
-  //    const { itemSection, sectionGlow } = self.pageElements.el;
-  //
-  //    const onMouseMove = (e: MouseEvent) => {
-  //      // Calculate the center coordinates of the circle
-  //      const centerX = e.pageX - sectionGlow.width();
-  //      const centerY = e.pageY - itemSection.position().top - sectionGlow[0].offsetHeight / 2;
-  //
-  //      // Update the position of the sectionGlow based on the center coordinates
-  //      sectionGlow.css('left', centerX + 'px');
-  //      sectionGlow.css('top', centerY + 'px');
-  //    };
-  //
-  //    document.addEventListener('mousemove', onMouseMove);
-  //  },
-  //  dispose(_self: UpdatePageAnimations) {
-  //    $(document).off('mousemove');
-  //  },
-  //};
-
-  //onMouseLeaveHandler = {
-  //  handler(self: UpdatePageAnimations) {
-  //    const circle = self.pageElements.el.sectionGlow;
-  //
-  //    self.pageElements.el.itemSection.on('mouseleave', () =>
-  //      gsap.set(circle, { display: 'none' })
-  //    );
-  //  },
-  //  dispose(self: UpdatePageAnimations) {
-  //    self.pageElements.el.itemSection.off('mouseleave');
-  //  },
-  //};
-
-  pageElements: PageElements<typeof this._el>;
+  pageElements: PageElements<typeof this.EL>;
 
   supportAnimations = GlobalPageAnimations;
 
@@ -88,7 +31,7 @@ export class UpdatePageAnimations
 
   initElements = () => {
     this.gsapAnimations = new GsapAnimations();
-    this.pageElements = new PageElements(this._el);
+    this.pageElements = new PageElements(this.EL);
     this._globeAnimation = new GlobeAnimation(false, this.gsapAnimations);
   };
 
@@ -102,9 +45,6 @@ export class UpdatePageAnimations
       this.supportAnimations.navBarAnimations.animateScrollButton(this.pageElements.el.itemSection);
       this.supportAnimations.logoAnimations.animateLogo();
       await this.initializeBaseState();
-      //this.onMouseEnterHandler.handler(this);
-      //this.onMouseLeaveHandler.handler(this);
-      //this.onMouseMoveHandler.handler(this);
     });
   };
 }

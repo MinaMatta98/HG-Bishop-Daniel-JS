@@ -17,6 +17,8 @@ import { LeafletMapComponent } from '../Components/map';
 export class MinistryContentAnimations
   implements IPageAnimations, IMouseEventAnimations, IGsapPageAnimations, IDisposableAnimations
 {
+  EL = ['.map', '.map-pin', '.loc-invitation', '.ministry-content-hero'] as const;
+
   private _heroPersonContainers: JQuery<HTMLElement>;
 
   private _heroPersonTextContainers: JQuery<HTMLElement>;
@@ -35,7 +37,7 @@ export class MinistryContentAnimations
 
   gsapAnimations: GsapAnimations;
 
-  pageElements: PageElements<['.map', '.map-pin', '.loc-invitation', '.ministry-content-hero']>;
+  pageElements: PageElements<typeof this.EL>;
 
   supportAnimations = GlobalPageAnimations;
 
@@ -58,12 +60,7 @@ export class MinistryContentAnimations
 
     this._ministryContentSection = $('.ministry-content-section').first();
 
-    this.pageElements = new PageElements([
-      '.map',
-      '.map-pin',
-      '.loc-invitation',
-      '.ministry-content-hero',
-    ] as const);
+    this.pageElements = new PageElements(this.EL);
   };
 
   initializeBaseState = () => {
