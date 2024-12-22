@@ -30,7 +30,11 @@ interface ZoomControlOptions {
   maxZoom: () => number;
   dragging: boolean;
   scrollWheelZoom: boolean;
-  [key: string]: any;
+  touchZoom?: false;
+  boxZoom?: false;
+  doubleClickZoom?: false;
+  keyboard?: false;
+  tap?: false;
 }
 
 export class LeafletMapComponent
@@ -78,6 +82,8 @@ export class LeafletMapComponent
       touchZoom: false,
       boxZoom: false,
       doubleClickZoom: false,
+      keyboard: false,
+      tap: false,
     };
     this._zoomControlOptions = zoomControlOptions;
     this.gsapComponentAnimations = new GsapComponentAnimations(gsapAnimations);
@@ -99,7 +105,19 @@ export class LeafletMapComponent
   animateComponent = () => {
     const { _zoomControlOptions } = this;
 
-    const { zoomControl, dragging, scrollWheelZoom, zoom, maxZoom, minZoom } = _zoomControlOptions;
+    const {
+      zoomControl,
+      dragging,
+      scrollWheelZoom,
+      zoom,
+      maxZoom,
+      minZoom,
+      tap,
+      touchZoom,
+      boxZoom,
+      keyboard,
+      doubleClickZoom,
+    } = _zoomControlOptions;
 
     this._map = leaflet
       .map(this._mapElement[0], {
@@ -109,6 +127,12 @@ export class LeafletMapComponent
         maxZoom: maxZoom(),
         minZoom: minZoom(),
         zoom: zoom(),
+        tap,
+        touchZoom,
+        boxZoom,
+        keyboard,
+        doubleClickZoom,
+        inertia: true,
       })
       .setView([-28.2744, 133.7751]);
 
@@ -147,7 +171,9 @@ export class LeafletMapComponent
           html: div ? div[0] : pin[0],
         });
 
-        const newMarker = leaflet.marker([lat, long], { icon: marker }).addTo(this._map);
+        const newMarker = leaflet
+          .marker([lat, long], { icon: marker, autoPan: false, autoPanOnFocus: false })
+          .addTo(this._map);
 
         if (div) {
           this._markers.push({
@@ -282,6 +308,14 @@ export class LeafletMapComponent
         $(marker).off('mousover');
       }
     },
+  };
+
+  onMouseClickHandler = {
+    handler(self: LeafletMapComponent) {
+      leaflet.DomEvent.on(self._mapElement[0], 'tap', leaflet.DomEvent.stopPropagation);
+      leaflet.DomEvent.on(self._mapElement[0], 'mousedown', leaflet.DomEvent.stopPropagation);
+    },
+    dispose(_self: LeafletMapComponent) {},
   };
 
   private hide = (div: JQuery<HTMLElement>, pin: JQuery<HTMLElement>) => {
