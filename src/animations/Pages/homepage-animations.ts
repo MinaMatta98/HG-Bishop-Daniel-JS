@@ -308,7 +308,7 @@ export class HomePageAnimations
 
   private dynamicPageAssignment = () => {
     const zoom = () =>
-      Math.max(Math.min((this.pageElements.el.webGL.width() / 1360.0) * 5.0, 5.0), 3.5);
+      Math.max(Math.min((this.pageElements.el.webGL.width() / 1360.0) * 5.0, 5.0), 3.0);
 
     this.pageElements.el.webGL.empty();
 
