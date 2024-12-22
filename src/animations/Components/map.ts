@@ -73,6 +73,7 @@ export class LeafletMapComponent
     this._fill = fill;
     this._className = className;
     this._color = color;
+    zoomControlOptions.tap = false;
     this._zoomControlOptions = zoomControlOptions;
     this.gsapComponentAnimations = new GsapComponentAnimations(gsapAnimations);
     this._leaderLines = [];
