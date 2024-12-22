@@ -345,6 +345,7 @@ export class HomePageAnimations
       if (isFirstLoad) {
         const pageLoadTween = gsap.set(this.pageElements.el.pageload, { display: 'flex' });
         this.gsapAnimations.newItem(pageLoadTween);
+        if ($(window).width() < 480) $('.spline-div').remove();
         isFirstLoad = false;
       }
 

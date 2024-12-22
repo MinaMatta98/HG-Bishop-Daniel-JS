@@ -103,7 +103,7 @@ export class LeafletMapComponent
   }
 
   animateComponent = () => {
-    const { _zoomControlOptions } = this;
+    const { _zoomControlOptions, onMouseEnterHandler, onMouseLeaveHandler } = this;
 
     const {
       zoomControl,
@@ -138,9 +138,7 @@ export class LeafletMapComponent
       .setMaxBounds([
         [-44, 112], // Southwest corner (latitude, longitude)
         [-10, 154], // Northeast corner (latitude, longitude));
-      ]); 
-
-    const { onMouseEnterHandler, onMouseLeaveHandler } = this;
+      ]);
 
     const self = this;
 
