@@ -134,7 +134,11 @@ export class LeafletMapComponent
         doubleClickZoom,
         inertia: true,
       })
-      .setView([-28.2744, 133.7751]);
+      .setView([-28.2744, 133.7751])
+      .setMaxBounds([
+        [-44, 112], // Southwest corner (latitude, longitude)
+        [-10, 154], // Northeast corner (latitude, longitude));
+      ]); 
 
     const { onMouseEnterHandler, onMouseLeaveHandler } = this;
 

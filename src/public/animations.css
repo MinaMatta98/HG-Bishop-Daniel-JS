@@ -176,3 +176,8 @@ input[type="password"],
 	color: white !important;
 	justify-content: center !important;
 }
+
+.slider_wrap {
+	max-width: min(calc(100vw - 6em), 1640px);
+	overflow: visible !important;
+}
