@@ -244,11 +244,33 @@ export class HomePageAnimations
 
         if (this._globeAnimation instanceof GlobeAnimation)
           this._globeAnimation.animateGlobeBlock();
+
+        this.handleThreeObj();
       });
     },
     dispose: () => {
       $(window).off('resize');
     },
+  };
+
+  handleThreeObj = () => {
+    const splineDiv = $('.spline-div');
+
+    if (splineDiv.length === 0 && $(window).width() > 767) {
+      const newSplineDiv = $('.spline-div');
+      const spline = $('.spline-scene-2');
+      spline.attr('data-animation-type', 'spline');
+      spline.attr(
+        'data-spline-url',
+        'https://prod.spline.design/OeE9j5LdWpG4L3Ot/scene.splinecode'
+      );
+      spline.appendTo(newSplineDiv);
+      newSplineDiv.appendTo('.spline');
+    }
+
+    if (splineDiv.length > 0 && $(window).width() < 767) {
+      $('.spline-div').remove();
+    }
   };
 
   onMouseEnterHandler = {
@@ -345,7 +367,8 @@ export class HomePageAnimations
       if (isFirstLoad) {
         const pageLoadTween = gsap.set(this.pageElements.el.pageload, { display: 'flex' });
         this.gsapAnimations.newItem(pageLoadTween);
-        if ($(window).width() < 480) $('.spline-div').remove();
+        if ($(window).width() < 767) $('.spline-div').remove();
+        $(window).scrollTop(0);
         isFirstLoad = false;
       }
 
@@ -354,7 +377,7 @@ export class HomePageAnimations
       //if (document.readyState === 'complete') {
       ScrollTrigger.normalizeScroll(true);
 
-      gsap.set(this.pageElements.el.cursor, { display: 'flex' });
+      this.supportAnimations.cursorAnimations.onResizeHandler();
 
       this.supportAnimations.progressBarAnimations.showProgress();
 

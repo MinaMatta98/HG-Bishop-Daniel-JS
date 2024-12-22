@@ -53,6 +53,8 @@ export class GenericAnimations implements IGenericAnimations {
 
     this.globalPageAnimations.tocAnimations.onResizeHandler.handler();
 
+    this.globalPageAnimations.cursorAnimations.onResizeHandler();
+
     obj.cssTransClass?.loadCss();
 
     if (obj.cmsTransClass) {

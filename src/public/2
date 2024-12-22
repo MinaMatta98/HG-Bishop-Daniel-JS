@@ -182,10 +182,6 @@ input[type="password"],
 	overflow: visible !important;
 }
 
-.input---brix::placeholder  {
-	font-size: min(1em, 18px);
-}
-
-#Additional-Feedback-feedback-submission-form-preview::placeholder {
-	font-size: min(1em, 16px);
+.input---brix::placeholder {
+	font-size: 0.5em;
 }
