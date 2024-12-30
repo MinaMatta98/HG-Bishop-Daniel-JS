@@ -189,3 +189,31 @@ input[type="password"],
 #Additional-Feedback-feedback-submission-form-preview::placeholder {
 	font-size: min(1em, 16px);
 }
+
+.canvas3d {
+	width: 100vw !important;
+	left: -3em;
+	position: absolute;
+}
+
+.spline-div {
+	left: 0;
+}
+
+.swiper-slide.is-slider-main {
+  height: -webkit-max-content!important;
+  height: -moz-max-content!important;
+  height: max-content!important;
+  width: -webkit-max-content!important;
+  width: -moz-max-content!important;
+  width: max-content!important;
+  overflow: visible !important;
+}
+
+.swiper.is-slider-main {
+  width: 100%;
+  max-width: 100%;
+  max-height: 100vh;
+  min-height: 0;
+  min-width: 0;
+}

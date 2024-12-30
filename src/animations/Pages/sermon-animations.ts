@@ -1,6 +1,7 @@
 import 'lettering.js';
 import 'textillate';
 import 'textillate/assets/animate.css';
+import 'swiper/css/bundle';
 
 import type { ITransitionData } from '@barba/core/dist/core/src/src/defs';
 import { gsap } from 'gsap/all';
@@ -11,8 +12,18 @@ import type { IMouseEventAnimations } from 'src/interfaces/IMouseEventAnimations
 import type { IPageAnimations } from 'src/interfaces/IPageAnimations';
 import { PageElements } from 'src/interfaces/IPageAnimations';
 import { GlobalPageAnimations } from 'src/interfaces/IPageAnimations';
+import Swiper from 'swiper/bundle';
+import {
+  Autoplay,
+  FreeMode,
+  Keyboard,
+  Manipulation,
+  Mousewheel,
+  Navigation,
+  Pagination,
+} from 'swiper/modules';
 
-import { PortablePlayer } from '../UI/Widgets/portable-player';
+// import { PortablePlayer } from '../UI/Widgets/portable-player';
 
 export class SermonPageAnimations
   implements IPageAnimations, IMouseEventAnimations, IGsapPageAnimations
@@ -26,11 +37,12 @@ export class SermonPageAnimations
     '.sermon-heading',
     '.sermon-title-block',
     '.filler',
+    '.slider-video_component',
   ] as const;
 
   private _scrollTL: gsap.core.Tween;
 
-  private _playerWidget: PortablePlayer;
+  // private _playerWidget: PortablePlayer;
 
   gsapAnimations: GsapAnimations;
 
@@ -53,7 +65,59 @@ export class SermonPageAnimations
       onMouseEnterHandler.handler(this);
       onMouseLeaveHandler.handler(this);
       this.animateHeading();
-      this.animateItemSection();
+      //this.animateItemSection();
+      this.initializeSwiper();
+    });
+  };
+
+  private initializeSwiper = () => {
+    this.pageElements.el.itemSection.each((_, slider) => {
+      new Swiper($(slider).find('.swiper')[0], {
+        slidesPerView: 4,
+        modules: [Navigation, Pagination, Mousewheel, Keyboard, Autoplay, FreeMode, Manipulation],
+        direction: 'horizontal',
+        breakpoints: {
+          480: {
+            slidesPerView: 1,
+          },
+          768: {
+            slidesPerView: 2,
+          },
+          992: {
+            slidesPerView: 4,
+          },
+        },
+        spaceBetween: '20px',
+        resistanceRatio: 0,
+        loop: true,
+        autoplay: true,
+        speed: 3000,
+        keyboard: true,
+        mousewheel: {
+          forceToAxis: true,
+        },
+        freeMode: true,
+        slideToClickedSlide: true,
+        followFinger: false,
+        pagination: {
+          el: $(slider).find('.swiper-bullet-wrapper')[0],
+          bulletActiveClass: 'is-active',
+          bulletClass: 'swiper-bullet',
+          bulletElement: 'button',
+          clickable: true,
+        },
+        navigation: {
+          nextEl: $(slider).parent().find('.is-right')[0],
+          prevEl: $(slider).parent().find('.is-left')[0],
+          disabledClass: 'is-disabled',
+        },
+        scrollbar: {
+          el: $(slider).find('.swiper-drag-wrapper')[0],
+          draggable: true,
+          dragClass: 'swiper-drag',
+          snapOnRelease: true,
+        },
+      });
     });
   };
 
@@ -89,8 +153,6 @@ export class SermonPageAnimations
           callback: function () {},
         },
         callback: async function () {
-          //sermonBlock = $('.sermon-title-block');
-
           const tween = await gsap.to(sermonHeading, { opacity: 0, duration: 1 });
 
           const secondTween = gsap.set(sermonTitleBlock, {
@@ -115,12 +177,6 @@ export class SermonPageAnimations
     });
   };
 
-  afterLeave?: (data: ITransitionData) => Promise<void>;
-
-  beforeEnter?: (data: ITransitionData) => Promise<void>;
-
-  beforeLeave?: (data: ITransitionData) => Promise<void>;
-
   pageElements: PageElements<typeof this.EL>;
 
   initializeBaseState = () => {
@@ -132,16 +188,19 @@ export class SermonPageAnimations
     this.namespace = 'sermons';
     this.pageElements = new PageElements(this.EL);
     this.gsapAnimations = new GsapAnimations();
-    this._playerWidget = new PortablePlayer();
+    // this._playerWidget = new PortablePlayer();
   };
 
   onMouseEnterHandler = {
     handler(self: SermonPageAnimations) {
       const { itemSection, sectionGlow } = self.pageElements.el;
 
-      itemSection.on('mouseenter', () => {
-        if (sectionGlow !== undefined)
-          self.gsapAnimations.newItem(gsap.set(sectionGlow, { display: 'block' }));
+      itemSection.each((_, item) => {
+        $(item).on('mouseenter', () => {
+          if (sectionGlow !== undefined)
+            self.gsapAnimations.newItem(gsap.set(sectionGlow, { display: 'block' }));
+          self.supportAnimations.cursorAnimations.cursorWhite();
+        });
       });
     },
     dispose(self: SermonPageAnimations) {
@@ -149,11 +208,11 @@ export class SermonPageAnimations
     },
   };
 
-  animateItemSection = () => {
-    this.pageElements.el.filler.each((index, item) => {
-      console.log(index, item);
-    });
-  };
+  //animateItemSection = () => {
+  //  this.pageElements.el.filler.each((index, item) => {
+  //    console.log(index, item);
+  //  });
+  //};
 
   onMouseLeaveHandler = {
     handler(self: SermonPageAnimations) {
@@ -162,6 +221,7 @@ export class SermonPageAnimations
       itemSection.on('mouseleave', () => {
         if (sectionGlow !== undefined)
           self.gsapAnimations.newItem(gsap.set(sectionGlow, { display: 'none' }));
+        self.supportAnimations.cursorAnimations.cursorBlue();
       });
     },
     dispose(self: SermonPageAnimations) {

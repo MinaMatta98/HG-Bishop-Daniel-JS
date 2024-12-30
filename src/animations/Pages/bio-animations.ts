@@ -1,6 +1,7 @@
 import type { ITransitionData } from '@barba/core/dist/core/src/src/defs';
 import { gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
+import * as Rx from 'rxjs';
 import SplitType from 'split-type';
 import type { ICssAnimations } from 'src/interfaces/ICssAnimations';
 import type { IGsapPageAnimations } from 'src/interfaces/IGsapPageAnimations';
@@ -29,14 +30,18 @@ export class BioAnimations
 
   supportAnimations = GlobalPageAnimations;
 
+  resizeObserverSubscriptions: Rx.Subscription[] = [];
+
   namespace: string = 'bio';
 
   onResizeHandler = {
     handler(self: BioAnimations) {
-      $(window).on('resize', () => {
+      const rx = Rx.fromEvent(window, 'resize').pipe(Rx.debounceTime(1000));
+      const sub = rx.subscribe(() => {
         if (self._splitType) this._splitType.revert();
         self.onScrollEventHandler.handler(self);
       });
+      self.resizeObserverSubscriptions.push(sub);
     },
     dispose() {
       $(window).off('resize');
@@ -60,7 +65,7 @@ export class BioAnimations
   onScrollEventHandler = {
     handler: (self: BioAnimations) => {
       const animateTimeline = () => {
-        const timelineItems: JQuery<HTMLElement> = self.pageElements.el.timeline_item;
+        const timelineItems: JQuery<HTMLElement> = self.pageElements.el.timelineItem;
 
         timelineItems.each((index, item) => {
           const tween = gsap.from(item, {

@@ -4,10 +4,11 @@ import 'swiper/css/effect-cards';
 import '../../public/animations.css';
 
 import type { ITransitionData } from '@barba/core/dist/core/src/src/defs';
+//import * as Spline from '@splinetool/runtime';
 import { getGPUTier, type TierResult } from 'detect-gpu';
 import { gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
-import { barbaInit } from 'src/barba';
+import * as Rx from 'rxjs';
 import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
 import type {
   IGsapComponentAnimations,
@@ -124,6 +125,8 @@ export class HomePageAnimations
 
   private _globeAnimation: GlobeAnimation | LeafletMapComponent;
 
+  //private _spline: Spline.Application;
+
   private _globeTL: GSAPTween;
 
   private _scheduleAnimator: ScheduleAnimations;
@@ -131,6 +134,8 @@ export class HomePageAnimations
   private _newsAnimator: NewsAnimations;
 
   private _openingHeroAnimator: OpeningHeroAnimations;
+
+  resizeObserverSubscriptions: Rx.Subscription[] = [];
 
   gsapAnimations: GsapAnimations;
 
@@ -143,8 +148,14 @@ export class HomePageAnimations
   namespace: string = 'home';
 
   disposePageAnimations = () => {
+    console.log('calling dispose');
     this._globeAnimation.disposePageAnimations();
     this.gsapAnimations.disposePageAnimations();
+    //if (this._spline !== undefined || this._spline !== null) {
+    //  this._spline.stop();
+    //  this._spline.dispose();
+    //}
+    //console.log('dispose complete', this._spline);
   };
 
   detectGPUSupported = async (): Promise<boolean> => {
@@ -165,7 +176,7 @@ export class HomePageAnimations
     });
 
     const contentSwiper = new Swiper(this.pageElements.el.swiperIsContent[0], {
-      speed: 0,
+      speed: 1000,
       loop: true,
       followFinger: true,
       effect: 'fade',
@@ -184,18 +195,23 @@ export class HomePageAnimations
     if (pageload.css('display') !== 'none') {
       const currentTime = new Date().getTime();
 
-      await (currentTime - initTime < 2000
-        ? barbaInit.sleep(2000 - (currentTime - initTime))
-        : Promise.resolve());
+      const obs = Rx.timer(2000 - (currentTime - initTime));
 
-      const tween = await gsap.to(pageload, {
-        display: 'none',
-        delay: currentTime - initTime < 2000 ? 2 - (currentTime - initTime) / 1000 : 0,
-      });
+      const removePageLoader = () => {
+        const tween = gsap.set(pageload, {
+          display: 'none',
+        });
 
-      this.gsapAnimations.newItem(tween);
+        this.gsapAnimations.newItem(tween);
 
-      pageload.remove();
+        pageload.remove();
+      };
+
+      currentTime - initTime < 2000
+        ? obs.subscribe((_) => {
+            removePageLoader();
+          })
+        : removePageLoader();
     }
   };
 
@@ -231,7 +247,9 @@ export class HomePageAnimations
 
   onResizeHandler = {
     handler: () => {
-      $(window).on('resize', () => {
+      const rx = Rx.fromEvent(window, 'resize').pipe(Rx.debounceTime(1000));
+
+      const sub = rx.subscribe(() => {
         this.gsapGlobeContainerExpand();
         const width = $(window).width();
 
@@ -245,33 +263,58 @@ export class HomePageAnimations
         if (this._globeAnimation instanceof GlobeAnimation)
           this._globeAnimation.animateGlobeBlock();
 
-        this.handleThreeObj();
+        //this.handleThreeObj();
       });
+      this.resizeObserverSubscriptions.push(sub);
     },
     dispose: () => {
       $(window).off('resize');
     },
   };
 
-  handleThreeObj = () => {
-    const splineDiv = $('.spline-div');
-
-    if (splineDiv.length === 0 && $(window).width() > 767) {
-      const newSplineDiv = $('.spline-div');
-      const spline = $('.spline-scene-2');
-      spline.attr('data-animation-type', 'spline');
-      spline.attr(
-        'data-spline-url',
-        'https://prod.spline.design/OeE9j5LdWpG4L3Ot/scene.splinecode'
-      );
-      spline.appendTo(newSplineDiv);
-      newSplineDiv.appendTo('.spline');
-    }
-
-    if (splineDiv.length > 0 && $(window).width() < 767) {
-      $('.spline-div').remove();
-    }
-  };
+  //handleThreeObj = () => {
+  //  $(() => {
+  //    console.log('handleThreeObj');
+  //
+  //    const splineDiv = $('.spline-div');
+  //    const windowWidth = $(window).width();
+  //
+  //    //if (this._spline) this._spline.dispose();
+  //    //
+  //    //if (splineDiv.length === 0 && windowWidth > 767) {
+  //    //  const newSplineDiv = $('<div>').addClass('spline-div');
+  //    //  newSplineDiv[0].style.width = '100vw !important';
+  //    //
+  //    //  const canvas = $('<canvas/>').addClass('canvas3d').appendTo(newSplineDiv);
+  //    //
+  //    //  this._spline = new Spline.Application(canvas[0] as HTMLCanvasElement, {
+  //    //    renderOnDemand: true,
+  //    //    renderMode: 'continuous',
+  //    //  });
+  //    //
+  //    //  this._spline.load('https://prod.spline.design/OeE9j5LdWpG4L3Ot/scene.splinecode');
+  //    //
+  //    //  this._spline.stop();
+  //
+  //      const splineWrapper = $('.spline');
+  //
+  //      if (splineWrapper.length > 0) {
+  //        //newSplineDiv[0].append(spline[0]);
+  //        splineWrapper[0].append(newSplineDiv[0]);
+  //        console.log('splineDiv added:', newSplineDiv);
+  //        console.log('splineWrapper:', splineWrapper);
+  //      } else {
+  //        console.warn('Spline wrapper not found.');
+  //      }
+  //    }
+  //
+  //    // Remove the splineDiv if it exists and the window width is less than 767
+  //    if (splineDiv.length > 0 && windowWidth < 767) {
+  //      splineDiv.remove();
+  //      console.log('splineDiv removed');
+  //    }
+  //  });
+  //};
 
   onMouseEnterHandler = {
     handler: (self: HomePageAnimations) => {
@@ -337,7 +380,6 @@ export class HomePageAnimations
     if (this._globeAnimation?.['off']) this._globeAnimation['off']();
 
     if (this._globeAnimation?.['destructor']) this._globeAnimation['destructor']();
-    console.log(this._gpuTier.tier);
 
     if ($(window).width() >= 480 && this._gpuTier.tier >= 2) {
       this._globeAnimation = new GlobeAnimation(true, this.gsapAnimations);
@@ -365,9 +407,9 @@ export class HomePageAnimations
       await this.partialInit();
 
       if (isFirstLoad) {
+        // moved outside to main load
         const pageLoadTween = gsap.set(this.pageElements.el.pageload, { display: 'flex' });
         this.gsapAnimations.newItem(pageLoadTween);
-        if ($(window).width() < 767) $('.spline-div').remove();
         $(window).scrollTop(0);
         isFirstLoad = false;
       }
@@ -397,8 +439,6 @@ export class HomePageAnimations
 
       this.supportAnimations.logoAnimations.logoAnimation();
 
-      this.supportAnimations.navBarAnimations.initNavLinks();
-
       this.onMouseEnterHandler.handler(this);
 
       this.onMouseLeaveHandler.handler(this);
@@ -418,6 +458,8 @@ export class HomePageAnimations
       this._openingHeroAnimator.animateProgressFade();
 
       await this.hidePageLoader(initTime);
+
+      //this.handleThreeObj();
 
       this.swiperAnimation();
 
@@ -475,7 +517,6 @@ class ScheduleAnimations implements IGsapComponentAnimations {
           end: 'bottom 50%',
           scrub: true,
           onEnter: () => {
-            console.log('onEnter');
             const childTween = gsap.set(children[index], { display: 'flex' });
             const childTweenSec = gsap.from(children[index], {
               opacity: 0,
@@ -487,11 +528,9 @@ class ScheduleAnimations implements IGsapComponentAnimations {
             this.gsapComponentAnimations.newItems([childTween, childTweenSec, , childTweenLast]);
           },
           onLeave: () => {
-            console.log('onLeave');
             this.gsapComponentAnimations.newItem(gsap.set(children[index], { display: 'none' }));
           },
           onEnterBack: () => {
-            console.log('onEnterBack');
             const childTween = gsap.set(children[index], {
               display: 'flex',
               flexDirection: index == 1 ? 'vertical' : null,
@@ -506,9 +545,7 @@ class ScheduleAnimations implements IGsapComponentAnimations {
             const childTweenLast = gsap.set(neighbours, { display: 'none' });
             this.gsapComponentAnimations.newItems([childTween, childTweenSec, childTweenLast]);
           },
-          onLeaveBack: () => {
-            console.log('onLeaveBack');
-          },
+          onLeaveBack: () => {},
         },
         marginBottom: '20em',
       });

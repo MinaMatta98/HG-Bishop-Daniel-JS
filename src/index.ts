@@ -2,14 +2,12 @@ import $ from 'jquery';
 
 import { barbaInit } from './barba';
 
-const containerSelector = '.main-wrapper';
-
 export const DOMAIN = window.location.origin;
 
 const observer = new MutationObserver((mutationsList, observer) => {
   for (const mutation of mutationsList) {
     if (mutation.type === 'childList') {
-      if ($(containerSelector).length) {
+      if ($('.main-wrapper').length) {
         const barba = new barbaInit();
         barba.init();
         observer.disconnect();

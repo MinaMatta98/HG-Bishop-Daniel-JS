@@ -1,4 +1,5 @@
 import gsap from 'gsap';
+import * as Rx from 'rxjs';
 
 export class CursorAnimations {
   private static _pins: string[] = ['.cursor-pin-1', '.cursor-pin-1.pin-2', '.cursor-pin-1.pin-3'];
@@ -25,7 +26,10 @@ export class CursorAnimations {
 
   public static onResizeHandler = () => {
     $(window).width() < 768 ? this.hideCursor() : this.showCursor();
-    $(window).on('resize', () => {
+
+    const rx = Rx.fromEvent(window, 'resize').pipe(Rx.debounceTime(300));
+
+    rx.subscribe(() => {
       $(window).width() < 768 ? this.hideCursor() : this.showCursor();
     });
   };

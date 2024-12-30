@@ -7,6 +7,7 @@ import '../Components/timeline/timeline.min.js';
 import type { ITransitionData } from '@barba/core/dist/core/src/src/defs';
 import { Flip, gsap, ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
+import * as Rx from 'rxjs';
 import type { ICarouselAnimations } from 'src/interfaces/ICarouselAnimations';
 import type { ICMSPageAnimations } from 'src/interfaces/ICMSPageAnimations';
 import { GenericCMSPageAnimations } from 'src/interfaces/ICMSPageAnimations';
@@ -47,6 +48,8 @@ export class ChurchContentAnimations
 
   private _targetState: string;
 
+  resizeObserverSubscriptions: Rx.Subscription[] = [];
+
   private _priestCarousel: PriestCarousel;
 
   private _map: LeafletMapComponent;
@@ -66,9 +69,11 @@ export class ChurchContentAnimations
 
   onResizeHandler = {
     handler: (self: ChurchContentAnimations) => {
-      $(window).on('resize', () => {
+      const rx = Rx.fromEvent(window, 'resize').pipe(Rx.debounceTime(1000));
+      const sub = rx.subscribe(() => {
         if (self._map) self._map.onResizeHandler.handler(self._map);
       });
+      this.resizeObserverSubscriptions.push(sub);
     },
     dispose: () => {
       $(window).off('resize');
@@ -289,7 +294,7 @@ export class ChurchContentAnimations
         });
       };
 
-      self.pageElements.el.timeline__content.on('mouseover', () =>
+      self.pageElements.el.timelineContent.on('mouseover', () =>
         self.supportAnimations.cursorAnimations.cursorWhite()
       );
 
@@ -304,14 +309,14 @@ export class ChurchContentAnimations
       children.each((_, e) => {
         $(e).off('mouseover');
       });
-      self.pageElements.el.timeline__content.off('mouseover');
+      self.pageElements.el.timelineContent.off('mouseover');
       self.pageElements.el.findUs.off('mouseover');
     },
   };
 
   onMouseLeaveHandler = {
     handler(self: ChurchContentAnimations) {
-      self.pageElements.el.timeline__content.on('mouseleave', () =>
+      self.pageElements.el.timelineContent.on('mouseleave', () =>
         self.supportAnimations.cursorAnimations.cursorBlue()
       );
 
@@ -320,7 +325,7 @@ export class ChurchContentAnimations
       );
     },
     dispose(self: ChurchContentAnimations) {
-      self.pageElements.el.timeline__content.on('mouseleave', () =>
+      self.pageElements.el.timelineContent.on('mouseleave', () =>
         self.supportAnimations.cursorAnimations.cursorBlue()
       );
 

@@ -39,5 +39,5 @@
 		"noImplicitAny": false
 	},
 	"include": ["src/**/*", "bin/inject.js"],
-    	"types": ["@finsweet/ts-utils"]
+    	"types": ["@finsweet/ts-utils", "@types/pdftron__pdfjs-express"]
 }

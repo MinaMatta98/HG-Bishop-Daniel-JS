@@ -1,6 +1,7 @@
 import type { ISchemaPage } from '@barba/core/dist/core/src/src/defs';
 import { gsap } from 'gsap/all';
 import $ from 'jquery';
+import * as Rx from 'rxjs';
 
 export class NavBarAnimations {
   private _links: JQuery<HTMLElement>;
@@ -33,6 +34,10 @@ export class NavBarAnimations {
           gsap.fromTo(image, { opacity: 0 }, { display: 'block', opacity: 1, duration: 0.5 })
         );
         $(e).on('mouseleave', () => gsap.to(image, { display: 'none', opacity: 0, duration: 0.5 }));
+        const rx = Rx.fromEvent(e, 'mouseleave').pipe(Rx.debounceTime(1000));
+        rx.subscribe(() => {
+          this.underlineNav($('.main-wrapper').attr('data-barba-namespace'), true);
+        });
       });
     });
   };
@@ -44,7 +49,8 @@ export class NavBarAnimations {
   };
 
   onResizeHandler = () => {
-    $(window).on('resize', () => {
+    const rx = Rx.fromEvent($(window), 'resize').pipe(Rx.debounceTime(500));
+    rx.subscribe(() => {
       const obj = {
         width: '100%',
         display: $(window).width() > 991 ? 'flex' : undefined,

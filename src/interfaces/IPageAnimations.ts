@@ -71,8 +71,6 @@ export class GenericAnimations implements IGenericAnimations {
 
     this.globalPageAnimations.logoAnimations.disposePageAnimations();
 
-    $(window).scrollTop(0);
-
     await this.globalPageAnimations.transitionAnimations.handleTransitionAnimation(true);
   };
 
@@ -104,6 +102,10 @@ export class GenericAnimations implements IGenericAnimations {
         obj.mouseEventTransClass.onScrollEventHandler?.dispose(obj.mouseEventTransClass);
       }
     }
+
+    $(window).scrollTop(0);
+
+    obj.resizeTransClass?.resizeObserverSubscriptions.forEach((sub) => sub.unsubscribe());
 
     obj.resizeTransClass?.onResizeHandler?.dispose(obj.resizeTransClass);
 
@@ -199,7 +201,9 @@ export type CamelCase<S extends string> = S extends `#${infer R}`
       ? `${P}${Capitalize<CamelCase<R>>}`
       : S extends `${infer P}-${infer R}`
         ? `${P}${Capitalize<CamelCase<R>>}`
-        : S;
+        : S extends `${infer P}_${infer R}`
+          ? `${P}${Capitalize<CamelCase<R>>}`
+          : S;
 
 // Define the properties type based on the keys
 export type ElementObjectProperties<T extends readonly string[]> = {
@@ -259,7 +263,7 @@ export class PageElements<T extends readonly string[]> {
     const cleanKey = hasLeadingDot || hasLeadingHash ? key.slice(1) : key;
 
     const camelCasedKey = cleanKey
-      .split(/[-.#]/)
+      .split(/[-.#_]/)
       .map((word, index) => (index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)))
       .join('');
 

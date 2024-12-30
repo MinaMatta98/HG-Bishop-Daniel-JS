@@ -3,6 +3,7 @@ import 'leaflet/dist/leaflet.css';
 import gsap from 'gsap/all';
 import LeaderLine from 'leader-line-new';
 import leaflet from 'leaflet';
+import * as Rx from 'rxjs';
 import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
 import type { GsapAnimations, IGsapComponentAnimations } from 'src/interfaces/IGsapPageAnimations';
 import { GsapComponentAnimations } from 'src/interfaces/IGsapPageAnimations';
@@ -236,7 +237,8 @@ export class LeafletMapComponent
 
   onResizeHandler = {
     handler(self: LeafletMapComponent) {
-      $(window).on('resize', () => {
+      const rx = Rx.fromEvent(window, 'resize').pipe(Rx.debounceTime(300));
+      rx.subscribe(() => {
         try {
           if (self._leaderLines) for (const line of self._leaderLines) line?.position?.();
           self._map.invalidateSize();

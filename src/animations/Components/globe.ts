@@ -1,6 +1,7 @@
 import Globe, { type GlobeInstance } from 'globe.gl';
 import gsap, { ScrollTrigger } from 'gsap/all';
 import $ from 'jquery';
+import * as Rx from 'rxjs';
 import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
 import type { GsapAnimations, IGsapComponentAnimations } from 'src/interfaces/IGsapPageAnimations';
 import { GsapComponentAnimations } from 'src/interfaces/IGsapPageAnimations';
@@ -385,7 +386,8 @@ export class GlobeAnimation
 
   onResizeHandler = {
     handler(self: GlobeAnimation, c: GlobeInstance) {
-      $(window).on('resize', () => {
+      const rx = Rx.fromEvent($(window), 'resize').pipe(Rx.debounceTime(500));
+      rx.subscribe(() => {
         const renderer = c.renderer();
         const setSize = self.setSize();
         renderer.setSize(setSize * self._RATIO, setSize * self._RATIO);

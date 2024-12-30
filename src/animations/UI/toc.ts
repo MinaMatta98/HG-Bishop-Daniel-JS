@@ -1,5 +1,6 @@
 import { gsap } from 'gsap/all';
 import $ from 'jquery';
+import * as Rx from 'rxjs';
 import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
 import type { IGsapComponentAnimations } from 'src/interfaces/IGsapPageAnimations';
 import { GsapAnimations } from 'src/interfaces/IGsapPageAnimations';
@@ -69,7 +70,9 @@ export class TOCAnimations
     handler: () => {
       const self = GlobalPageAnimations.tocAnimations;
 
-      $(window).on('resize', () => {
+      const rx = Rx.fromEvent($(window), 'resize').pipe(Rx.debounceTime(300));
+
+      rx.subscribe(() => {
         self.disposePageAnimations();
         this.animateComponent();
       });

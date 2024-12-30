@@ -1,6 +1,7 @@
 import 'leaflet/dist/leaflet.css';
 
 import $ from 'jquery';
+import * as Rx from 'rxjs';
 import type { ICMSPageAnimations } from 'src/interfaces/ICMSPageAnimations';
 import { GenericCMSPageAnimations } from 'src/interfaces/ICMSPageAnimations';
 import { GenericCollectionAnimations } from 'src/interfaces/ICollectionAnimations';
@@ -26,6 +27,8 @@ export class ChurchAnimations
   EL = ['.item', '.filler', '.item-grid', '#map', '.map-pin'] as const;
 
   genericCMSAnimations = new GenericCMSPageAnimations();
+
+  resizeObserverSubscriptions: Rx.Subscription[] = [];
 
   mapPinCoordinates<K extends keyof ElementObjectProperties<typeof this.pageElements.keys>>(
     key: K
