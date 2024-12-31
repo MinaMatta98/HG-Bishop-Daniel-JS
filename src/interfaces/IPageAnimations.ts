@@ -29,7 +29,7 @@ export class GenericAnimations implements IGenericAnimations {
   }
 
   private handleLinks = () => {
-    const links = $('a[href]');
+    const links: JQuery<HTMLAnchorElement> = $('a[href]');
     const cbk = (e: JQuery.ClickEvent<HTMLElement>) => {
       const target = e.currentTarget as HTMLAnchorElement;
 
@@ -38,10 +38,12 @@ export class GenericAnimations implements IGenericAnimations {
         e.stopPropagation();
       }
 
-      links.each((_, link) => {
-        $(link).on('click', cbk);
-      });
+      $(window).scrollTop(0);
     };
+
+    links.each((_, link) => {
+      $(link).on('click', cbk);
+    });
   };
 
   enter = async <C extends ICssAnimations, M extends ICMSPageAnimations>(obj: {
@@ -105,7 +107,8 @@ export class GenericAnimations implements IGenericAnimations {
 
     $(window).scrollTop(0);
 
-    obj.resizeTransClass?.resizeObserverSubscriptions.forEach((sub) => sub.unsubscribe());
+    if (obj.resizeTransClass) console.log(obj.resizeTransClass)
+    obj.resizeTransClass?.resizeObserverSubscriptions?.forEach((sub) => sub.unsubscribe());
 
     obj.resizeTransClass?.onResizeHandler?.dispose(obj.resizeTransClass);
 
@@ -120,6 +123,8 @@ export class GenericAnimations implements IGenericAnimations {
     data: ITransitionData;
     collectionTransClass?: CL;
   }) => {
+    this.handleLinks();
+
     this.globalPageAnimations.tocAnimations.animateComponent();
 
     await obj.collectionTransClass?.animateFillers();

@@ -201,12 +201,14 @@ input[type="password"],
 }
 
 .swiper-slide.is-slider-main {
-  height: -webkit-max-content!important;
-  height: -moz-max-content!important;
-  height: max-content!important;
-  width: -webkit-max-content!important;
-  width: -moz-max-content!important;
-  width: max-content!important;
+  /*height: -webkit-max-content!important;*/
+  /*height: -moz-max-content!important;*/
+  /*height: max-content!important;*/
+  /*width: -webkit-max-content!important;*/
+  /*width: -moz-max-content!important;*/
+  /*width: max-content!important;*/
+  height: inherit !important;
+  max-height: inherit !important;
   overflow: visible !important;
 }
 

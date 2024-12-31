@@ -16,6 +16,8 @@ export class TOCAnimations
     IDisposableAnimations,
     IResizePageAnimations
 {
+  resizeObserverSubscriptions: Rx.Subscription[] = [];
+
   public EL = ['.sections-toc', '.section-holder'] as const;
 
   public _tocButton: TOCButton;
@@ -45,7 +47,10 @@ export class TOCAnimations
     sectionIcon: JQuery<HTMLElement>;
     sectionHeading: JQuery<HTMLElement>;
   } => {
-    const sectionName = $(element).attr('data-section-descriptor');
+    let sectionName = $(element).attr('data-section-descriptor');
+
+    sectionName = sectionName[0].toUpperCase() + sectionName.slice(1);
+
     // Create individual elements
     const sectionWrapper = $('<div></div>').addClass('toc-section-wrapper');
     const sectionIcon = $('<div></div>').addClass('current-section-icon');
@@ -76,8 +81,11 @@ export class TOCAnimations
         self.disposePageAnimations();
         this.animateComponent();
       });
+
+      this.resizeObserverSubscriptions.push(rx.subscribe());
     },
     dispose: () => {
+      this.resizeObserverSubscriptions.forEach((sub) => sub.unsubscribe());
       $(window).off('resize');
     },
   };
@@ -143,55 +151,57 @@ export class TOCAnimations
 
       const sectionWrappers = this._sectionWrappers;
 
-      _sections.forEach(([element, parentNum]) => {
-        const { textWrapper, sectionWrapper } = this.setupInnerElements(
-          tocSectionHolder,
-          $(element)
-        );
+      _sections
+        .filter(([section, _], __) => $(section).css('display') !== 'none')
+        .forEach(([element, parentNum]) => {
+          const { textWrapper, sectionWrapper } = this.setupInnerElements(
+            tocSectionHolder,
+            $(element)
+          );
 
-        // Check if window is within section
-        if (
-          window.scrollY >= $(element).offset().top &&
-          window.scrollY <= $(element).offset().top + $(element).height()
-        ) {
-          sectionWrapper[0].className = 'toc-section-wrapper current';
-        }
+          // Check if window is within section
+          if (
+            window.scrollY >= $(element).offset().top &&
+            window.scrollY <= $(element).offset().top + $(element).height()
+          ) {
+            sectionWrapper[0].className = 'toc-section-wrapper current';
+          }
 
-        gsap.set(textWrapper, { marginLeft: `${parentNum * 1}em` });
+          gsap.set(textWrapper, { marginLeft: `${parentNum * 1}em` });
 
-        sectionWrappers.push(sectionWrapper[0]);
+          sectionWrappers.push(sectionWrapper[0]);
 
-        onMouseClickHandler.handler(this, sectionWrapper, $(element));
+          onMouseClickHandler.handler(this, sectionWrapper, $(element));
 
-        const tween = gsap.to(sectionWrapper, {
-          scrollTrigger: {
-            trigger: element,
-            start: 'top 50%',
-            end: 'bottom 50%',
-            scrub: true,
-            onToggle() {
-              $(sectionWrappers)
-                .filter((i, e) => {
-                  return parentNum !== _sections[i][1] || e !== sectionWrapper[0];
-                })
-                .each((_, e) => {
-                  e.className = 'toc-section-wrapper';
-                });
+          const tween = gsap.to(sectionWrapper, {
+            scrollTrigger: {
+              trigger: element,
+              start: 'top 50%',
+              end: 'bottom 50%',
+              scrub: true,
+              onToggle() {
+                $(sectionWrappers)
+                  .filter((i, e) => {
+                    return parentNum !== _sections[i][1] || e !== sectionWrapper[0];
+                  })
+                  .each((_, e) => {
+                    e.className = 'toc-section-wrapper';
+                  });
+              },
+              onRefresh() {
+                $(sectionWrappers)
+                  .filter((i, e) => {
+                    return parentNum !== _sections[i][1] || e !== sectionWrapper[0];
+                  })
+                  .each((_, e) => {
+                    e.className = 'toc-section-wrapper';
+                  });
+              },
             },
-            onRefresh() {
-              $(sectionWrappers)
-                .filter((i, e) => {
-                  return parentNum !== _sections[i][1] || e !== sectionWrapper[0];
-                })
-                .each((_, e) => {
-                  e.className = 'toc-section-wrapper';
-                });
-            },
-          },
-          className: 'toc-section-wrapper current',
+            className: 'toc-section-wrapper current',
+          });
+          this.gsapComponentAnimations.newItem(tween);
         });
-        this.gsapComponentAnimations.newItem(tween);
-      });
 
       const { tocButton } = this._tocButton.pageElements.el;
 

@@ -3,6 +3,7 @@ import gsap from 'gsap/all';
 import $ from 'jquery';
 import type { ICMSPageAnimations } from 'src/interfaces/ICMSPageAnimations';
 import { GenericCMSPageAnimations } from 'src/interfaces/ICMSPageAnimations';
+import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
 import type { IGsapPageAnimations } from 'src/interfaces/IGsapPageAnimations';
 import { GsapAnimations } from 'src/interfaces/IGsapPageAnimations';
 import type { IMouseEventAnimations } from 'src/interfaces/IMouseEventAnimations';
@@ -13,8 +14,12 @@ import Swiper from 'swiper/bundle';
 import { PDFViewer } from '../UI/Widgets/pdf';
 
 export class SermonContentAnimations
-  implements IMouseEventAnimations, IGsapPageAnimations, ICMSPageAnimations
+  implements IMouseEventAnimations, IGsapPageAnimations, ICMSPageAnimations, IDisposableAnimations
 {
+  disposePageAnimations = () => {
+    this._pdf?.disposePageAnimations();
+  };
+
   genericCMSAnimations = new GenericCMSPageAnimations();
 
   EL = ['.sermons-content-hero', '.sermons-items', '.item-section', '.section-glow'] as const;
@@ -68,20 +73,20 @@ export class SermonContentAnimations
     handler(self: SermonContentAnimations) {
       const { sectionGlow, itemSection } = self.pageElements.el;
 
-      itemSection.on('mouseleave', () => {
+      itemSection.on('mouseover', () => {
         if (sectionGlow !== undefined)
           self.gsapAnimations.newItem(gsap.set(sectionGlow, { display: 'none' }));
-        self.supportAnimations.cursorAnimations.cursorBlue();
+        self.supportAnimations.cursorAnimations.cursorWhite();
       });
     },
     dispose(self: SermonContentAnimations) {
-      self.pageElements.el.itemSection.off('mouseleave');
+      self.pageElements.el.itemSection.off('mouseover');
     },
   };
 
   private initializeSwiper = () => {
     this.pageElements.el.itemSection.each((_, slider) => {
-      new Swiper($(slider).find('.swiper')[0], {
+      const swiper = new Swiper($(slider).find('.swiper')[0], {
         slidesPerView: 4,
         direction: 'horizontal',
         breakpoints: {
@@ -126,6 +131,7 @@ export class SermonContentAnimations
           snapOnRelease: true,
         },
       });
+      swiper.updateSize();
     });
   };
 
