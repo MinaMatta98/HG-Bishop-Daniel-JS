@@ -78,15 +78,17 @@ export class SermonPageAnimations
         breakpoints: {
           480: {
             slidesPerView: 1,
+	    spaceBetween: '20px',
           },
           768: {
             slidesPerView: 2,
+	    spaceBetween: '20px',
           },
           992: {
             slidesPerView: 4,
+	    spaceBetween: '20px',
           },
         },
-        spaceBetween: '20px',
         resistanceRatio: 0,
         loop: true,
         autoplay: true,
