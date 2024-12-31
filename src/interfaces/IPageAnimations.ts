@@ -107,7 +107,6 @@ export class GenericAnimations implements IGenericAnimations {
 
     $(window).scrollTop(0);
 
-    if (obj.resizeTransClass) console.log(obj.resizeTransClass)
     obj.resizeTransClass?.resizeObserverSubscriptions?.forEach((sub) => sub.unsubscribe());
 
     obj.resizeTransClass?.onResizeHandler?.dispose(obj.resizeTransClass);
