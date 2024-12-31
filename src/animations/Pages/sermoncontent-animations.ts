@@ -87,7 +87,6 @@ export class SermonContentAnimations
   private initializeSwiper = () => {
     this.pageElements.el.itemSection.each((_, slider) => {
       const swiper = new Swiper($(slider).find('.swiper')[0], {
-        slidesPerView: 4,
         direction: 'horizontal',
         breakpoints: {
           480: {
@@ -131,7 +130,6 @@ export class SermonContentAnimations
           snapOnRelease: true,
         },
       });
-      swiper.updateSize();
     });
   };
 

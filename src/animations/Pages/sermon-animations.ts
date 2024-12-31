@@ -58,7 +58,7 @@ export class SermonPageAnimations
       );
       this.pageElements.el.sermonHeading.css('display', 'none');
       this.pageElements.el.sermonScene.css('opacity', '0');
-      this.onScrollEventHandler.handler(this);
+      if ($(window).width() > 768) this.onScrollEventHandler.handler(this);
       await this.supportAnimations.logoAnimations.animateLogo();
       const { onMouseEnterHandler, onMouseLeaveHandler, onMouseMoveHandler } = this;
       onMouseMoveHandler.handler(this);
@@ -73,7 +73,6 @@ export class SermonPageAnimations
   private initializeSwiper = () => {
     this.pageElements.el.itemSection.each((_, slider) => {
       new Swiper($(slider).find('.swiper')[0], {
-        slidesPerView: 4,
         modules: [Navigation, Pagination, Mousewheel, Keyboard, Autoplay, FreeMode, Manipulation],
         direction: 'horizontal',
         breakpoints: {

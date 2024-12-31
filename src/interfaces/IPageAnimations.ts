@@ -105,8 +105,6 @@ export class GenericAnimations implements IGenericAnimations {
       }
     }
 
-    $(window).scrollTop(0);
-
     obj.resizeTransClass?.resizeObserverSubscriptions?.forEach((sub) => sub.unsubscribe());
 
     obj.resizeTransClass?.onResizeHandler?.dispose(obj.resizeTransClass);
@@ -122,7 +120,7 @@ export class GenericAnimations implements IGenericAnimations {
     data: ITransitionData;
     collectionTransClass?: CL;
   }) => {
-    this.handleLinks();
+    $(window).scrollTop(0);
 
     this.globalPageAnimations.tocAnimations.animateComponent();
 
