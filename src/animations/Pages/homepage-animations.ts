@@ -219,7 +219,12 @@ export class HomePageAnimations
     if (this._globeTL) {
       this.gsapAnimations.clearAnimation(this._globeTL);
       this.gsapAnimations.newItem(
-        gsap.set(this.pageElements.el.globeContainer, { maxWidth: '100vw', borderRadius: '0' })
+        gsap.set(this.pageElements.el.globeContainer, {
+          maxWidth: '100vw',
+          borderRadius: '0',
+          paddingLeft: 0,
+          paddingRight: 0,
+        })
       );
     }
 

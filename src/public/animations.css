@@ -219,3 +219,6 @@ input[type="password"],
   min-height: 0;
   min-width: 0;
 }
+.arrows.sermons.cta {
+	overflow: visible !important;
+}
