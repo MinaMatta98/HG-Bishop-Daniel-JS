@@ -47,10 +47,11 @@ export class PDFViewer
       //    <embed ng-src="{{srcUrlTrusted}}" width="100%" height="800"> </embed>
       //</object>
 
-
       const obj = $('<object/>').attr('data', this._src)[0];
 
       $('<embed/>').attr('ng-src', this._src).appendTo(obj);
+
+      this.pageElements.el.pdf.append(obj);
 
       this._pdfElement = obj;
 
