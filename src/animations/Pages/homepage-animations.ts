@@ -411,6 +411,7 @@ export class HomePageAnimations
         },
         this.gsapAnimations
       );
+      this.gsapGlobeContainerExpand();
     }
   };
 
