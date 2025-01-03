@@ -251,6 +251,7 @@ export class HomePageAnimations
 
       const sub = rx.subscribe(() => {
         this.gsapGlobeContainerExpand();
+
         const width = $(window).width();
 
         if (
@@ -397,6 +398,8 @@ export class HomePageAnimations
       this._globeAnimation = new GlobeAnimation(true, this.gsapAnimations);
       this.initGlobe();
     } else {
+      this.gsapGlobeContainerExpand();
+
       this._globeAnimation = new LeafletMapComponent(
         this.pageElements.el.webGL,
         () => '#ffffff50',
@@ -411,7 +414,6 @@ export class HomePageAnimations
         },
         this.gsapAnimations
       );
-      this.gsapGlobeContainerExpand();
     }
   };
 
