@@ -43,7 +43,9 @@ export class PDFViewer
         //width: this.pageElements.el.pdf.width().toString(),
       });
     } else {
-      this._pdfElement = $('<iframe>').attr('src', this._src).appendTo(this.pageElements.el.pdf)[0];
+      this._pdfElement = $('<iframe>')
+        .attr('src', `http://docs.google.com/gview?url=${this._src}`)
+        .appendTo(this.pageElements.el.pdf)[0];
     }
 
     this.onMouseEnterHandler.handler(this);
