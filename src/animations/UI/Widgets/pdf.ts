@@ -43,9 +43,20 @@ export class PDFViewer
         //width: this.pageElements.el.pdf.width().toString(),
       });
     } else {
-      this._pdfElement = $('<iframe>')
-        .attr('src', `https://docs.google.com/gview?embedded=true&url=${this._src}`)
-        .appendTo(this.pageElements.el.pdf)[0];
+      //<object data="{{srcUrlTrusted}}" width="100%" height="800">
+      //    <embed ng-src="{{srcUrlTrusted}}" width="100%" height="800"> </embed>
+      //</object>
+
+
+      const obj = $('<object/>').attr('data', this._src)[0];
+
+      $('<embed/>').attr('ng-src', this._src).appendTo(obj);
+
+      this._pdfElement = obj;
+
+      //this._pdfElement = $('<iframe>')
+      //  .attr('src', `https://docs.google.com/gview?embedded=true&url=${this._src}`)
+      //  .appendTo(this.pageElements.el.pdf)[0];
     }
 
     this.onMouseEnterHandler.handler(this);
