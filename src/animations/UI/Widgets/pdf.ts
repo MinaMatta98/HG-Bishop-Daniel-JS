@@ -1,5 +1,3 @@
-//import { WebViewer } from '@pdftron/pdfjs-express-viewer';
-//import { DOMAIN } from 'src';
 import PDFObject from 'pdfobject';
 import * as Rx from 'rxjs';
 import type { IDisposableAnimations } from 'src/interfaces/IDisposableAnimations';
@@ -10,7 +8,6 @@ import {
 } from 'src/interfaces/IGsapPageAnimations';
 import type { IMouseEventAnimations } from 'src/interfaces/IMouseEventAnimations';
 import { GlobalPageAnimations, PageElements } from 'src/interfaces/IPageAnimations';
-// import { APIQuery } from 'src/utils/query';
 
 // This is a public key that is fine to share, as it allows for readonly query of database data, which is intended for public exposure.
 // The key DOES NOT allow for CMS (database) modification
@@ -36,15 +33,21 @@ export class PDFViewer
   };
 
   animateComponent = () => {
-    this._pdfElement = PDFObject.embed(this._src, this.pageElements.el.pdf, {
-      pdfOpenParams: {
-        title: this._name,
-      },
-      forcePDFJS: true,
-      height: this.pageElements.el.pdf.height().toString(),
-      //width: this.pageElements.el.pdf.width().toString(),
-    });
+    if (PDFObject.supportsPDFs) {
+      this._pdfElement = PDFObject.embed(this._src, this.pageElements.el.pdf, {
+        pdfOpenParams: {
+          title: this._name,
+        },
+        forcePDFJS: true,
+        height: this.pageElements.el.pdf.height().toString(),
+        //width: this.pageElements.el.pdf.width().toString(),
+      });
+    } else {
+      this._pdfElement = $('<iframe>').attr('src', this._src).appendTo(this.pageElements.el.pdf)[0];
+    }
+
     this.onMouseEnterHandler.handler(this);
+
     this.onMouseLeaveHandler.handler(this);
   };
 
