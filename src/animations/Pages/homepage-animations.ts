@@ -195,7 +195,7 @@ export class HomePageAnimations
     if (pageload.css('display') !== 'none') {
       const currentTime = new Date().getTime();
 
-      const obs = Rx.timer(2000 - (currentTime - initTime));
+      const obs = Rx.timer(2500 - (currentTime - initTime));
 
       const removePageLoader = () => {
         const tween = gsap.set(pageload, {
@@ -207,7 +207,7 @@ export class HomePageAnimations
         pageload.remove();
       };
 
-      currentTime - initTime < 2000
+      currentTime - initTime < 2500
         ? obs.subscribe((_) => {
             removePageLoader();
           })
@@ -373,7 +373,7 @@ export class HomePageAnimations
 
   private dynamicPageAssignment = () => {
     const zoom = () =>
-      Math.max(Math.min((this.pageElements.el.webGL.width() / 1360.0) * 5.0, 5.0), 3.4);
+      Math.max(Math.min((this.pageElements.el.webGL.width() / 1360.0) * 4.9, 4.9), 3.4);
 
     this.pageElements.el.webGL.empty();
 
