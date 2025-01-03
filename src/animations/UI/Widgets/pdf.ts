@@ -33,46 +33,47 @@ export class PDFViewer
   };
 
   animateComponent = () => {
-    //if (PDFObject.supportsPDFs) {
-    //  this._pdfElement = PDFObject.embed(this._src, this.pageElements.el.pdf, {
-    //    pdfOpenParams: {
-    //      title: this._name,
-    //    },
-    //    forcePDFJS: true,
-    //    height: this.pageElements.el.pdf.height().toString(),
-    //    //width: this.pageElements.el.pdf.width().toString(),
-    //  });
-    //} else {
-    //  //<object data="{{srcUrlTrusted}}" width="100%" height="800">
-    //  //    <embed ng-src="{{srcUrlTrusted}}" width="100%" height="800"> </embed>
-    //  //</object>
+    if (PDFObject.supportsPDFs) {
+      this._pdfElement = PDFObject.embed(this._src, this.pageElements.el.pdf, {
+        pdfOpenParams: {
+          title: this._name,
+        },
+        forcePDFJS: true,
+        height: this.pageElements.el.pdf.height().toString(),
+        //width: this.pageElements.el.pdf.width().toString(),
+      });
+    } else {
+      //  //<object data="{{srcUrlTrusted}}" width="100%" height="800">
+      //  //    <embed ng-src="{{srcUrlTrusted}}" width="100%" height="800"> </embed>
+      //  //</object>
 
-    //https://docs.google.com/gview?url=https://cdn.prod.website-files.com/667eb009aa9a4a63dba68808/6770f71f796275bf61da8758_6-%20Sermonby%20Hg%20Bishop%20Daniel%20%20about%20Commitment-%2020%20November%202023-PDF.pdf&embedded=true
-    const src = `https://docs.google.com/gview?url=${this._src}&embedded=true`;
+      const src = `https://docs.google.com/gview?url=${this._src}&embedded=true`;
 
-    const obj = $('<object/>')
-      .attr({
-        data: src,
-        type: 'application/pdf',
-        frameborder: '0',
-        width: '100%',
-      })
-      .css('width', '100%')[0];
+      const obj = $('<object/>')
+        .attr({
+          data: src,
+          type: 'application/pdf',
+          frameborder: '0',
+          width: '100%',
+        })
+        .css('width', '100%')[0];
 
-    $('<embed/>')
-      .attr({
-        src,
-      })
-      .appendTo(obj);
+      $('<embed/>')
+        .attr({
+          src,
+          width: '100%',
+          height: '100%',
+        })
+        .appendTo(obj);
 
-    this.pageElements.el.pdf.append(obj);
+      this.pageElements.el.pdf.append(obj);
 
-    this._pdfElement = obj;
+      this._pdfElement = obj;
 
-    //  //this._pdfElement = $('<iframe>')
-    //  //  .attr('src', `https://docs.google.com/gview?embedded=true&url=${this._src}`)
-    //  //  .appendTo(this.pageElements.el.pdf)[0];
-    //}
+      //  //this._pdfElement = $('<iframe>')
+      //  //  .attr('src', `https://docs.google.com/gview?embedded=true&url=${this._src}`)
+      //  //  .appendTo(this.pageElements.el.pdf)[0];
+    }
 
     this.onMouseEnterHandler.handler(this);
 
