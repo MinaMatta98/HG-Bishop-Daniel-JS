@@ -61,6 +61,7 @@ export class GlobeAnimation
       this._lightBG = lightBg;
     });
   }
+  resizeObserverSubscriptions: Rx.Subscription[] = [];
 
   supportingAnimations: typeof GlobalPageAnimations;
 
@@ -101,7 +102,7 @@ export class GlobeAnimation
   public disposePageAnimations = (clearAnimations = true) => {
     this.destructor();
     if (clearAnimations) this.gsapComponentAnimations.gsapPageAnimations.disposePageAnimations();
-    this.onResizeHandler.dispose();
+    this.onResizeHandler.dispose(this);
   };
 
   public destructor = () => {
@@ -394,8 +395,10 @@ export class GlobeAnimation
         c.width(setSize * self._RATIO);
         c.height(setSize * self._RATIO);
       });
+      self.resizeObserverSubscriptions.push(rx.subscribe());
     },
-    dispose() {
+    dispose(self: GlobeAnimation) {
+      self.resizeObserverSubscriptions.forEach((sub) => sub.unsubscribe());
       $(window).off('resize');
     },
   };

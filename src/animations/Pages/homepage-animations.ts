@@ -318,23 +318,35 @@ export class HomePageAnimations
 
   onMouseEnterHandler = {
     handler: (self: HomePageAnimations) => {
-      self.pageElements.el.stickyImageContainer.on('mouseenter', () =>
-        self.supportAnimations.cursorAnimations.cursorWhite()
-      );
+      const globeSub = Rx.fromEvent(self.pageElements.el.globeContainer, 'mouseenter')
+        .pipe(Rx.debounceTime(300))
+        .subscribe(() => self.supportAnimations.cursorAnimations.cursorWhite());
+
+      const stickySub = Rx.fromEvent(self.pageElements.el.stickyImageContainer, 'mouseenter')
+        .pipe(Rx.debounceTime(300))
+        .subscribe(() => self.supportAnimations.cursorAnimations.cursorWhite());
+
+      self.resizeObserverSubscriptions.push(globeSub, stickySub);
     },
     dispose: (self: HomePageAnimations) => {
-      self.pageElements.el.stickyImageContainer.off('mouseenter');
+      self.resizeObserverSubscriptions.forEach((sub) => sub.unsubscribe());
     },
   };
 
   onMouseLeaveHandler = {
     handler: (self: HomePageAnimations) => {
-      self.pageElements.el.stickyImageContainer.on('mouseenter', () =>
-        self.supportAnimations.cursorAnimations.cursorBlue()
-      );
+      const globeSub = Rx.fromEvent(self.pageElements.el.globeContainer, 'mouseleave')
+        .pipe(Rx.debounceTime(300))
+        .subscribe(() => self.supportAnimations.cursorAnimations.cursorBlue());
+
+      const stickySub = Rx.fromEvent(self.pageElements.el.stickyImageContainer, 'mouseleave')
+        .pipe(Rx.debounceTime(300))
+        .subscribe(() => self.supportAnimations.cursorAnimations.cursorBlue());
+
+      self.resizeObserverSubscriptions.push(globeSub, stickySub);
     },
     dispose: (self: HomePageAnimations) => {
-      self.pageElements.el.stickyImageContainer.off('mouseenter');
+      self.resizeObserverSubscriptions.forEach((sub) => sub.unsubscribe());
     },
   };
 
